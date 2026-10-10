@@ -52,3 +52,20 @@ const { title, description, date, updated, tags } = post.data;
     <CiteThis post={post} lang={lang} />
   </article>
 </Base>
+
+<script>
+  // Mark sideways-scrolling blocks with the side(s) that have more content.
+  const mark = (el: HTMLElement) => {
+    const rest = el.scrollWidth - el.clientWidth;
+    const left = el.scrollLeft > 1;
+    const right = el.scrollLeft < rest - 1;
+    const more = rest <= 1 ? '' : left && right ? 'both' : left ? 'left' : right ? 'right' : '';
+    if (more) el.dataset.more = more;
+    else delete el.dataset.more;
+  };
+  const resize = new ResizeObserver((entries) => entries.forEach((e) => mark(e.target as HTMLElement)));
+  for (const el of document.querySelectorAll<HTMLElement>('.prose mjx-container[display], .prose .table-wrap, .prose pre')) {
+    el.addEventListener('scroll', () => mark(el), { passive: true });
+    resize.observe(el);
+  }
+</script>

@@ -35,7 +35,6 @@
     "hast-util-to-html": "^9.0.5",
     "hast-util-to-text": "^4.0.2",
     "lxgw-wenkai-screen-webfont": "^1.7.0",
-    "mdast-util-to-string": "^4.0.0",
     "remark-directive": "^4.0.0",
     "remark-math": "^6.0.0",
     "sharp": "^0.35.5",

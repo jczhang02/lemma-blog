@@ -3,8 +3,9 @@
 Astro static site. Math is rendered at build time by MathJax 4 (SVG), so pages ship no math JS.
 
 ```sh
-pnpm dev      # http://localhost:4321
-pnpm build    # output in dist/
+bun install   # dependencies (bun.lock)
+bun run dev   # http://localhost:4321
+bun run build # output in dist/
 ```
 
 ## Writing
@@ -68,5 +69,5 @@ pnpm build    # output in dist/
   wrappers, localised footnote labels.
 - `plugins/media.mjs`: video embedding, serving in dev, copying into the build.
 - `src/styles/global.css`: all design tokens (colors, fonts) at the top.
-- `src/styles/mathjax.css`: generated; rerun `node scripts/gen-mathjax-css.mjs` after a MathJax upgrade.
+- `src/styles/mathjax.css`: generated; rerun `bun scripts/gen-mathjax-css.mjs` after a MathJax upgrade.
 - `src/i18n.ts`: site name and UI strings.

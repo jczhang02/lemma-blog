@@ -1,5 +1,5 @@
 // Regenerate src/styles/mathjax.css after upgrading MathJax:
-//   node scripts/gen-mathjax-css.mjs
+//   bun scripts/gen-mathjax-css.mjs
 import { writeFile } from 'node:fs/promises';
 import { mathjaxStylesheet } from '../plugins/rehype-mathjax4.mjs';
 

@@ -30,7 +30,8 @@ export default function remarkMedia({ posts }) {
             type: 'video',
             data: {
               hName: 'video',
-              hProperties: { src, controls: true, preload: 'metadata', playsInline: true, title: child.alt || undefined },
+              // "#t=0.001" makes browsers show the first frame instead of a blank box.
+              hProperties: { src: `${src}#t=0.001`, controls: true, preload: 'metadata', playsInline: true, title: child.alt || undefined },
               hChildren: [{ type: 'element', tagName: 'a', properties: { href: src }, children: [{ type: 'text', value: child.alt || src }] }],
             },
           };
