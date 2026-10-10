@@ -20,6 +20,7 @@ const MODULES = [
   './plugins/rehype-toc.mjs',
   './plugins/rehype-tables.mjs',
   './plugins/rehype-footnotes.mjs',
+  './plugins/media.mjs',
   './src/math-macros.mjs',
 ];
 const bibliography = new URL('./src/references.bib', import.meta.url);
@@ -29,15 +30,24 @@ const version = createHash('sha1')
   .update(LOCAL.map((f) => readFileSync(new URL(f, import.meta.url))).join(''))
   .digest('hex')
   .slice(0, 12);
-const [remarkTheorems, remarkCite, rehypeMathJax4, rehypeToc, rehypeTables, rehypeFootnotes, macros] = await Promise.all(
-  MODULES.map(async (f) => (await import(`${f}?v=${version}`)).default),
-);
+const [
+  { default: remarkTheorems },
+  { default: remarkCite },
+  { default: rehypeMathJax4 },
+  { default: rehypeToc },
+  { default: rehypeTables },
+  { default: rehypeFootnotes },
+  { default: remarkMedia, mediaIntegration },
+  { default: macros },
+] = await Promise.all(MODULES.map((f) => import(`${f}?v=${version}`)));
+const posts = new URL('./src/content/posts/', import.meta.url);
 
 export default defineConfig({
   // TODO: replace with your domain.
   site: 'https://example.com',
   integrations: [
     sitemap(),
+    mediaIntegration({ posts }),
     // Restart the dev server when a local plugin or the macros file changes.
     {
       name: 'watch-local-modules',
@@ -46,6 +56,8 @@ export default defineConfig({
       },
     },
   ],
+  // Markdown images get a srcset and are scaled down for small screens.
+  image: { layout: 'constrained' },
   i18n: {
     locales: ['zh', 'en'],
     defaultLocale: 'zh',
@@ -56,7 +68,7 @@ export default defineConfig({
     processor: unified({
       // Off: punctuation stays exactly as typed (no curly quotes, no -- to en dash).
       smartypants: false,
-      remarkPlugins: [remarkMath, remarkDirective, remarkTheorems, [remarkCite, { bibliography }]],
+      remarkPlugins: [remarkMath, remarkDirective, remarkTheorems, [remarkCite, { bibliography }], [remarkMedia, { posts }]],
       rehypePlugins: [[rehypeMathJax4, { macros, version }], rehypeToc, rehypeTables, rehypeFootnotes],
     }),
     shikiConfig: {

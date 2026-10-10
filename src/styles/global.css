@@ -500,11 +500,6 @@ main:focus {
   border-top: 1px solid var(--rule);
 }
 
-.prose img {
-  max-width: 100%;
-  height: auto;
-}
-
 /* Tables follow booktabs: a heavy top and bottom rule, a light rule under
    the header, no vertical rules, centred as with \centering. */
 .table-wrap {
@@ -604,6 +599,60 @@ main:focus {
 
 .qed-line .qed {
   float: none;
+}
+
+/* ---------- Figures, tables, video ---------- */
+
+.prose figure {
+  margin: 2em 0;
+}
+
+.figure-media {
+  text-align: center;
+}
+
+.prose img,
+.prose video {
+  max-width: 100%;
+  height: auto;
+}
+
+.prose video {
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+/* Captions: smaller, centred while short (as LaTeX does), with a bold label. */
+.prose figcaption {
+  max-width: 36em;
+  margin: 0.75em auto 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.prose figcaption strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Table captions sit above the table. */
+.float-table figcaption {
+  margin: 0 auto 0.75em;
+}
+
+.float-table .table-wrap {
+  margin: 0;
+}
+
+/* Line art on a transparent background: invert in dark mode (opt in with
+   :::figure{.invert-dark}); photos keep their colours. */
+[data-theme='dark'] .invert-dark img {
+  filter: invert(1) hue-rotate(180deg);
 }
 
 /* ---------- Footnotes ---------- */

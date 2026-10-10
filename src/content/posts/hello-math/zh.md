@@ -112,14 +112,30 @@ $$
 \Hom_{\mathsf{Set}}(X, Y) \cong \set{f : X \to Y}, \qquad \underbrace{1 + 1 + \cdots + 1}_{n} = n
 $$
 
-## 表格
+## 表格与图片
 
+表 \ref{tab:groups} 列出几个小群. 图 \ref{fig:hom} 是一个群同态的示意图, 图 \ref{fig:clip} 是一段视频.
+
+:::table{#tab:groups}
 | 群 $G$ | 阶 $\abs{G}$ | 是否交换 |
 |:--|--:|:-:|
 | $\Z/n\Z$ | $n$ | 是 |
 | $S_3$ | $6$ | 否 |
 | $Q_8$ | $8$ | 否 |
 | $A_5$ | $60$ | 否 |
+
+几个小群的阶与交换性.
+:::
+
+:::figure{#fig:hom .invert-dark}
+![群同态示意图](./homomorphism.png)
+
+群同态 $\varphi\colon G \to H$. 透明背景的黑线图在深色模式下自动反色.
+:::
+
+:::figure[一段测试视频 (3 秒).]{#fig:clip}
+![测试视频](./test-clip.mp4)
+:::
 
 ## 代码
 

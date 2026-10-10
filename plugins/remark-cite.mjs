@@ -49,7 +49,7 @@ function restoreMath(tree, math) {
 /** @param {{ bibliography: URL }} options */
 export default function remarkCite({ bibliography }) {
   return (tree, file) => {
-    const lang = /[/\\]posts[/\\]en[/\\]/.test(file.path ?? '') ? 'en' : 'zh';
+    const lang = /[/\\]en\.md$/.test(file.path ?? '') ? 'en' : 'zh';
     const order = [];
     let lib;
 

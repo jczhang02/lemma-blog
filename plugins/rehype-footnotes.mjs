@@ -9,7 +9,7 @@ const LABELS = {
 
 export default function rehypeFootnotes() {
   return (tree, file) => {
-    const labels = LABELS[/[/\\]posts[/\\]en[/\\]/.test(file.path ?? '') ? 'en' : 'zh'];
+    const labels = LABELS[/[/\\]en\.md$/.test(file.path ?? '') ? 'en' : 'zh'];
     visit(tree, 'element', (node) => {
       if (node.properties?.id === 'footnote-label') {
         node.children = [{ type: 'text', value: labels.heading }];

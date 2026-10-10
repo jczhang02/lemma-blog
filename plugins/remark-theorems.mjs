@@ -9,20 +9,37 @@
 // h2/h3 are numbered 1, 1.1, ...; theorem-like kinds share one counter that
 // restarts in each section (2.1, 2.2, ...), as amsthm with [section].
 // `numbering: false` in frontmatter turns section numbers off (theorems are
-// then 1, 2, ...). `\ref{id}` in prose becomes a link with the number of a
-// section or theorem; other \ref and \eqref are left for MathJax.
+// then 1, 2, ...). Figures and tables are numbered 1, 2, ... per post:
+//
+//   :::figure{#fig:cayley}          :::table{#tab:groups}
+//   ![Cayley graph](./cayley.png)   | a | b |
+//                                    |---|---|
+//   Caption, may contain $math$.     Caption.
+//   :::                              :::
+//
+// (the caption can also go in brackets: :::figure[Caption]{#fig:x}).
+// `\ref{id}` in prose becomes a link with the number of a section, theorem,
+// figure or table; other \ref and \eqref are left for MathJax.
 import { visit, SKIP } from 'unist-util-visit';
 
 const LABELS = {
   zh: {
     theorem: '定理', lemma: '引理', proposition: '命题', corollary: '推论',
     definition: '定义', example: '例', remark: '注', proof: '证明',
+    figure: '图', table: '表',
   },
   en: {
     theorem: 'Theorem', lemma: 'Lemma', proposition: 'Proposition', corollary: 'Corollary',
     definition: 'Definition', example: 'Example', remark: 'Remark', proof: 'Proof',
+    figure: 'Figure', table: 'Table',
   },
 };
+
+// A paragraph holding only images (videos are images until remark-media).
+const isMedia = (node) =>
+  node.type === 'paragraph' &&
+  node.children.some((c) => c.type === 'image') &&
+  node.children.every((c) => c.type === 'image' || (c.type === 'text' && !c.value.trim()));
 
 const REF = /\\ref\{([^}]+)\}/g;
 const LABEL = /\s*\\label\{([^}]+)\}/;
@@ -31,7 +48,7 @@ const text = (value) => ({ type: 'text', value });
 const span = (className, children) => ({ type: 'emphasis', data: { hName: 'span', hProperties: { className } }, children });
 
 function langOf(file) {
-  return /[/\\]posts[/\\]en[/\\]/.test(file.path ?? '') ? 'en' : 'zh';
+  return /[/\\]en\.md$/.test(file.path ?? '') ? 'en' : 'zh';
 }
 
 // Put the inline head at the start of the first paragraph, or in its own
@@ -82,6 +99,7 @@ export default function remarkTheorems() {
     let section = 0;
     let subsection = 0;
     let counter = 0;
+    const floats = { figure: 0, table: 0 };
 
     // Directives we do not handle (e.g. "std::vector", "note:this", or the
     // ":intro" in "\label{sec:intro}") go back to their source text first, so
@@ -123,7 +141,28 @@ export default function remarkTheorems() {
 
       const kind = node.name;
       const id = node.attributes?.id;
+      const classes = node.attributes?.class?.split(/\s+/) ?? [];
       const title = node.children[0]?.data?.directiveLabel ? node.children.shift().children : null;
+
+      if (kind === 'figure' || kind === 'table') {
+        floats[kind]++;
+        const n = `${floats[kind]}`;
+        if (id) numbers.set(id, n);
+        // Caption: the bracket label, else the first paragraph that is not media.
+        const at = title ? -1 : node.children.findIndex((c) => c.type === 'paragraph' && !isMedia(c));
+        const caption = title ?? (at >= 0 ? node.children.splice(at, 1)[0].children : []);
+        for (const child of node.children) if (isMedia(child)) child.data = { hName: 'div', hProperties: { className: ['figure-media'] } };
+        const figcaption = {
+          type: 'paragraph',
+          data: { hName: 'figcaption' },
+          children: [{ type: 'strong', children: [text(`${labels[kind]} ${n}.`)] }, ...(caption.length ? [text(' '), ...caption] : [])],
+        };
+        // Tables are captioned above, figures below, as in print.
+        if (kind === 'table') node.children.unshift(figcaption);
+        else node.children.push(figcaption);
+        node.data = { hName: 'figure', hProperties: { className: ['float', `float-${kind}`, ...classes], id } };
+        return;
+      }
 
       if (kind === 'proof') {
         node.data = { hName: 'section', hProperties: { className: ['proof'], id } };

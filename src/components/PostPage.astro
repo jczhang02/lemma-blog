@@ -12,7 +12,7 @@ const { post } = Astro.props;
 const lang = langOf(post);
 const t = ui[lang];
 const { Content, remarkPluginFrontmatter } = await render(post);
-const translation = await getEntry('posts', `${otherLang(lang)}/${slugOf(post)}`);
+const translation = await getEntry('posts', `${slugOf(post)}/${otherLang(lang)}`);
 const alternate = translation && !translation.data.draft ? postUrl(translation) : undefined;
 const { title, description, date, updated, tags } = post.data;
 ---

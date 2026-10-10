@@ -57,8 +57,9 @@ export const otherLang = (lang: Lang): Lang => (lang === 'zh' ? 'en' : 'zh');
 /** Locale prefix for URLs: '' for the default locale, '/en' for English. */
 export const prefix = (lang: Lang) => (lang === 'zh' ? '' : `/${lang}`);
 
-export const langOf = (post: CollectionEntry<'posts'>) => post.id.split('/')[0] as Lang;
-export const slugOf = (post: CollectionEntry<'posts'>) => post.id.split('/').slice(1).join('/');
+// Entry ids are "<slug>/<lang>" (from src/content/posts/<slug>/<lang>.md).
+export const langOf = (post: CollectionEntry<'posts'>) => post.id.split('/').at(-1) as Lang;
+export const slugOf = (post: CollectionEntry<'posts'>) => post.id.split('/').slice(0, -1).join('/');
 export const postUrl = (post: CollectionEntry<'posts'>) => `${prefix(langOf(post))}/posts/${slugOf(post)}/`;
 
 export async function getPosts(lang: Lang) {

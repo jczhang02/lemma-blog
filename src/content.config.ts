@@ -2,8 +2,8 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-// Posts live in src/content/posts/<lang>/<slug>.md.
-// Two files with the same <slug> in zh/ and en/ are translations of each other.
+// One folder per post: src/content/posts/<slug>/{zh,en}.md, with the post's
+// images and videos next to them. zh.md and en.md are translations of each other.
 const macro = z.union([
   z.string(),
   z.tuple([z.string(), z.number()]),
@@ -11,7 +11,7 @@ const macro = z.union([
 ]);
 
 const posts = defineCollection({
-  loader: glob({ pattern: '{zh,en}/**/*.md', base: './src/content/posts' }),
+  loader: glob({ pattern: '**/{zh,en}.md', base: './src/content/posts' }),
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
