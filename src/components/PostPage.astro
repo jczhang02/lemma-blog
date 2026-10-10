@@ -36,13 +36,15 @@ const { title, description, date, updated, tags } = post.data;
       }
       {
         tags.length > 0 && (
-          <ul class="tag-list" aria-label={t.tags}>
-            {tags.map((tag) => (
-              <li>
+          <p class="keywords">
+            <span class="keywords-label">{t.keywords}:</span>{' '}
+            {tags.map((tag, i) => (
+              <>
+                {i > 0 && ', '}
                 <a href={tagUrl(lang, tag)}>{tag}</a>
-              </li>
+              </>
             ))}
-          </ul>
+          </p>
         )
       }
     </header>

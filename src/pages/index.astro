@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import PostList from '../components/PostList.astro';
+import TagLine from '../components/TagLine.astro';
 import { getPosts, ui } from '../i18n';
 
 const lang = 'zh';
@@ -11,5 +12,6 @@ const posts = await getPosts(lang);
   <section class="intro">
     <p>{ui[lang].description}</p>
   </section>
+  <TagLine lang={lang} />
   <PostList posts={posts} lang={lang} />
 </Base>

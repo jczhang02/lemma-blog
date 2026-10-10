@@ -62,8 +62,7 @@ const switchTo = alternate ?? `${prefix(other)}/`;
         {SITE.title}
       </a>
       <nav>
-        <a class="nav-posts" href={`${prefix(lang)}/`}>{t.posts}</a>
-        <a href={`${prefix(lang)}/tags/`}>{t.tags}</a>
+        <a href={`${prefix(lang)}/`}>{t.posts}</a>
         <a href={switchTo} hreflang={other} lang={other}>{other === 'en' ? 'EN' : '中'}</a>
         <button class="theme-toggle" type="button" aria-label={t.toggleTheme} title={t.toggleTheme}>
           <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>

@@ -1,0 +1,27 @@
+---
+// All tags of one language in a single flowing line, each with its post count.
+import { getTags, tagUrl, ui, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tags = await getTags(lang);
+---
+
+{
+  tags.length > 0 && (
+    <nav class="tag-line" aria-label={ui[lang].tags}>
+      <ul>
+        {tags.map((tag) => (
+          <li>
+            <a href={tagUrl(lang, tag.name)}>
+              {tag.name}
+              <span class="tag-count">{tag.posts.length}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}

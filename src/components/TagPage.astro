@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import PostList from './PostList.astro';
-import { ui, type Lang } from '../i18n';
+import { prefix, ui, type Lang } from '../i18n';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -14,6 +14,12 @@ const t = ui[lang];
 ---
 
 <Base lang={lang} title={t.taggedWith(name)}>
-  <h1 class="page-title">{t.taggedWith(name)}</h1>
+  <header class="tag-header">
+    <h1 class="page-title">{name}</h1>
+    <p class="page-meta">
+      <span>{t.postCount(posts.length)}</span>
+      <a href={`${prefix(lang)}/`}>{t.allPosts}</a>
+    </p>
+  </header>
   <PostList posts={posts} lang={lang} />
 </Base>

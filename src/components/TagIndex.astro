@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import TagLine from './TagLine.astro';
 import { getTags, otherLang, prefix, ui, type Lang } from '../i18n';
 
 interface Props {
@@ -12,17 +13,5 @@ const tags = await getTags(lang);
 
 <Base lang={lang} title={t.tags} alternate={`${prefix(otherLang(lang))}/tags/`}>
   <h1 class="page-title">{t.tags}</h1>
-  {tags.length === 0 && <p class="empty">{t.noPosts}</p>}
-  <ul class="tag-index">
-    {
-      tags.map((tag) => (
-        <li>
-          <a href={`${prefix(lang)}/tags/${tag.slug}/`}>
-            <span>{tag.name}</span>
-            <span class="tag-count">{t.postCount(tag.posts.length)}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  {tags.length === 0 ? <p class="empty">{t.noPosts}</p> : <TagLine lang={lang} />}
 </Base>
