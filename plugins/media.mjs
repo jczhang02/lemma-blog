@@ -3,7 +3,7 @@
 // Astro only processes images, so video files are served from their post
 // folder at /media/posts/<post>/<file>: by middleware in dev, and copied into
 // the build output after a build.
-import { cpSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { cpSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sirv from 'sirv';
@@ -56,7 +56,13 @@ export function mediaIntegration({ posts }) {
       },
       'astro:build:done': ({ dir }) => {
         const out = join(fileURLToPath(dir), BASE);
+        // A folder whose posts are all drafts is not published, nor are its videos.
+        const draftOnly = (folder) => {
+          const posts = readdirSync(folder).filter((f) => /^(zh|en)\.md$/.test(f));
+          return posts.length > 0 && posts.every((f) => /^draft:\s*true\s*$/m.test(readFileSync(join(folder, f), 'utf8').split(/^---\s*$/m)[1] ?? ''));
+        };
         const copy = (from) => {
+          if (draftOnly(from)) return;
           for (const entry of readdirSync(from, { withFileTypes: true })) {
             const path = join(from, entry.name);
             if (entry.isDirectory()) copy(path);

@@ -11,6 +11,8 @@ import '@fontsource-variable/jetbrains-mono/wght-italic.css';
 import 'lxgw-wenkai-screen-webfont/lxgwwenkaiscreen.css';
 import '../styles/mathjax.css';
 import '../styles/global.css';
+import { Image } from 'astro:assets';
+import avatar from '../assets/avatar.jpg';
 import { SITE, ui, prefix, otherLang, type Lang } from '../i18n';
 
 interface Props {
@@ -35,7 +37,9 @@ const switchTo = alternate ?? `${prefix(other)}/`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" href="/icon-192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href={`${prefix(lang)}/rss.xml`} />
     {alternate && <link rel="alternate" hreflang={other} href={alternate} />}
     <meta name="color-scheme" content="light dark" />
@@ -53,9 +57,12 @@ const switchTo = alternate ?? `${prefix(other)}/`;
   <body>
     <a class="skip-link" href="#main">{t.skipToContent}</a>
     <header class="site-header">
-      <a class="wordmark" href={`${prefix(lang)}/`}>{SITE.title}</a>
+      <a class="wordmark" href={`${prefix(lang)}/`}>
+        <Image class="wordmark-avatar" src={avatar} alt="" width={32} height={32} densities={[1, 2, 3]} loading="eager" />
+        {SITE.title}
+      </a>
       <nav>
-        <a href={`${prefix(lang)}/`}>{t.posts}</a>
+        <a class="nav-posts" href={`${prefix(lang)}/`}>{t.posts}</a>
         <a href={`${prefix(lang)}/tags/`}>{t.tags}</a>
         <a href={switchTo} hreflang={other} lang={other}>{other === 'en' ? 'EN' : '中'}</a>
         <button class="theme-toggle" type="button" aria-label={t.toggleTheme} title={t.toggleTheme}>
@@ -69,7 +76,11 @@ const switchTo = alternate ?? `${prefix(other)}/`;
     </main>
     <footer class="site-footer">
       <span>© {new Date().getFullYear()} {SITE.title}</span>
-      <a href={`${prefix(lang)}/rss.xml`}>{t.rss}</a>
+      <nav class="footer-links" aria-label="Links">
+        <a href={`mailto:${SITE.email}`}>{t.email}</a>
+        <a href={`https://github.com/${SITE.github}`}>GitHub</a>
+        <a href={`${prefix(lang)}/rss.xml`}>{t.rss}</a>
+      </nav>
     </footer>
     <script>
       document.querySelector('.theme-toggle')?.addEventListener('click', () => {

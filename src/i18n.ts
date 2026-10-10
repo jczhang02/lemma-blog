@@ -1,11 +1,12 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 export const SITE = {
-  // TODO: your name / site name.
-  title: 'JC Zhang',
-  author: 'JC Zhang',
+  title: 'Chengrui Zhang',
+  author: 'Chengrui Zhang',
   // Author as BibTeX expects it ("Last, First"), for the "cite this post" block.
-  authorBibtex: 'Zhang, JC',
+  authorBibtex: 'Zhang, Chengrui',
+  email: 'jczhang@live.it',
+  github: 'jczhang02',
 };
 
 export type Lang = 'zh' | 'en';
@@ -13,9 +14,10 @@ export const LANGS: Lang[] = ['zh', 'en'];
 
 export const ui = {
   zh: {
-    description: '数学, 以及其他.',
+    description: '方程, 模型, 以及其他.',
     posts: '文章',
-    about: '关于',
+    noPosts: '还没有文章.',
+    email: '邮箱',
     rss: 'RSS',
     readIn: 'Read in English',
     updated: '更新于',
@@ -32,9 +34,10 @@ export const ui = {
     postCount: (n: number) => `${n} 篇`,
   },
   en: {
-    description: 'Mathematics, and other things.',
+    description: 'Equations, models, and other things.',
     posts: 'Posts',
-    about: 'About',
+    noPosts: 'No posts yet.',
+    email: 'Email',
     rss: 'RSS',
     readIn: '阅读中文版',
     updated: 'Updated',

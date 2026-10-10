@@ -3,6 +3,7 @@ title: A Math Rendering Test
 description: Checks how MathJax 4 renders on this site, including AMS environments, the physics package, and custom macros.
 date: 2026-10-10
 tags: [meta, Group Theory]
+draft: true
 macros:
   abs: ['\left| #1 \right|', 1]
   Gal: '\operatorname{Gal}'

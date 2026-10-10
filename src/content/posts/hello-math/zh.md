@@ -3,6 +3,7 @@ title: 公式渲染测试
 description: 检查 MathJax 4 在本站的渲染效果, 包括 AMS 环境, physics 宏包和自定义宏.
 date: 2026-10-10
 tags: [meta, 代数]
+draft: true
 macros:
   abs: ['\left| #1 \right|', 1]
   Gal: '\operatorname{Gal}'

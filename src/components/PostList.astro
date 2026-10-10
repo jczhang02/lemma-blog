@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { formatDate, postUrl, type Lang } from '../i18n';
+import { formatDate, postUrl, ui, type Lang } from '../i18n';
 
 interface Props {
   posts: CollectionEntry<'posts'>[];
@@ -9,16 +9,20 @@ interface Props {
 const { posts, lang } = Astro.props;
 ---
 
-<ul class="post-list">
-  {
-    posts.map((post) => (
-      <li>
-        <a href={postUrl(post)}>
-          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date, lang)}</time>
-          <span class="post-title">{post.data.title}</span>
-          {post.data.description && <span class="post-desc">{post.data.description}</span>}
-        </a>
-      </li>
-    ))
-  }
-</ul>
+{
+  posts.length === 0 ? (
+    <p class="empty">{ui[lang].noPosts}</p>
+  ) : (
+    <ul class="post-list">
+      {posts.map((post) => (
+        <li>
+          <a href={postUrl(post)}>
+            <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date, lang)}</time>
+            <span class="post-title">{post.data.title}</span>
+            {post.data.description && <span class="post-desc">{post.data.description}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

@@ -12,6 +12,7 @@ const tags = await getTags(lang);
 
 <Base lang={lang} title={t.tags} alternate={`${prefix(otherLang(lang))}/tags/`}>
   <h1 class="page-title">{t.tags}</h1>
+  {tags.length === 0 && <p class="empty">{t.noPosts}</p>}
   <ul class="tag-index">
     {
       tags.map((tag) => (
