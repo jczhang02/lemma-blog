@@ -15,16 +15,21 @@ const { Content, remarkPluginFrontmatter } = await render(post);
 const translation = await getEntry('posts', `${slugOf(post)}/${otherLang(lang)}`);
 const alternate = translation && !translation.data.draft ? postUrl(translation) : undefined;
 const { title, description, date, updated, tags } = post.data;
+const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
 ---
 
 <Base lang={lang} title={title} description={description} alternate={alternate}>
   <Toc toc={remarkPluginFrontmatter.toc ?? []} label={t.toc} />
-  <article class="post">
+  <article class="post" data-copy={t.copy} data-copied={t.copied}>
     <header class="post-header">
       <h1>{title}</h1>
       <p class="post-meta">
-        <time datetime={date.toISOString()}>{formatDate(date, lang)}</time>
-        {updated && <span>{t.updated} <time datetime={updated.toISOString()}>{formatDate(updated, lang)}</time></span>}
+        <span class="post-facts">
+          <time datetime={date.toISOString()}>{formatDate(date, lang)}</time>
+          {updated && <span>{t.updated} <time datetime={updated.toISOString()}>{formatDate(updated, lang)}</time></span>}
+          <span>{t.readingTime(readingMinutes)}</span>
+          {sections > 0 && <span>{t.sectionCount(sections)}</span>}
+        </span>
         {alternate && <a href={alternate} hreflang={otherLang(lang)} lang={otherLang(lang)}>{t.readIn}</a>}
       </p>
       {
@@ -56,6 +61,28 @@ const { title, description, date, updated, tags } = post.data;
 </Base>
 
 <script>
+  // Copy buttons: one on every code block, plus the BibTeX block. Each copies
+  // the <pre> right before it.
+  const article = document.querySelector<HTMLElement>('article.post')!;
+  for (const pre of article.querySelectorAll<HTMLElement>('.prose pre.astro-code')) {
+    const block = document.createElement('div');
+    block.className = 'code-block';
+    pre.replaceWith(block);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-button';
+    button.textContent = article.dataset.copy!;
+    block.append(pre, button);
+  }
+  article.addEventListener('click', async (event) => {
+    const button = (event.target as Element).closest<HTMLButtonElement>('.copy-button');
+    const pre = button?.previousElementSibling;
+    if (!button || !pre) return;
+    await navigator.clipboard.writeText(pre.textContent ?? '');
+    button.textContent = article.dataset.copied!;
+    setTimeout(() => (button.textContent = article.dataset.copy!), 1500);
+  });
+
   // Mark sideways-scrolling blocks with the side(s) that have more content.
   const mark = (el: HTMLElement) => {
     const rest = el.scrollWidth - el.clientWidth;

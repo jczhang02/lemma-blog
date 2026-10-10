@@ -33,6 +33,8 @@ export const ui = {
     keywords: '关键词',
     taggedWith: (tag: string) => `标签: ${tag}`,
     postCount: (n: number) => `${n} 篇`,
+    readingTime: (n: number) => `约 ${n} 分钟`,
+    sectionCount: (n: number) => `${n} 节`,
   },
   en: {
     description: 'Equations, models, and other things.',
@@ -54,6 +56,8 @@ export const ui = {
     keywords: 'Keywords',
     taggedWith: (tag: string) => `Tagged "${tag}"`,
     postCount: (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`,
+    readingTime: (n: number) => `${n} min read`,
+    sectionCount: (n: number) => `${n} ${n === 1 ? 'section' : 'sections'}`,
   },
 } as const;
 
@@ -72,8 +76,10 @@ export async function getPosts(lang: Lang) {
   return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 
+// Chinese dates keep a space between digits and characters: 2026 年 10 月 10 日.
 export function formatDate(date: Date, lang: Lang) {
-  return date.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+  if (lang === 'zh') return `${date.getUTCFullYear()} 年 ${date.getUTCMonth() + 1} 月 ${date.getUTCDate()} 日`;
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
 }
 
 /** URL segment for a tag: lowercase, spaces to hyphens ("Number Theory" -> "number-theory"). */

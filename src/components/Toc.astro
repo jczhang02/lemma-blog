@@ -1,9 +1,10 @@
 ---
-// Minimap-style table of contents (after Notion / ChatGPT / chanhdai's TOC
-// Minimap): one tick per heading in the left margin; hovering or focusing
-// opens a panel with the titles. Wide screens only.
+// Minimap-style table of contents, after ChatGPT's: one tick per heading in
+// the left margin. Hovering or focusing a tick shows a card for that section
+// only (its title and the start of its first paragraph); clicking jumps there.
+// Wide screens only.
 interface Props {
-  toc: { depth: number; slug: string; html: string }[];
+  toc: { depth: number; slug: string; html: string; label: string; excerpt: string }[];
   label: string;
 }
 const { toc, label } = Astro.props;
@@ -12,20 +13,19 @@ const { toc, label } = Astro.props;
 {
   toc.length >= 2 && (
     <nav class="toc" aria-label={label}>
-      <ol class="toc-ticks" aria-hidden="true">
+      <ol>
         {toc.map((h) => (
-          <li data-depth={h.depth} data-slug={h.slug} />
+          <li data-depth={h.depth} data-slug={h.slug}>
+            <a href={`#${h.slug}`} aria-label={h.label}>
+              <span class="toc-tick" />
+            </a>
+            <div class="toc-card" aria-hidden="true">
+              <span class="toc-card-title" set:html={h.html} />
+              {h.excerpt && <span class="toc-card-text" set:html={h.excerpt} />}
+            </div>
+          </li>
         ))}
       </ol>
-      <div class="toc-panel">
-        <ol>
-          {toc.map((h) => (
-            <li data-depth={h.depth} data-slug={h.slug}>
-              <a href={`#${h.slug}`} set:html={h.html} />
-            </li>
-          ))}
-        </ol>
-      </div>
     </nav>
   )
 }
@@ -34,8 +34,9 @@ const { toc, label } = Astro.props;
   // Highlight the last heading that has scrolled past the top fifth of the viewport.
   const nav = document.querySelector<HTMLElement>('.toc');
   if (nav) {
-    const items = [...nav.querySelectorAll<HTMLElement>('.toc-ticks li, .toc-panel li')];
-    const headings = [...new Set(items.map((li) => li.dataset.slug!))]
+    const items = [...nav.querySelectorAll<HTMLElement>('li')];
+    const headings = items
+      .map((li) => li.dataset.slug!)
       .map((slug) => document.getElementById(slug))
       .filter((h): h is HTMLElement => h !== null);
     let active: string | undefined;
@@ -81,10 +82,6 @@ const { toc, label } = Astro.props;
     for (const type of ['wheel', 'touchmove', 'keydown']) {
       addEventListener(type, () => pinned && ((pinned = undefined), schedule()), { passive: true });
     }
-    // Long lists scroll inside the panel; open it at the current section.
-    nav.addEventListener('mouseenter', () =>
-      nav.querySelector('.toc-panel li[data-active]')?.scrollIntoView({ block: 'nearest' }),
-    );
     update();
   }
 </script>
@@ -107,23 +104,27 @@ const { toc, label } = Astro.props;
   }
 
   ol {
-    list-style: none;
+    max-height: 70vh;
     margin: 0;
     padding: 0;
+    list-style: none;
   }
 
-  /* Ticks: 2px bars, shorter for deeper headings. */
-  .toc-ticks {
+  li {
+    position: relative;
+  }
+
+  /* Each link is a full-width row, so moving along the ticks never leaves a
+     gap between hover targets. */
+  a {
     display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
-    max-height: 60vh;
-    overflow: hidden;
-    padding: 0.5rem 0;
+    align-items: center;
+    width: 2.75rem;
+    height: 0.75rem;
   }
 
-  /* Full length is the active state; others are scaled down (20px, 12px). */
-  .toc-ticks li {
+  /* Ticks: 2px bars, shorter for deeper headings; full length when current. */
+  .toc-tick {
     width: 1.75rem;
     height: 2px;
     border-radius: 1px;
@@ -133,105 +134,83 @@ const { toc, label } = Astro.props;
     transition: background-color 0.2s, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .toc-ticks li[data-depth='3'] {
+  li[data-depth='3'] .toc-tick {
     transform: scaleX(0.429);
   }
 
-  .toc-ticks li[data-active] {
+  li[data-active] .toc-tick {
     background: var(--text);
     transform: none;
   }
 
-  /* Panel: opens to the right of the ticks. The left padding is a hover
-     bridge, so the pointer can cross the gap without closing it. */
-  .toc-panel {
+  li:hover .toc-tick,
+  a:focus-visible .toc-tick {
+    background: var(--muted);
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 0;
+    border-radius: 2px;
+  }
+
+  /* The card for one section, beside its tick. Shown on hover or focus;
+     it is a preview only, so the pointer passes through it. */
+  .toc-card {
     position: absolute;
     top: 50%;
-    left: 100%;
-    padding-left: 0.875rem;
-    /* Hidden with opacity, not visibility, so the links stay focusable and
-       keyboard focus can open the panel through :focus-within. */
-    opacity: 0;
-    pointer-events: none;
-    filter: blur(4px);
-    transform: translate(-0.375rem, -50%) scale(0.98);
-    transform-origin: left center;
-    /* Closing waits a beat, so a pointer that slips off briefly does not flicker it. */
-    transition:
-      opacity 0.12s ease-in 0.08s,
-      transform 0.12s ease-in 0.08s,
-      filter 0.12s ease-in 0.08s;
-  }
-
-  .toc:hover .toc-panel,
-  .toc:focus-within .toc-panel {
-    opacity: 1;
-    pointer-events: auto;
-    filter: none;
-    transform: translate(0, -50%);
-    transition:
-      opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-      filter 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .toc-panel ol {
-    width: max-content;
-    min-width: 12rem;
-    max-width: 18rem;
-    max-height: 60vh;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding: 0.375rem;
+    left: 3.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 19rem;
+    padding: 0.75rem 1rem;
     border-radius: 14px;
     background: var(--raised);
     box-shadow: var(--shadow-raised);
-    scrollbar-width: thin;
-    scrollbar-color: var(--rule) transparent;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-0.25rem, -50%);
+    transition: opacity 0.12s, transform 0.12s;
   }
 
-  .toc-panel a {
+  li:hover .toc-card,
+  li:focus-within .toc-card {
+    opacity: 1;
+    transform: translate(0, -50%);
+    transition: opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .toc-card-title {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .toc-card-text {
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     overflow: hidden;
-    padding: 0.4375rem 0.75rem;
-    border-radius: 8px;
     color: var(--muted);
+    font-family: var(--font-serif);
     font-size: 0.875rem;
-    line-height: 1.45;
-    text-decoration: none;
-    transition: background-color 0.15s, color 0.15s;
+    line-height: 1.6;
   }
 
-  /* Subsections: indented, one step smaller. */
-  .toc-panel li[data-depth='3'] a {
-    padding-left: 1.625rem;
-    font-size: 0.8125rem;
-  }
-
-  /* Ink at low alpha, so the fill reads on the raised surface in both themes. */
-  .toc-panel a:hover {
-    background: color-mix(in srgb, var(--text) 6%, transparent);
-    color: var(--text);
-  }
-
-  .toc-panel a:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: -2px;
-  }
-
-  /* Current section: ink and weight, distinct from the hover fill. */
-  .toc-panel li[data-active] a {
-    color: var(--text);
-    font-weight: 550;
+  /* Formulas in the preview follow the text size. */
+  .toc-card :global(mjx-container) {
+    font-size: 95%;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .toc-panel,
-    .toc:hover .toc-panel,
-    .toc:focus-within .toc-panel {
-      filter: none;
+    .toc-card,
+    li:hover .toc-card,
+    li:focus-within .toc-card {
       transform: translate(0, -50%);
       transition: opacity 0.12s;
     }

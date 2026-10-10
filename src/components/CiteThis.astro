@@ -26,17 +26,7 @@ const bibtex = `@misc{${key},
   <p>{SITE.author}. {post.data.title}. {year}. <a href={url}>{url}</a></p>
   <div class="cite-bibtex">
     <pre><code>{bibtex}</code></pre>
-    <button type="button" data-copied={t.copied}>{t.copy}</button>
+    <button class="copy-button" type="button">{t.copy}</button>
   </div>
 </section>
 
-<script>
-  for (const button of document.querySelectorAll<HTMLButtonElement>('.cite-bibtex button')) {
-    button.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(button.previousElementSibling!.textContent!);
-      const label = button.textContent;
-      button.textContent = button.dataset.copied!;
-      setTimeout(() => (button.textContent = label), 1500);
-    });
-  }
-</script>

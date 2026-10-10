@@ -303,7 +303,7 @@ main:focus {
 
 .post-list a {
   display: grid;
-  grid-template-columns: 8.5rem 1fr;
+  grid-template-columns: 9.5rem 1fr;
   column-gap: 1.5rem;
   padding: 1.25rem 0;
   text-decoration: none;
@@ -445,6 +445,12 @@ main:focus {
 
 .post-meta a {
   margin-left: auto;
+}
+
+/* Date, reading time, sections: separated by middle dots. */
+.post-facts > * + *::before {
+  content: '·';
+  margin: 0 0.5em;
 }
 
 /* Abstract under the title, set in from both sides as in a paper. */
@@ -859,7 +865,7 @@ main:focus {
   line-height: 1.6;
 }
 
-.cite-bibtex button {
+.copy-button {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
@@ -868,13 +874,31 @@ main:focus {
   border-radius: 6px;
   background: var(--bg);
   color: var(--muted);
-  font: inherit;
+  font-family: var(--font-sans);
   font-size: 0.8125rem;
+  line-height: 1.5;
   cursor: pointer;
+  transition: opacity 0.15s, color 0.15s;
 }
 
-.cite-bibtex button:hover {
+.copy-button:hover {
   color: var(--text);
+}
+
+/* Code blocks: the button appears on hover or focus; touch screens always show it. */
+.code-block {
+  position: relative;
+}
+
+@media (hover: hover) {
+  .code-block .copy-button {
+    opacity: 0;
+  }
+
+  .code-block:hover .copy-button,
+  .code-block .copy-button:focus-visible {
+    opacity: 1;
+  }
 }
 
 /* ---------- Code ---------- */

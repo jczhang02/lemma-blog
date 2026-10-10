@@ -15,6 +15,7 @@ import remarkDirective from 'remark-directive';
 //   the config (plugin options), so an edit re-renders every post.
 const MODULES = [
   './plugins/remark-theorems.mjs',
+  './plugins/remark-reading.mjs',
   './plugins/remark-cite.mjs',
   './plugins/rehype-mathjax4.mjs',
   './plugins/rehype-toc.mjs',
@@ -32,6 +33,7 @@ const version = createHash('sha1')
   .slice(0, 12);
 const [
   { default: remarkTheorems },
+  { default: remarkReading },
   { default: remarkCite },
   { default: rehypeMathJax4 },
   { default: rehypeToc },
@@ -68,7 +70,7 @@ export default defineConfig({
     processor: unified({
       // Off: punctuation stays exactly as typed (no curly quotes, no -- to en dash).
       smartypants: false,
-      remarkPlugins: [remarkMath, remarkDirective, remarkTheorems, [remarkCite, { bibliography }], [remarkMedia, { posts }]],
+      remarkPlugins: [remarkMath, remarkDirective, remarkTheorems, remarkReading, [remarkCite, { bibliography }], [remarkMedia, { posts }]],
       rehypePlugins: [[rehypeMathJax4, { macros, version }], rehypeToc, rehypeTables, rehypeFootnotes],
     }),
     shikiConfig: {
