@@ -12,7 +12,7 @@ macros:
 
 > 引用块用正文的宋体, 颜色较浅. 引用中的公式也正常: $e^{i\pi} + 1 = 0$.
 
-## AMS 环境与编号
+## AMS 环境与编号 \label{sec:ams}
 
 带编号的公式可以用 `\label` 和 `\eqref` 引用:
 
@@ -23,7 +23,7 @@ $$
 \end{equation}
 $$
 
-由 \eqref{eq:gauss} 可得 $\Gamma(1/2) = \sqrt{\pi}$. 多行对齐:
+由 \eqref{eq:gauss}[^gauss] 可得 $\Gamma(1/2) = \sqrt{\pi}$. 多行对齐:
 
 $$
 \begin{align*}
@@ -41,7 +41,9 @@ f(x) = \begin{cases}
 \end{cases}
 $$
 
-## 定理环境
+## 定理环境 \label{sec:thm}
+
+定理的编号随章节变化, 例如本节的定理写作 2.x. 第 \ref{sec:ams} 节介绍了公式编号. 关于数论的入门, 见 \cite{serre1973} 或 \cite[第 3 章]{hua1957}.
 
 :::definition
 设 $G$ 是群, $H \subseteq G$. 如果 $H$ 对 $G$ 的运算也构成群, 就称 $H$ 是 $G$ 的**子群**, 记作 $H \le G$.
@@ -70,7 +72,7 @@ $$
 :::
 
 :::remark
-定理 \ref{thm:lagrange} 的逆命题不成立: $A_4$ 没有 6 阶子群. 普通文字里的冒号不受影响, 例如 std::vector 和 note:this.
+定理 \ref{thm:lagrange} 的逆命题不成立 (参见 \cite{serre1973, greentao2008}): $A_4$ 没有 6 阶子群. 普通文字里的冒号不受影响, 例如 std::vector 和 note:this.
 :::
 
 ## 字体与箭头
@@ -132,3 +134,5 @@ def zeta(s, terms=10_000):
 $$
 \left( \sum_{k=1}^{n} a_k b_k \right)^2 \le \left( \sum_{k=1}^{n} a_k^2 \right) \left( \sum_{k=1}^{n} b_k^2 \right) \quad \text{for all } a_1, \dots, a_n, b_1, \dots, b_n \in \R
 $$
+
+[^gauss]: 这是 Gauss 积分, 可以用极坐标计算 $\left(\int e^{-x^2} dx\right)^2$.

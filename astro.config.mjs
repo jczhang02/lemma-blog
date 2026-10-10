@@ -7,18 +7,30 @@ import { unified } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import remarkDirective from 'remark-directive';
 
-// Local modules are imported with a hash of their sources, for two reasons:
+// Local modules are imported with a hash of their sources (and of the data
+// files they read), for two reasons:
 // - Node caches imports for the life of the process, and Astro re-imports only
 //   this file on change; without the hash a running dev server keeps old plugin code.
 // - Astro caches rendered posts until the config changes; the hash is part of
 //   the config (plugin options), so an edit re-renders every post.
-const LOCAL = ['./plugins/remark-theorems.mjs', './plugins/rehype-mathjax4.mjs', './plugins/rehype-toc.mjs', './plugins/rehype-tables.mjs', './src/math-macros.mjs'];
+const MODULES = [
+  './plugins/remark-theorems.mjs',
+  './plugins/remark-cite.mjs',
+  './plugins/rehype-mathjax4.mjs',
+  './plugins/rehype-toc.mjs',
+  './plugins/rehype-tables.mjs',
+  './plugins/rehype-footnotes.mjs',
+  './src/math-macros.mjs',
+];
+const bibliography = new URL('./src/references.bib', import.meta.url);
+const DATA = ['./plugins/ams-numeric.csl', './src/references.bib'];
+const LOCAL = [...MODULES, ...DATA];
 const version = createHash('sha1')
   .update(LOCAL.map((f) => readFileSync(new URL(f, import.meta.url))).join(''))
   .digest('hex')
   .slice(0, 12);
-const [remarkTheorems, rehypeMathJax4, rehypeToc, rehypeTables, macros] = await Promise.all(
-  LOCAL.map(async (f) => (await import(`${f}?v=${version}`)).default),
+const [remarkTheorems, remarkCite, rehypeMathJax4, rehypeToc, rehypeTables, rehypeFootnotes, macros] = await Promise.all(
+  MODULES.map(async (f) => (await import(`${f}?v=${version}`)).default),
 );
 
 export default defineConfig({
@@ -44,8 +56,8 @@ export default defineConfig({
     processor: unified({
       // Off: punctuation stays exactly as typed (no curly quotes, no -- to en dash).
       smartypants: false,
-      remarkPlugins: [remarkMath, remarkDirective, remarkTheorems],
-      rehypePlugins: [[rehypeMathJax4, { macros, version }], rehypeToc, rehypeTables],
+      remarkPlugins: [remarkMath, remarkDirective, remarkTheorems, [remarkCite, { bibliography }]],
+      rehypePlugins: [[rehypeMathJax4, { macros, version }], rehypeToc, rehypeTables, rehypeFootnotes],
     }),
     shikiConfig: {
       themes: { light: 'vitesse-light', dark: 'vitesse-dark' },

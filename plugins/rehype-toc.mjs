@@ -12,6 +12,7 @@ import { visit } from 'unist-util-visit';
 function slugText(node) {
   if (node.type === 'text') return node.value;
   if (node.tagName === 'mjx-container') return node.properties?.dataTex ?? '';
+  if (node.properties?.className?.includes('secnum')) return '';
   return (node.children ?? []).map(slugText).join('');
 }
 
@@ -21,8 +22,9 @@ export default function rehypeToc() {
     const toc = [];
     visit(tree, 'element', (node) => {
       const depth = { h2: 2, h3: 3 }[node.tagName];
-      if (!depth) return;
-      node.properties.id ??= slugger.slug(slugText(node));
+      // The footnotes heading is screen-reader-only and not part of the outline.
+      if (!depth || node.properties.id === 'footnote-label') return;
+      node.properties.id ??= slugger.slug(slugText(node).trim());
       toc.push({ depth, slug: node.properties.id, html: toHtml(node.children) });
     });
     file.data.astro.frontmatter.toc = toc;

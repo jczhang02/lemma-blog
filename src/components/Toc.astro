@@ -117,8 +117,10 @@ const { toc, label } = Astro.props;
     top: 50%;
     left: 100%;
     padding-left: 0.875rem;
+    /* Hidden with opacity, not visibility, so the links stay focusable and
+       keyboard focus can open the panel through :focus-within. */
     opacity: 0;
-    visibility: hidden;
+    pointer-events: none;
     filter: blur(4px);
     transform: translate(-0.375rem, -50%) scale(0.98);
     transform-origin: left center;
@@ -126,21 +128,19 @@ const { toc, label } = Astro.props;
     transition:
       opacity 0.12s ease-in 0.08s,
       transform 0.12s ease-in 0.08s,
-      filter 0.12s ease-in 0.08s,
-      visibility 0s linear 0.2s;
+      filter 0.12s ease-in 0.08s;
   }
 
   .toc:hover .toc-panel,
   .toc:focus-within .toc-panel {
     opacity: 1;
-    visibility: visible;
+    pointer-events: auto;
     filter: none;
     transform: translate(0, -50%);
     transition:
       opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
       transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-      filter 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-      visibility 0s;
+      filter 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .toc-panel ol {
@@ -201,7 +201,7 @@ const { toc, label } = Astro.props;
     .toc:focus-within .toc-panel {
       filter: none;
       transform: translate(0, -50%);
-      transition: opacity 0.12s, visibility 0s;
+      transition: opacity 0.12s;
     }
   }
 </style>

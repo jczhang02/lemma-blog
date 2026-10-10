@@ -30,7 +30,9 @@ $$
 
 Equation \eqref{eq:square} has its own number.
 
-## Theorem
+## Theorem \label{sec:thm}
+
+Theorems are numbered within sections. For background see \cite{serre1973}; for a famous application of such counting arguments see \cite[Sec.~2]{wiles1995}.
 
 :::theorem[Lagrange]{#thm:lagrange}
 Let $G$ be a finite group and $H \le G$. Then $\abs{H}$ divides $\abs{G}$, and `card` agrees:

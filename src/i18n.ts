@@ -3,6 +3,9 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 export const SITE = {
   // TODO: your name / site name.
   title: 'JC Zhang',
+  author: 'JC Zhang',
+  // Author as BibTeX expects it ("Last, First"), for the "cite this post" block.
+  authorBibtex: 'Zhang, JC',
 };
 
 export type Lang = 'zh' | 'en';
@@ -19,6 +22,11 @@ export const ui = {
     toggleTheme: '切换深色模式',
     allPosts: '全部文章',
     toc: '目录',
+    skipToContent: '跳到正文',
+    abstract: '摘要',
+    citeThis: '引用本文',
+    copy: '复制',
+    copied: '已复制',
     tags: '标签',
     taggedWith: (tag: string) => `标签: ${tag}`,
     postCount: (n: number) => `${n} 篇`,
@@ -33,6 +41,11 @@ export const ui = {
     toggleTheme: 'Toggle dark mode',
     allPosts: 'All posts',
     toc: 'Contents',
+    skipToContent: 'Skip to content',
+    abstract: 'Abstract',
+    citeThis: 'Cite this post',
+    copy: 'Copy',
+    copied: 'Copied',
     tags: 'Tags',
     taggedWith: (tag: string) => `Tagged "${tag}"`,
     postCount: (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`,

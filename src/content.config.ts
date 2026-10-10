@@ -21,6 +21,8 @@ const posts = defineCollection({
     draft: z.boolean().default(false),
     // Read by plugins/rehype-mathjax4.mjs, not by templates.
     macros: z.record(z.string(), macro).optional(),
+    // Section numbers (1, 1.1) and theorem numbers per section (2.1); see plugins/remark-theorems.mjs.
+    numbering: z.boolean().default(true),
   }),
 });
 

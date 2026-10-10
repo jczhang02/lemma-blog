@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { SITE, postUrl, slugOf, ui, type Lang } from '../i18n';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  lang: Lang;
+}
+const { post, lang } = Astro.props;
+const t = ui[lang];
+const url = new URL(postUrl(post), Astro.site).href;
+const year = post.data.date.getUTCFullYear();
+const key = `${SITE.authorBibtex.split(',')[0].toLowerCase()}${year}${slugOf(post).replace(/[^\w-]/g, '')}`;
+// Double braces keep BibTeX from changing the title's case.
+const bibtex = `@misc{${key},
+  author = {${SITE.authorBibtex}},
+  title  = {{${post.data.title}}},
+  year   = {${year}},
+  url    = {${url}},
+  note   = {${lang === 'zh' ? '博客文章' : 'Blog post'}},
+}`;
+---
+
+<section class="cite-this" aria-labelledby="cite-this">
+  <h2 id="cite-this">{t.citeThis}</h2>
+  <p>{SITE.author}. {post.data.title}. {year}. <a href={url}>{url}</a></p>
+  <div class="cite-bibtex">
+    <pre><code>{bibtex}</code></pre>
+    <button type="button" data-copied={t.copied}>{t.copy}</button>
+  </div>
+</section>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('.cite-bibtex button')) {
+    button.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(button.previousElementSibling!.textContent!);
+      const label = button.textContent;
+      button.textContent = button.dataset.copied!;
+      setTimeout(() => (button.textContent = label), 1500);
+    });
+  }
+</script>
