@@ -39,16 +39,48 @@ const { toc, label } = Astro.props;
       .map((slug) => document.getElementById(slug))
       .filter((h): h is HTMLElement => h !== null);
     let active: string | undefined;
+    let pinned: string | undefined;
     let queued = false;
+    // A heading becomes current at the scroll position where it reaches the
+    // top fifth of the viewport. Near the end of the page the last headings
+    // may never get there, so every heading that would become current in the
+    // last half screen of scrolling (or never) is spread evenly over that
+    // stretch instead: each still becomes current in order, the last one at
+    // the very bottom.
     const update = () => {
       queued = false;
-      const line = innerHeight / 5;
-      const current = headings.filter((h) => h.getBoundingClientRect().top < line).at(-1) ?? headings[0];
+      const max = document.documentElement.scrollHeight - innerHeight;
+      const tail = Math.min(innerHeight / 2, max);
+      const start = max - tail;
+      const at = headings.map((h) => h.getBoundingClientRect().top + scrollY - innerHeight / 5);
+      const late = at.findIndex((a) => a > start);
+      if (late >= 0) {
+        const k = at.length - late;
+        for (let i = late; i < at.length; i++) at[i] = start + (tail * (i - late + 1)) / k;
+      }
+      const i = at.findLastIndex((a) => a <= scrollY + 1);
+      const current = (pinned && document.getElementById(pinned)) || headings[Math.max(i, 0)];
       if (current?.id === active) return;
       active = current?.id;
       for (const li of items) li.toggleAttribute('data-active', li.dataset.slug === active);
     };
-    addEventListener('scroll', () => queued || ((queued = true), requestAnimationFrame(update)), { passive: true });
+    const schedule = () => queued || ((queued = true), requestAnimationFrame(update));
+    addEventListener('scroll', schedule, { passive: true });
+    addEventListener('resize', schedule);
+    // After following a link to a heading (TOC entry or \ref), keep that
+    // heading current even if the page cannot scroll it to the top; the
+    // reader's own next scroll releases it.
+    document.addEventListener('click', (event) => {
+      const href = (event.target as Element).closest?.('a[href^="#"]')?.getAttribute('href');
+      const id = href && decodeURIComponent(href.slice(1));
+      if (id && headings.some((h) => h.id === id)) {
+        pinned = id;
+        schedule();
+      }
+    });
+    for (const type of ['wheel', 'touchmove', 'keydown']) {
+      addEventListener(type, () => pinned && ((pinned = undefined), schedule()), { passive: true });
+    }
     // Long lists scroll inside the panel; open it at the current section.
     nav.addEventListener('mouseenter', () =>
       nav.querySelector('.toc-panel li[data-active]')?.scrollIntoView({ block: 'nearest' }),
