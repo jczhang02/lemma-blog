@@ -1,6 +1,8 @@
 /* ---------- Tokens ---------- */
 
 :root {
+  color-scheme: light;
+
   /* Fonts. Latin font first, so English glyphs never come from the CJK font. */
   --font-sans: 'Inter Variable', 'Noto Sans SC Variable', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-serif: 'Source Serif 4 Variable', 'Noto Serif SC Variable', 'Songti SC', 'STSong', serif;
@@ -26,6 +28,7 @@
 }
 
 :root[data-theme='dark'] {
+  color-scheme: dark;
   --bg: #171715;
   --text: #e9e6de;
   --muted: #9c998f;
@@ -223,7 +226,11 @@ main:focus {
 
 .site-footer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  /* space-between spaces the two items; the column gap is only a minimum, so
+     both still fit on one row at 360px. */
+  gap: 0.5rem 0.25rem;
   margin-top: 6rem;
   padding: 2rem 0 3rem;
   border-top: 1px solid var(--rule);
@@ -233,6 +240,12 @@ main:focus {
 
 .site-footer a {
   text-decoration: none;
+}
+
+/* Very narrow screens: the links wrap below the copyright, never inside it. */
+.site-footer > span,
+.footer-links a {
+  white-space: nowrap;
 }
 
 .footer-links {
@@ -393,7 +406,6 @@ main:focus {
   margin-left: 0.35em;
   font-size: 0.75em;
   font-variant-numeric: lining-nums tabular-nums;
-  opacity: 0.75;
 }
 
 /* A tag page: the tag as title, then its post count and a way back. */
@@ -707,16 +719,21 @@ main:focus {
 
 /* Wide formulas, tables and code scroll sideways; the edge with more content
    fades out (data-more is set by the script in PostPage.astro). */
-.prose [data-more='right'] {
+:is(.prose, .cite-bibtex) [data-more='right'] {
   mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
 }
 
-.prose [data-more='left'] {
+:is(.prose, .cite-bibtex) [data-more='left'] {
   mask-image: linear-gradient(to left, #000 calc(100% - 2.5rem), transparent);
 }
 
-.prose [data-more='both'] {
+:is(.prose, .cite-bibtex) [data-more='both'] {
   mask-image: linear-gradient(to right, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
+}
+
+/* The mask would also hide the focus outline, so a focused block shows in full. */
+:is(.prose, .cite-bibtex) [data-more]:focus-visible {
+  mask-image: none;
 }
 
 /* ---------- Figures, tables, video ---------- */
@@ -898,6 +915,13 @@ main:focus {
   .code-block:hover .copy-button,
   .code-block .copy-button:focus-visible {
     opacity: 1;
+  }
+}
+
+/* The always-visible button sits above the first line, not on it. */
+@media (hover: none) {
+  .prose .code-block pre {
+    padding-top: 2.75rem;
   }
 }
 

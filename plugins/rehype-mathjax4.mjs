@@ -7,6 +7,7 @@
 import MathJax from '@mathjax/src';
 import { fromHtml } from 'hast-util-from-html';
 import { toText } from 'hast-util-to-text';
+import { visit } from 'unist-util-visit';
 import { visitParents } from 'unist-util-visit-parents';
 
 // Loaded up front; anything else is still reachable through \require or autoload.
@@ -33,8 +34,46 @@ function init(macros) {
     },
     // Wide display math scrolls sideways instead of overflowing the column.
     svg: { fontCache: 'local', displayOverflow: 'scroll' },
-  });
+  }).then(breakAfterOperators);
   return ready;
+}
+
+// Break inline math after relations and operators, as TeX does; MathJax breaks
+// before them. No option for this, so it patches internals of MathJax 4.1.3
+// (output/common.js markInlineBreaks, output/common/Wrappers/mo.js moLineBBox):
+// re-check on upgrade.
+function breakAfterOperators() {
+  const { BIN, REL } = MathJax._.core.MmlTree.MmlNode.TEXCLASS;
+  const output = MathJax.startup.output;
+  const mark = output.markInlineBreaks;
+  output.markInlineBreaks = function (node) {
+    // Classes first, so a unary minus (BIN -> ORD) is not taken for a break.
+    if (node?.parent?.isKind('math')) node.parent.setTeXclass(null);
+    mark.call(this, node);
+    for (const child of node?.childNodes ?? []) {
+      if (!child.getProperty('breakable') || !child.isEmbellished) continue;
+      const mo = child.coreMO();
+      const attrs = mo.attributes;
+      if (![BIN, REL].includes(mo.texClass) || attrs.get('linebreak') !== 'auto' || attrs.hasExplicit('linebreakstyle')) continue;
+      // Nothing to break before at the end.
+      if (child === node.childNodes.at(-1)) this.unmarkInlineBreaks(child);
+      else attrs.set('linebreakstyle', 'after');
+    }
+  };
+  // The space at the break is the left space of what follows the operator
+  // (MathJax looks for it in the wrong place and drops it).
+  const Mo = output.factory.getNodeClass('mo');
+  const moLineBBox = Mo.prototype.moLineBBox;
+  Mo.prototype.moLineBBox = function (i, style, obox) {
+    const bbox = moLineBBox.call(this, i, style, obox);
+    if (i === 0 && style === 'after') {
+      let top = this;
+      while (top.parent?.node.isEmbellished) top = top.parent;
+      const siblings = top.parent?.childNodes ?? [];
+      bbox.originalL = siblings[siblings.indexOf(top) + 1]?.getBBox().L ?? 0;
+    }
+    return bbox;
+  };
 }
 
 // Astro may transform several files at once; MathJax state (labels, macro
@@ -46,14 +85,57 @@ function serial(fn) {
   return run;
 }
 
+// [name, "\newcommand..."] for each macro.
 function toNewcommands(macros = {}) {
-  return Object.entries(macros)
-    .map(([name, def]) => {
-      const [body, n, opt] = Array.isArray(def) ? def : [def];
-      const args = n ? `[${n}]` + (opt !== undefined ? `[${opt}]` : '') : '';
-      return `\\newcommand{\\${name}}${args}{${body}}`;
-    })
-    .join('');
+  return Object.entries(macros).map(([name, def]) => {
+    const [body, n, opt] = Array.isArray(def) ? def : [def];
+    const args = n ? `[${n}]` + (opt !== undefined ? `[${opt}]` : '') : '';
+    return [name, `\\newcommand{\\${name}}${args}{${body}}`];
+  });
+}
+
+async function toSvg(tex, display) {
+  const html = MathJax.startup.adaptor.serializeXML(await MathJax.tex2svgPromise(tex, { display }));
+  return { html, error: html.match(/data-mjx-error="([^"]*)"/)?.[1] };
+}
+
+// The characters an SVG element draws, e.g. "(1)" for an \eqref link.
+function glyphText(node) {
+  let out = '';
+  visit(node, 'element', (el) => {
+    if (el.properties.dataC) out += String.fromCodePoint(parseInt(el.properties.dataC, 16));
+    else if (el.tagName === 'text') out += toText(el);
+    else return;
+    return 'skip';
+  });
+  return out;
+}
+
+// Render one item and put the SVG in place of the item (or of its last render).
+async function render(item, file, warn = true) {
+  const { html, error } = await toSvg(item.tex, item.display);
+  if (error && warn) console.warn(`[mathjax] ${file.path}: ${error}\n  in: ${item.tex}`);
+  const [rendered] = fromHtml(html, { fragment: true }).children;
+  rendered.properties ??= {};
+  rendered.properties.dataTex = item.tex;
+  // Screen readers get the TeX source, and links in it their number. Inline
+  // math with line breaks is several <svg>s: the first carries the label, the
+  // rest are hidden unless they hold a link.
+  const label = item.tex.replace(/\\label\{[^}]*\}/g, '').trim();
+  rendered.children
+    .filter((c) => c.tagName === 'svg')
+    .forEach((svg, i) => {
+      const links = [];
+      visit(svg, 'element', (el) => {
+        if (el.tagName === 'a') links.push(el);
+      });
+      for (const a of links) a.properties.ariaLabel = glyphText(a);
+      if (i && !links.length) svg.properties.ariaHidden = 'true';
+      else svg.properties.ariaLabel = label;
+    });
+  const node = item.rendered ?? item.node;
+  item.parent.children[item.parent.children.indexOf(node)] = rendered;
+  item.rendered = rendered;
 }
 
 function isMath(node) {
@@ -62,7 +144,7 @@ function isMath(node) {
 }
 
 // Bare \ref{..} / \eqref{..} in prose, as in LaTeX, without $ around them.
-const REF = /\\(?:eq)?ref\{[^}]+\}/g;
+const REF = /\\(?:eq)?ref\{([^}]+)\}/g;
 
 function wrapRefs(tree) {
   visitParents(tree, 'text', (node, ancestors) => {
@@ -108,19 +190,36 @@ export default function rehypeMathJax4(options = {}) {
     const fm = file.data.astro?.frontmatter ?? {};
     await serial(async () => {
       MathJax.texReset();
-      await MathJax.tex2svgPromise(`\\begingroupSandbox${toNewcommands(fm.macros)}`);
+      await MathJax.tex2svgPromise('\\begingroupSandbox');
+      // One macro at a time, so a broken one is named and does not drop the rest.
+      for (const [name, def] of toNewcommands(fm.macros)) {
+        const { error } = await toSvg(def, false);
+        if (error) console.warn(`[mathjax] ${file.path}: frontmatter macro \\${name}: ${error}`);
+      }
+
+      const tags = MathJax.startup.input[0].parseOptions.tags;
       for (const item of items) {
-        const out = await MathJax.tex2svgPromise(item.tex, { display: item.display });
-        const html = MathJax.startup.adaptor.serializeXML(out);
-        if (html.includes('data-mjx-error')) {
-          const msg = html.match(/data-mjx-error="([^"]*)"/)?.[1];
-          console.warn(`[mathjax] ${file.path}: ${msg}\n  in: ${item.tex}`);
+        item.refs = [...item.tex.matchAll(REF)].map((m) => m[1]);
+        // A label further down (or in the same formula) is not known yet and renders as "???".
+        item.forward = item.refs.some((key) => !Object.hasOwn(tags.allLabels, key));
+        await render(item, file);
+      }
+
+      // Now all labels are known. Render forward references again, but only in
+      // math that cannot define a label or step the equation counter.
+      const warned = new Set();
+      for (const item of items.filter((item) => item.forward)) {
+        const unknown = item.refs.filter((key) => !Object.hasOwn(tags.allLabels, key));
+        for (const key of unknown) {
+          if (!warned.has(key)) console.warn(`[mathjax] ${file.path}: unknown label ${key}`);
+          warned.add(key);
         }
-        const [rendered] = fromHtml(html, { fragment: true }).children;
-        rendered.properties ??= {};
-        rendered.properties.dataTex = item.tex;
-        const i = item.parent.children.indexOf(item.node);
-        item.parent.children[i] = rendered;
+        if (unknown.length) continue;
+        if (/\\(?:label|tag|begin)\b/.test(item.tex)) {
+          console.warn(`[mathjax] ${file.path}: forward reference in math that may hold a label or number, shown as ???\n  in: ${item.tex}`);
+        } else {
+          await render(item, file, false);
+        }
       }
     });
   };

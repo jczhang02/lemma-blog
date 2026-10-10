@@ -26,7 +26,7 @@ const bibtex = `@misc{${key},
   <p>{SITE.author}. {post.data.title}. {year}. <a href={url}>{url}</a></p>
   <div class="cite-bibtex">
     <pre><code>{bibtex}</code></pre>
-    <button class="copy-button" type="button">{t.copy}</button>
+    <button class="copy-button" type="button" aria-live="polite">{t.copy}</button>
   </div>
 </section>
 

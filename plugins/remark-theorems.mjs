@@ -100,6 +100,11 @@ export default function remarkTheorems() {
     let subsection = 0;
     let counter = 0;
     const floats = { figure: 0, table: 0 };
+    const ids = new Set();
+    const claim = (id) => {
+      if (ids.has(id)) console.warn(`[theorems] ${file.path}: duplicate label ${id}`);
+      ids.add(id);
+    };
 
     // Directives we do not handle (e.g. "std::vector", "note:this", or the
     // ":intro" in "\label{sec:intro}") go back to their source text first, so
@@ -114,9 +119,11 @@ export default function remarkTheorems() {
     mergeText(tree);
 
     visit(tree, (node) => {
-      if (node.type === 'heading' && (node.depth === 2 || node.depth === 3)) {
+      if (node.type === 'heading' && node.depth >= 2) {
         const label = takeLabel(node);
-        if (!numbered) {
+        if (label) claim(label);
+        // h4-h6 are not numbered; their label only sets the id.
+        if (!numbered || node.depth > 3) {
           if (label) node.data = { hProperties: { id: label } };
           return;
         }
@@ -141,6 +148,7 @@ export default function remarkTheorems() {
 
       const kind = node.name;
       const id = node.attributes?.id;
+      if (id) claim(id);
       const classes = node.attributes?.class?.split(/\s+/) ?? [];
       const title = node.children[0]?.data?.directiveLabel ? node.children.shift().children : null;
 

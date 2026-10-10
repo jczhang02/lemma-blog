@@ -2,13 +2,14 @@
 import Base from '../layouts/Base.astro';
 import PostList from '../components/PostList.astro';
 import TagLine from '../components/TagLine.astro';
-import { getPosts, ui } from '../i18n';
+import { SITE, getPosts, ui } from '../i18n';
 
 const lang = 'zh';
 const posts = await getPosts(lang);
 ---
 
 <Base lang={lang} alternate="/en/">
+  <h1 class="sr-only">{SITE.title}</h1>
   <section class="intro">
     <p>{ui[lang].description}</p>
   </section>

@@ -41,6 +41,8 @@ const { toc, label } = Astro.props;
       .filter((h): h is HTMLElement => h !== null);
     let active: string | undefined;
     let pinned: string | undefined;
+    // Where the jump to the pinned heading landed; any other scroll releases it.
+    let pinnedAt: number | undefined;
     let queued = false;
     // A heading becomes current at the scroll position where it reaches the
     // top fifth of the viewport. Near the end of the page the last headings
@@ -50,6 +52,7 @@ const { toc, label } = Astro.props;
     // the very bottom.
     const update = () => {
       queued = false;
+      if (pinned && pinnedAt !== undefined && Math.abs(scrollY - pinnedAt) > 4) pinned = undefined;
       const max = document.documentElement.scrollHeight - innerHeight;
       const tail = Math.min(innerHeight / 2, max);
       const start = max - tail;
@@ -70,18 +73,39 @@ const { toc, label } = Astro.props;
     addEventListener('resize', schedule);
     // After following a link to a heading (TOC entry or \ref), keep that
     // heading current even if the page cannot scroll it to the top; the
-    // reader's own next scroll releases it.
+    // reader's own next scroll (wheel, touch, scroll keys, scrollbar, script)
+    // releases it.
+    const pin = (id: string | undefined) => {
+      pinned = id;
+      pinnedAt = undefined;
+      schedule();
+      if (!id) return;
+      // The jump to the heading is instant; record where it landed. Back and
+      // Forward restore the old scroll position instead, so keep the pin only
+      // if the heading is at the top (or on screen at the end of the page).
+      requestAnimationFrame(() => {
+        if (pinned !== id) return;
+        const top = document.getElementById(id)!.getBoundingClientRect().top;
+        const end = scrollY >= document.documentElement.scrollHeight - innerHeight - 4;
+        if (Math.abs(top) <= 4 || (end && top > 0 && top < innerHeight)) pinnedAt = scrollY;
+        else pin(undefined);
+      });
+    };
+    const isHeading = (id: string | undefined) => !!id && headings.some((h) => h.id === id);
     document.addEventListener('click', (event) => {
       const href = (event.target as Element).closest?.('a[href^="#"]')?.getAttribute('href');
-      const id = href && decodeURIComponent(href.slice(1));
-      if (id && headings.some((h) => h.id === id)) {
-        pinned = id;
-        schedule();
-      }
+      const id = href ? decodeURIComponent(href.slice(1)) : undefined;
+      if (isHeading(id)) pin(id);
     });
-    for (const type of ['wheel', 'touchmove', 'keydown']) {
-      addEventListener(type, () => pinned && ((pinned = undefined), schedule()), { passive: true });
-    }
+    // Back/Forward between headings: pin the heading in the new URL, if any.
+    addEventListener('hashchange', () => {
+      const id = decodeURIComponent(location.hash.slice(1));
+      pin(isHeading(id) ? id : undefined);
+    });
+    const release = () => pinned && ((pinned = undefined), schedule());
+    for (const type of ['wheel', 'touchmove']) addEventListener(type, release, { passive: true });
+    const scrollKeys = ['PageUp', 'PageDown', 'ArrowUp', 'ArrowDown', 'Home', 'End', ' '];
+    addEventListener('keydown', (event) => scrollKeys.includes(event.key) && release());
     update();
   }
 </script>
@@ -213,6 +237,10 @@ const { toc, label } = Astro.props;
     li:focus-within .toc-card {
       transform: translate(0, -50%);
       transition: opacity 0.12s;
+    }
+
+    .toc-tick {
+      transition: background-color 0.2s;
     }
   }
 </style>

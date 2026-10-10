@@ -22,10 +22,19 @@ export default function remarkMedia({ posts }) {
     const visit = (node) => {
       for (const [i, child] of (node.children ?? []).entries()) {
         if (child.type === 'image' && isVideo(child.url) && !/^[a-z]+:/i.test(child.url)) {
-          const path = join(dirname(file.path), decodeURIComponent(child.url));
-          if (!existsSync(path)) console.warn(`[media] ${file.path}: missing ${child.url}`);
-          else if (statSync(path).size > MAX_BYTES) console.warn(`[media] ${file.path}: ${child.url} is over 25 MiB; host it elsewhere`);
-          const src = `${BASE}/${relative(root, path).split('\\').join('/')}`;
+          let src = child.url;
+          // Root-absolute URLs point into public/ and are served as they are.
+          if (!src.startsWith('/')) {
+            const path = join(dirname(file.path), decodeURIComponent(child.url));
+            const rel = relative(root, path);
+            if (rel.startsWith('..')) {
+              console.warn(`[media] ${file.path}: ${child.url} is outside the posts folder`);
+              continue;
+            }
+            if (!existsSync(path)) console.warn(`[media] ${file.path}: missing ${child.url}`);
+            else if (statSync(path).size > MAX_BYTES) console.warn(`[media] ${file.path}: ${child.url} is over 25 MiB; host it elsewhere`);
+            src = `${BASE}/${rel.split('\\').join('/')}`;
+          }
           node.children[i] = {
             type: 'video',
             data: {

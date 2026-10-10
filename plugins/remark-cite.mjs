@@ -41,8 +41,9 @@ function restoreMath(tree, math) {
     const parts = node.value.split(TOKEN).map((part, i) =>
       i % 2 ? { type: 'element', tagName: 'code', properties: { className: ['math-inline'] }, children: [text(math[part])] } : text(part),
     );
-    parent.children.splice(index, 1, ...parts.filter((p) => p.type !== 'text' || p.value));
-    return index + parts.length;
+    const kept = parts.filter((p) => p.type !== 'text' || p.value);
+    parent.children.splice(index, 1, ...kept);
+    return index + kept.length;
   });
 }
 

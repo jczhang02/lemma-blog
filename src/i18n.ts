@@ -18,6 +18,7 @@ export const ui = {
     posts: '文章',
     noPosts: '还没有文章.',
     email: '邮箱',
+    links: '链接',
     rss: 'RSS',
     readIn: 'Read in English',
     updated: '更新于',
@@ -41,6 +42,7 @@ export const ui = {
     posts: 'Posts',
     noPosts: 'No posts yet.',
     email: 'Email',
+    links: 'Links',
     rss: 'RSS',
     readIn: '阅读中文版',
     updated: 'Updated',
@@ -82,8 +84,17 @@ export function formatDate(date: Date, lang: Lang) {
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
 }
 
-/** URL segment for a tag: lowercase, spaces to hyphens ("Number Theory" -> "number-theory"). */
-export const tagSlug = (tag: string) => tag.trim().toLowerCase().replace(/\s+/g, '-');
+/**
+ * URL segment for a tag: lowercase, spaces and URL-reserved characters to
+ * hyphens ("Number Theory" -> "number-theory", "C#" -> "c").
+ */
+export const tagSlug = (tag: string) =>
+  tag
+    .trim()
+    .toLowerCase()
+    .replace(/[\s/#?%]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 export const tagUrl = (lang: Lang, tag: string) => `${prefix(lang)}/tags/${tagSlug(tag)}/`;
 
 /** Tags of one language with their posts, most used first. */

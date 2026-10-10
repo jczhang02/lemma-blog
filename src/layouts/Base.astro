@@ -46,11 +46,19 @@ const switchTo = alternate ?? `${prefix(other)}/`;
     <script is:inline>
       // Runs before paint, so the page never flashes the wrong theme.
       (() => {
-        const stored = localStorage.getItem('theme');
+        // Storage can be blocked (privacy settings); then follow the OS.
+        const stored = () => {
+          try {
+            return localStorage.getItem('theme');
+          } catch {
+            return null;
+          }
+        };
         const media = matchMedia('(prefers-color-scheme: dark)');
         const apply = (dark) => (document.documentElement.dataset.theme = dark ? 'dark' : 'light');
-        apply(stored ? stored === 'dark' : media.matches);
-        media.addEventListener('change', (e) => !localStorage.getItem('theme') && apply(e.matches));
+        const theme = stored();
+        apply(theme ? theme === 'dark' : media.matches);
+        media.addEventListener('change', (e) => !stored() && apply(e.matches));
       })();
     </script>
   </head>
@@ -58,7 +66,7 @@ const switchTo = alternate ?? `${prefix(other)}/`;
     <a class="skip-link" href="#main">{t.skipToContent}</a>
     <header class="site-header">
       <a class="wordmark" href={`${prefix(lang)}/`}>
-        <Image class="wordmark-avatar" src={avatar} alt="" width={32} height={32} densities={[1, 2, 3]} loading="eager" />
+        <Image class="wordmark-avatar" src={avatar} alt="" width={32} height={32} layout="none" densities={[1, 2, 3]} loading="eager" />
         {SITE.title}
       </a>
       <nav>
@@ -75,17 +83,23 @@ const switchTo = alternate ?? `${prefix(other)}/`;
     </main>
     <footer class="site-footer">
       <span>© {new Date().getFullYear()} {SITE.title}</span>
-      <nav class="footer-links" aria-label="Links">
+      <nav class="footer-links" aria-label={t.links}>
         <a href={`mailto:${SITE.email}`}>{t.email}</a>
         <a href={`https://github.com/${SITE.github}`}>GitHub</a>
         <a href={`${prefix(lang)}/rss.xml`}>{t.rss}</a>
       </nav>
     </footer>
     <script>
-      document.querySelector('.theme-toggle')?.addEventListener('click', () => {
+      const toggle = document.querySelector<HTMLButtonElement>('.theme-toggle');
+      const pressed = () => toggle?.setAttribute('aria-pressed', String(document.documentElement.dataset.theme === 'dark'));
+      pressed();
+      toggle?.addEventListener('click', () => {
         const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
         document.documentElement.dataset.theme = next;
-        localStorage.setItem('theme', next);
+        pressed();
+        try {
+          localStorage.setItem('theme', next);
+        } catch {}
       });
     </script>
   </body>

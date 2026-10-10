@@ -8,6 +8,7 @@ export const rssFeed = (lang: Lang) => async (context: APIContext) => {
     title: SITE.title,
     description: ui[lang].description,
     site: context.site!,
+    customData: `<language>${lang === 'zh' ? 'zh-CN' : 'en'}</language>`,
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
