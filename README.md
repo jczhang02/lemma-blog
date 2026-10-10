@@ -1,43 +1,43 @@
-# Astro Starter Kit: Minimal
+# Blog
+
+Astro static site. Math is rendered at build time by MathJax 4 (SVG), so pages ship no math JS.
 
 ```sh
-pnpm create astro@latest -- --template minimal
+pnpm dev      # http://localhost:4321
+pnpm build    # output in dist/
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Writing
 
-## 🚀 Project Structure
+- Posts: `src/content/posts/zh/<slug>.md` and `src/content/posts/en/<slug>.md`.
+  The same `<slug>` in both folders links the two versions.
+- Use `.md`, not `.mdx`: MDX treats `{`, `}` and `<` as JSX and breaks TeX.
+- Math: `$...$` inline, `$$...$$` display. `\label` / `\eqref` work, also bare in prose.
+- Macros: site-wide in `src/math-macros.mjs`; per post under `macros:` in frontmatter.
+  `\newcommand` inside a post stays in that post.
+- The build prints `[mathjax] <file>: <error>` for TeX errors and undefined macros.
+- Theorem-like environments (theorem, lemma, proposition, corollary, definition,
+  example, remark, proof). Numbered kinds share one counter per post:
 
-Inside of your Astro project, you'll see the following folders and files:
+  ```md
+  :::theorem[Lagrange]{#thm:lagrange}
+  Statement.
+  :::
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+  :::proof
+  By Theorem \ref{thm:lagrange}, ...
+  :::
+  ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+  `\ref{id}` of a theorem becomes a link with its number (write "定理 \ref{..}" as in LaTeX).
+  Other `\ref` / `\eqref` go to MathJax. `:::proof[Proof of ...]` replaces the proof head.
+  Write theorem `\ref` in prose, not inside `$...$`: MathJax only knows equation labels.
+  Forward references work.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Files
 
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- `plugins/rehype-mathjax4.mjs`: MathJax pipeline (package list, macro sandbox).
+- `plugins/remark-theorems.mjs`: theorem environments, numbering, `\ref` to theorems.
+- `src/styles/global.css`: all design tokens (colors, fonts) at the top.
+- `src/styles/mathjax.css`: generated; rerun `node scripts/gen-mathjax-css.mjs` after a MathJax upgrade.
+- `src/i18n.ts`: site name and UI strings.

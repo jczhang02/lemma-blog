@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts, ui } from '../../i18n';
+
+const lang = 'en';
+const posts = await getPosts(lang);
+---
+
+<Base lang={lang} alternate="/">
+  <section class="intro">
+    <p>{ui[lang].description}</p>
+  </section>
+  <PostList posts={posts} lang={lang} />
+</Base>

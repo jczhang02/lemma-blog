@@ -1,0 +1,45 @@
+---
+import { getEntry, render, type CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Toc from './Toc.astro';
+import { formatDate, langOf, otherLang, postUrl, slugOf, tagUrl, ui } from '../i18n';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+const { post } = Astro.props;
+const lang = langOf(post);
+const t = ui[lang];
+const { Content, remarkPluginFrontmatter } = await render(post);
+const translation = await getEntry('posts', `${otherLang(lang)}/${slugOf(post)}`);
+const alternate = translation && !translation.data.draft ? postUrl(translation) : undefined;
+const { title, description, date, updated, tags } = post.data;
+---
+
+<Base lang={lang} title={title} description={description} alternate={alternate}>
+  <Toc toc={remarkPluginFrontmatter.toc ?? []} label={t.toc} />
+  <article class="post">
+    <header class="post-header">
+      <h1>{title}</h1>
+      <p class="post-meta">
+        <time datetime={date.toISOString()}>{formatDate(date, lang)}</time>
+        {updated && <span>{t.updated} <time datetime={updated.toISOString()}>{formatDate(updated, lang)}</time></span>}
+        {alternate && <a href={alternate} hreflang={otherLang(lang)} lang={otherLang(lang)}>{t.readIn}</a>}
+      </p>
+      {
+        tags.length > 0 && (
+          <ul class="tag-list" aria-label={t.tags}>
+            {tags.map((tag) => (
+              <li>
+                <a href={tagUrl(lang, tag)}>{tag}</a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Base>

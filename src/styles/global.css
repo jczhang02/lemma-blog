@@ -1,0 +1,583 @@
+/* ---------- Tokens ---------- */
+
+:root {
+  /* Fonts. Latin font first, so English glyphs never come from the CJK font. */
+  --font-sans: 'Inter Variable', 'Noto Sans SC Variable', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-serif: 'Source Serif 4 Variable', 'Noto Serif SC Variable', 'Songti SC', 'STSong', serif;
+  --font-kai: 'Source Serif 4 Variable', 'LXGW WenKai Screen', 'Kaiti SC', 'STKaiti', serif;
+  /* The Nerd Font is used if installed locally; visitors get the same letterforms from the webfont. */
+  --font-mono: 'JetBrainsMono Nerd Font Mono', 'JetBrainsMono Nerd Font', 'JetBrains Mono Variable', ui-monospace, Menlo, Consolas, 'Noto Sans SC Variable', monospace;
+
+  --measure: 46rem;
+  --text-base: 1.125rem;
+  --leading: 1.75;
+
+  /* Light: warm paper. */
+  --bg: #faf9f5;
+  --text: #191917;
+  --muted: #6b6a64;
+  --rule: #e6e3d9;
+  --surface: #f2f0e8;
+  --accent: #b5532f;
+  --selection: #ead9cc;
+  /* Floating surfaces (popovers): lighter paper lifted by shadow. */
+  --raised: #fffefb;
+  --shadow-raised: 0 1px 2px rgb(25 25 23 / 0.06), 0 12px 32px -8px rgb(25 25 23 / 0.2);
+}
+
+:root[data-theme='dark'] {
+  --bg: #171715;
+  --text: #e9e6de;
+  --muted: #9c998f;
+  --rule: #2e2d29;
+  --surface: #201f1c;
+  --accent: #e08b66;
+  --selection: #4a3328;
+  /* Shadows barely read on dark; a faint ring carries the edge instead. */
+  --raised: #22211e;
+  --shadow-raised: 0 0 0 1px rgb(255 255 255 / 0.07), 0 16px 40px -8px rgb(0 0 0 / 0.6);
+}
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0 auto;
+  max-width: calc(var(--measure) + 3rem);
+  padding: 0 1.5rem;
+  font-size: var(--text-base);
+  line-height: var(--leading);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+a {
+  color: inherit;
+  text-decoration-color: var(--rule);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+
+a:hover {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ---------- Header / footer ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 0 4rem;
+  font-family: var(--font-serif);
+  /* Serif reads smaller than sans at the same size. */
+  font-size: 1rem;
+}
+
+.wordmark {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.site-header nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.site-header nav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.site-header nav a:hover {
+  color: var(--text);
+}
+
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0 -0.375rem 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+}
+
+.theme-toggle svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+[data-theme='light'] .icon-sun,
+[data-theme='dark'] .icon-moon {
+  display: none;
+}
+
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding: 2rem 0 3rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.site-footer a {
+  text-decoration: none;
+}
+
+/* ---------- Home ---------- */
+
+.intro {
+  margin-bottom: 3rem;
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+}
+
+.intro p {
+  margin: 0;
+}
+
+.post-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.post-list li {
+  border-bottom: 1px solid var(--rule);
+}
+
+.post-list a {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  column-gap: 1.5rem;
+  padding: 1.25rem 0;
+  text-decoration: none;
+}
+
+.post-list time {
+  grid-row: span 2;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.post-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.post-desc {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.post-list a:hover .post-title {
+  color: var(--accent);
+}
+
+@media (max-width: 36rem) {
+  .post-list a {
+    grid-template-columns: 1fr;
+  }
+  .post-list time {
+    grid-row: auto;
+    line-height: 1.6;
+  }
+}
+
+/* ---------- Tags ---------- */
+
+.page-title {
+  margin: 0 0 2.5rem;
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+
+.tag-list a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.tag-list a::before {
+  content: '#';
+  margin-right: 0.1em;
+  color: var(--rule);
+}
+
+.tag-list a:hover {
+  color: var(--accent);
+}
+
+.tag-index {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.tag-index li {
+  border-bottom: 1px solid var(--rule);
+}
+
+.tag-index a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.875rem 0;
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  text-decoration: none;
+}
+
+.tag-count {
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tag-index a:hover span:first-child {
+  color: var(--accent);
+}
+
+/* ---------- Post ---------- */
+
+.post-header {
+  margin-bottom: 3rem;
+}
+
+.post-header h1 {
+  margin: 0 0 1rem;
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.post-meta a {
+  margin-left: auto;
+}
+
+/* ---------- Prose ---------- */
+
+/* Article text is serif; site chrome (nav, dates, lists) stays sans. */
+.prose {
+  font-family: var(--font-serif);
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose p,
+.prose ul,
+.prose ol,
+.prose blockquote {
+  margin: 0 0 1.25em;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.prose h2 {
+  margin: 2.5em 0 0.75em;
+  font-size: 1.625rem;
+}
+
+.prose h3 {
+  margin: 2em 0 0.5em;
+  font-size: 1.25rem;
+}
+
+.prose h4 {
+  margin: 1.75em 0 0.5em;
+  font-size: 1.0625rem;
+}
+
+.prose a {
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.prose a:hover {
+  text-decoration-color: currentColor;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.5em;
+}
+
+.prose li + li {
+  margin-top: 0.25em;
+}
+
+.prose li::marker {
+  color: var(--muted);
+}
+
+.prose blockquote {
+  padding-left: 1.25em;
+  border-left: 2px solid var(--rule);
+  color: var(--muted);
+}
+
+.prose hr {
+  margin: 3em 0;
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Tables follow booktabs: a heavy top and bottom rule, a light rule under
+   the header, no vertical rules, centred as with \centering. */
+.table-wrap {
+  margin: 1.5em 0;
+  overflow-x: auto;
+}
+
+.prose table {
+  margin: 0 auto;
+  border-collapse: collapse;
+  border-top: 1.5px solid var(--text);
+  border-bottom: 1.5px solid var(--text);
+  font-size: 0.9375rem;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1.5;
+}
+
+.prose thead th {
+  border-bottom: 1px solid var(--text);
+  font-weight: 600;
+}
+
+.prose th,
+.prose td {
+  padding: 0.4em 0.9em;
+}
+
+/* GFM column alignment comes as an align attribute; only fill in a default. */
+.prose th:not([align]),
+.prose td:not([align]) {
+  text-align: left;
+}
+
+/* First row after the header gets the space booktabs adds below \midrule. */
+.prose tbody tr:first-child td {
+  padding-top: 0.6em;
+}
+
+.prose tbody tr:last-child td {
+  padding-bottom: 0.6em;
+}
+
+/* ---------- Theorems ---------- */
+
+.thm,
+.proof {
+  margin: 1.75em 0;
+}
+
+.thm > :last-child,
+.proof > :last-child {
+  margin-bottom: 0;
+}
+
+/* Statements: kai in Chinese, italic in English, as in print. */
+:lang(zh) .thm:is([data-kind='theorem'], [data-kind='lemma'], [data-kind='proposition'], [data-kind='corollary']) {
+  font-family: var(--font-kai);
+}
+
+:lang(en) .thm:is([data-kind='theorem'], [data-kind='lemma'], [data-kind='proposition'], [data-kind='corollary']) {
+  font-style: italic;
+}
+
+.thm code {
+  font-style: normal;
+}
+
+/* The head stays in the body font, upright. */
+.thm-head {
+  font-family: var(--font-serif);
+  font-style: normal;
+}
+
+.thm-head strong {
+  font-weight: 600;
+}
+
+:lang(zh) .proof .thm-head {
+  font-family: var(--font-kai);
+}
+
+:lang(en) .proof .thm-head {
+  font-style: italic;
+}
+
+.qed {
+  float: right;
+  margin-left: 1em;
+  color: var(--muted);
+}
+
+/* Proof that ends in display math: the mark gets its own right-aligned line. */
+.prose .qed-line {
+  margin-top: -1.75em;
+  text-align: right;
+}
+
+.qed-line .qed {
+  float: none;
+}
+
+/* ---------- Code ---------- */
+
+code,
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+.prose :not(pre) > code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.prose pre {
+  margin: 0 0 1.5em;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+/* Shiki emits both themes as CSS variables; pick one by data-theme. */
+.astro-code {
+  background-color: var(--surface) !important;
+}
+
+.astro-code,
+.astro-code span {
+  color: var(--shiki-light);
+}
+
+[data-theme='dark'] .astro-code,
+[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark);
+}
+
+/* ---------- Math ---------- */
+
+mjx-container[jax='SVG'][display] {
+  margin: 1.25em 0;
+  padding: 0.25em 0;
+}
+
+/* \eqref and \href links inside math. */
+mjx-container[jax='SVG'] > svg a {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+g[data-mml-node='merror'] > rect[data-background] {
+  fill: color-mix(in srgb, #e5484d 15%, transparent);
+}
+
+g[data-mml-node='merror'] > g {
+  fill: #e5484d;
+  stroke: #e5484d;
+}
