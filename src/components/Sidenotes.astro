@@ -27,7 +27,14 @@
     const note = document.createElement('div');
     note.className = 'sidenote';
     note.setAttribute('role', 'note');
-    note.append(...displayCopy(li).childNodes);
+    // The list is hidden beside the notes: links in a note must take focus,
+    // and every reference points to the note (a reference moves focus to it).
+    note.id = `side-${li.id}`;
+    note.tabIndex = -1;
+    note.append(...displayCopy(li, { focusable: true }).childNodes);
+    for (const a of prose.querySelectorAll(`a[data-footnote-ref][href="#${CSS.escape(li.id)}"]`)) a.setAttribute('aria-details', note.id);
+    // The reference the note stands beside (it needs no preview card).
+    ref.dataset.sidenote = '';
     const num = document.createElement('span');
     num.className = 'sidenote-num';
     num.textContent = ref.textContent;
@@ -37,7 +44,7 @@
     const refMark = baselineMark();
     sup.after(refMark);
     column.append(note);
-    return [{ ref, sup, note, refMark, noteMark }];
+    return [{ li, ref, sup, note, refMark, noteMark }];
   });
 
   if (notes.length) {
@@ -75,9 +82,24 @@
     };
     prose.addEventListener('mouseover', (event) => link(event, true));
     prose.addEventListener('mouseout', (event) => link(event, false));
-    // The note is already beside the text: the reference does not jump to the list.
+    prose.addEventListener('focusin', (event) => link(event, true));
+    prose.addEventListener('focusout', (event) => link(event, false));
+    // A reference goes to its note, not to the hidden list. The note beside
+    // it takes focus only from the keyboard (so Tab reaches its links); a
+    // later reference to the same note scrolls to it. A link preview on a
+    // touch screen cancels the click first: then nothing happens.
     prose.addEventListener('click', (event) => {
-      if (article.classList.contains('has-sidenotes') && (event.target as Element).closest('a[data-footnote-ref]')) event.preventDefault();
+      if (event.defaultPrevented || !article.classList.contains('has-sidenotes')) return;
+      const a = (event.target as Element).closest('a[data-footnote-ref]');
+      const pair = a && notes.find((n) => a.getAttribute('href') === `#${n.li.id}`);
+      if (!pair) return;
+      event.preventDefault();
+      if (a !== pair.ref || event.detail === 0) pair.note.focus({ preventScroll: a === pair.ref });
+    });
+    // Escape in a note goes back to its reference.
+    column.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !article.classList.contains('has-sidenotes')) return;
+      notes.find((n) => n.note.contains(event.target as Node))?.ref.focus();
     });
   }
 </script>

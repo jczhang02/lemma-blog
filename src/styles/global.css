@@ -472,7 +472,7 @@ main:focus {
 
 /* ---------- Prose ---------- */
 
-/* Article text is serif; site chrome (nav, dates, lists) stays sans. */
+/* Article text is serif, as is the header; dates and lists stay sans. */
 .prose {
   font-family: var(--font-serif);
 }
@@ -845,8 +845,9 @@ main:focus {
   margin: 0 0 0.5em;
 }
 
-/* Narrow columns are not justified (see Prose); long code may break anywhere. */
-:lang(zh) .prose :is(.sidenote, .preview-body) p {
+/* Narrow columns are not justified (see Prose); long code may break anywhere.
+   The preview card's body is itself .prose, so it is matched as one. */
+:lang(zh) :is(.prose .sidenote, .prose.preview-body) p {
   text-align: left;
 }
 
@@ -906,7 +907,8 @@ main:focus {
 }
 
 .preview-body {
-  max-height: 18rem;
+  /* Room left for the padding and jump link, on short screens too. */
+  max-height: min(18rem, 100vh - 6rem);
   overflow: hidden;
   font-size: 0.9375rem;
   line-height: 1.6;

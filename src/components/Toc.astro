@@ -108,6 +108,13 @@ const { toc, label } = Astro.props;
     for (const type of ['wheel', 'touchmove']) addEventListener(type, release, { passive: true });
     const scrollKeys = ['PageUp', 'PageDown', 'ArrowUp', 'ArrowDown', 'Home', 'End', ' '];
     addEventListener('keydown', (event) => scrollKeys.includes(event.key) && release());
+    // Escape hides the card of the focused tick, until focus or the pointer
+    // moves on.
+    nav.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') (event.target as Element).closest('li')?.setAttribute('data-dismissed', '');
+    });
+    nav.addEventListener('focusout', (event) => (event.target as Element).closest('li')?.removeAttribute('data-dismissed'));
+    nav.addEventListener('mouseleave', () => items.forEach((li) => li.removeAttribute('data-dismissed')));
     update();
   }
 </script>
@@ -212,6 +219,11 @@ const { toc, label } = Astro.props;
     opacity: 1;
     transform: translate(0, -50%);
     transition: opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  li[data-dismissed] .toc-card {
+    opacity: 0;
+    transform: translate(-0.25rem, -50%);
   }
 
   .toc-card-title {

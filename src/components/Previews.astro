@@ -34,17 +34,21 @@
   const hrefOf = (a: Element) => a.getAttribute('href') ?? a.getAttribute('xlink:href') ?? '';
 
   // The links that preview: in the article text, not in a card, and footnote
-  // references only where no sidenote stands beside them.
+  // references only where no sidenote stands beside them (a note cited twice
+  // stands beside its first reference only).
   function previewLink(node: EventTarget | null) {
     const a = node instanceof Element ? node.closest(LINKS) : null;
     if (!a || !prose.contains(a) || a.closest('.sidenotes')) return null;
-    if (a.matches('[data-footnote-ref]') && article.classList.contains('has-sidenotes')) return null;
+    if (a.matches('[data-footnote-ref][data-sidenote]') && article.classList.contains('has-sidenotes')) return null;
     return a;
   }
 
   // What the card shows for a link, or nothing if the target is missing.
   function preview(a: Element) {
-    const target = document.getElementById(decodeURIComponent(hrefOf(a).slice(1)));
+    // Footnote ids stay percent-encoded (a label such as [^注]); other ids are
+    // found by their decoded form, as the browser does.
+    const frag = hrefOf(a).slice(1);
+    const target = document.getElementById(frag) ?? document.getElementById(decodeURIComponent(frag));
     if (!target) return null;
     // A list entry (reference or note) is numbered by its list: say the number.
     if (target.matches('li')) {
@@ -82,16 +86,20 @@
     // Below the link, or above it if only that fits; never past the sides.
     const below = link.bottom + margin;
     const top = below + h > innerHeight - margin && link.top - margin - h > margin ? link.top - margin - h : below;
+    // If neither fits (a short screen), keep the whole card, and its jump
+    // link, on screen.
+    const y = Math.max(margin, Math.min(top, innerHeight - margin - h));
     const left = Math.min(Math.max(link.left + link.width / 2 - w / 2, margin), innerWidth - w - margin);
-    card.style.top = `${top}px`;
+    card.style.top = `${y}px`;
     card.style.left = `${left}px`;
   }
 
+  // Whether the card is open for the link (not if its target is missing).
   function open(a: Element) {
     clearTimeout(closeTimer);
-    if (current === a) return;
+    if (current === a) return true;
     const parts = preview(a);
-    if (!parts) return;
+    if (!parts) return false;
     current = a;
     body.replaceChildren(...parts);
     jump.href = hrefOf(a);
@@ -103,6 +111,7 @@
     place(a);
     card.classList.remove('is-measuring');
     card.classList.add('is-open');
+    return true;
   }
 
   function close() {
@@ -145,19 +154,15 @@
   addEventListener('keydown', (event) => event.key === 'Escape' && close());
 
   // Touch: the first tap opens the card, a second tap on the same link
-  // follows it. Capture phase, so other handlers (the TOC) see the
-  // cancelled click.
+  // follows it; a link with nothing to preview is followed at once. Capture
+  // phase, so other handlers (the TOC, sidenotes) see the cancelled click.
   document.addEventListener(
     'click',
     (event) => {
       if (!touch.matches) return;
       const a = previewLink(event.target);
-      if (a && a !== current) {
-        event.preventDefault();
-        open(a);
-      } else if (!card.contains(event.target as Node)) {
-        close();
-      }
+      if (a && a !== current && open(a)) event.preventDefault();
+      else if (!card.contains(event.target as Node)) close();
     },
     true,
   );
