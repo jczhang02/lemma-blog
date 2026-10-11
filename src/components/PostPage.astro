@@ -19,7 +19,7 @@ const { title, description, date, updated, tags } = post.data;
 const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
 ---
 
-<Base lang={lang} title={title} description={description} alternate={alternate}>
+<Base lang={lang} title={title} description={description} alternate={alternate} published={date}>
   <Toc toc={remarkPluginFrontmatter.toc ?? []} label={t.toc} />
   <article class="post" data-copy={t.copy} data-copied={t.copied}>
     <header class="post-header">
@@ -109,7 +109,7 @@ const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
     else el.removeAttribute('tabindex');
   };
   const resize = new ResizeObserver((entries) => entries.forEach((e) => mark(e.target as HTMLElement)));
-  for (const el of document.querySelectorAll<HTMLElement>('.prose mjx-container[display], .prose .table-wrap, .prose pre, .cite-bibtex pre')) {
+  for (const el of document.querySelectorAll<HTMLElement>('.prose mjx-container[display], .prose .table-wrap, .prose .tikz, .prose pre, .cite-bibtex pre')) {
     el.addEventListener('scroll', () => mark(el), { passive: true });
     resize.observe(el);
   }

@@ -3,7 +3,7 @@
 //
 // Prose is timed by script: Chinese at 400 characters a minute, Latin text at
 // 230 words a minute. Math takes longer than its length suggests, so each
-// formula and theorem-like block adds a fixed time. Must run before
+// formula, diagram and theorem-like block adds a fixed time. Must run before
 // remark-cite, which appends the reference list (not counted).
 import { visit } from 'unist-util-visit';
 
@@ -35,6 +35,7 @@ export default function remarkReading() {
           seconds += SECONDS.inlineMath;
           break;
         case 'math':
+        case 'tikz':
           seconds += SECONDS.math;
           break;
         case 'code':

@@ -1,6 +1,6 @@
 // @ts-check
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
@@ -14,6 +14,7 @@ import remarkDirective from 'remark-directive';
 // - Astro caches rendered posts until the config changes; the hash is part of
 //   the config (plugin options), so an edit re-renders every post.
 const MODULES = [
+  './plugins/remark-tikz.mjs',
   './plugins/remark-theorems.mjs',
   './plugins/remark-reading.mjs',
   './plugins/remark-cite.mjs',
@@ -22,16 +23,21 @@ const MODULES = [
   './plugins/rehype-tables.mjs',
   './plugins/rehype-footnotes.mjs',
   './plugins/media.mjs',
+  './plugins/shiki-themes.mjs',
   './src/math-macros.mjs',
 ];
-const bibliography = new URL('./src/references.bib', import.meta.url);
-const DATA = ['./plugins/ams-numeric.csl', './src/references.bib'];
+// references.bib is exported by Zotero (Better BibTeX, kept updated): do not
+// edit it. Entries not in Zotero go in references-manual.bib.
+const BIB = ['./src/references.bib', './src/references-manual.bib'];
+const bibliographies = BIB.map((f) => new URL(f, import.meta.url));
+const DATA = ['./plugins/ams-numeric.csl', ...BIB, './src/media-r2.json'];
 const LOCAL = [...MODULES, ...DATA];
 const version = createHash('sha1')
-  .update(LOCAL.map((f) => readFileSync(new URL(f, import.meta.url))).join(''))
+  .update(LOCAL.map((f) => (existsSync(new URL(f, import.meta.url)) ? readFileSync(new URL(f, import.meta.url)) : '')).join(''))
   .digest('hex')
   .slice(0, 12);
 const [
+  { default: remarkTikz },
   { default: remarkTheorems },
   { default: remarkReading },
   { default: remarkCite },
@@ -40,16 +46,21 @@ const [
   { default: rehypeTables },
   { default: rehypeFootnotes },
   { default: remarkMedia, mediaIntegration },
+  { default: codeThemes },
   { default: macros },
 ] = await Promise.all(MODULES.map((f) => import(`${f}?v=${version}`)));
 const posts = new URL('./src/content/posts/', import.meta.url);
+const tikzCache = new URL('./tikz-cache/', import.meta.url);
+const manifest = new URL('./src/media-r2.json', import.meta.url);
+// The code block backgrounds (--surface in src/styles/global.css); keep in sync.
+const themes = await codeThemes({ light: '#f2f0e8', dark: '#201f1c' });
 
 export default defineConfig({
-  // TODO: replace with your domain.
-  site: 'https://example.com',
+  site: 'https://jczhang.cc',
   integrations: [
-    sitemap(),
-    mediaIntegration({ posts }),
+    // hreflang alternates pair /posts/x/ with /en/posts/x/.
+    sitemap({ i18n: { defaultLocale: 'zh', locales: { zh: 'zh-CN', en: 'en' } } }),
+    mediaIntegration({ posts, manifest }),
     // Restart the dev server when a local plugin or the macros file changes.
     {
       name: 'watch-local-modules',
@@ -70,11 +81,11 @@ export default defineConfig({
     processor: unified({
       // Off: punctuation stays exactly as typed (no curly quotes, no -- to en dash).
       smartypants: false,
-      remarkPlugins: [remarkMath, remarkDirective, remarkTheorems, remarkReading, [remarkCite, { bibliography }], [remarkMedia, { posts }]],
+      remarkPlugins: [remarkMath, remarkDirective, [remarkTikz, { cache: tikzCache, macros }], remarkTheorems, remarkReading, [remarkCite, { bibliographies }], [remarkMedia, { posts, manifest }]],
       rehypePlugins: [[rehypeMathJax4, { macros, version }], rehypeToc, rehypeTables, rehypeFootnotes],
     }),
     shikiConfig: {
-      themes: { light: 'vitesse-light', dark: 'vitesse-dark' },
+      themes,
       defaultColor: false,
     },
   },

@@ -100,6 +100,18 @@ $$
 \end{CD}
 $$
 
+tikz-cd, 带编号:
+
+:::figure{#fig:pullback}
+```tikzcd
+X \arrow[drr, bend left, "x"] \arrow[ddr, bend right, "y"'] \arrow[dr, dashed, "\exists!" description] \\
+& P \arrow[r, "p"] \arrow[d, "q"'] \arrow[dr, phantom, very near start, "\lrcorner"] & A \arrow[d, "f"] \\
+& B \arrow[r, "g"'] & C
+```
+
+拉回 $P = A \times_C B$ 的泛性质.
+:::
+
 ## physics 与 mathtools
 
 $$

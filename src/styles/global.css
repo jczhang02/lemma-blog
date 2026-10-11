@@ -784,6 +784,23 @@ main:focus {
   margin: 0;
 }
 
+/* TikZ diagrams (inline SVG in currentColor), centred; wide ones scroll. */
+.prose .tikz {
+  margin: 1.5em 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.prose .tikz svg {
+  display: inline-block;
+  max-width: none;
+  vertical-align: top;
+}
+
+.prose figure .tikz {
+  margin: 0;
+}
+
 /* Line art on a transparent background: invert in dark mode (opt in with
    :::figure{.invert-dark}); photos keep their colours. */
 [data-theme='dark'] .invert-dark img {

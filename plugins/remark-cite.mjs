@@ -2,9 +2,10 @@
 // numbered links ([1], [1, 2], [1, Thm. 3]), numbered in order of first
 // citation, and a reference list in AMS style is appended to the post.
 //
-// Entries come from one BibTeX file (option `bibliography`, a file URL).
+// Entries come from BibTeX files (option `bibliographies`, file URLs; missing
+// files are skipped). A key in several files is taken from the first.
 // Must run after remark-theorems, which restores the ":key" in keys with a colon.
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { Cite, plugins } from '@citation-js/core';
 import '@citation-js/plugin-bibtex';
 import '@citation-js/plugin-csl';
@@ -25,12 +26,22 @@ const HEADING = { zh: '参考文献', en: 'References' };
 const text = (value) => ({ type: 'text', value });
 
 let library;
-function load(url) {
-  if (library?.url === url.href) return library;
+function load(urls) {
+  const id = urls.map((u) => u.href).join(' ');
+  if (library?.id === id) return library;
   const math = [];
-  const bib = readFileSync(url, 'utf8').replace(/\$([^$]+)\$/g, (_, tex) => `mathph${math.push(tex) - 1}x`);
-  const cite = new Cite(bib);
-  library = { url: url.href, cite, math, ids: new Set(cite.data.map((d) => d.id)) };
+  const data = [];
+  for (const url of urls.filter((u) => existsSync(u))) {
+    const bib = readFileSync(url, 'utf8').replace(/\$([^$]+)\$/g, (_, tex) => `mathph${math.push(tex) - 1}x`);
+    // An empty export (no entries yet) is valid; citation-js rejects it.
+    if (!/@\w+\s*\{/.test(bib)) continue;
+    for (const entry of new Cite(bib).data) {
+      if (data.some((d) => d.id === entry.id)) console.warn(`[cite] ${url.pathname}: duplicate key ${entry.id}, using the first`);
+      else data.push(entry);
+    }
+  }
+  const cite = new Cite(data);
+  library = { id, cite, math, ids: new Set(data.map((d) => d.id)) };
   return library;
 }
 
@@ -47,8 +58,8 @@ function restoreMath(tree, math) {
   });
 }
 
-/** @param {{ bibliography: URL }} options */
-export default function remarkCite({ bibliography }) {
+/** @param {{ bibliographies: URL[] }} options */
+export default function remarkCite({ bibliographies }) {
   return (tree, file) => {
     const lang = /[/\\]en\.md$/.test(file.path ?? '') ? 'en' : 'zh';
     const order = [];
@@ -56,7 +67,7 @@ export default function remarkCite({ bibliography }) {
 
     visit(tree, 'text', (node, index, parent) => {
       if (!node.value.includes('\\cite')) return;
-      lib ??= load(bibliography);
+      lib ??= load(bibliographies);
       const parts = [];
       let last = 0;
       for (const m of node.value.matchAll(CITE)) {
