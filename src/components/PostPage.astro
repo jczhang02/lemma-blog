@@ -3,6 +3,8 @@ import { getEntry, render, type CollectionEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Toc from './Toc.astro';
 import CiteThis from './CiteThis.astro';
+import Sidenotes from './Sidenotes.astro';
+import Previews from './Previews.astro';
 import { formatDate, langOf, otherLang, postUrl, slugOf, tagUrl, ui } from '../i18n';
 
 interface Props {
@@ -21,7 +23,7 @@ const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
 
 <Base lang={lang} title={title} description={description} alternate={alternate} published={date}>
   <Toc toc={remarkPluginFrontmatter.toc ?? []} label={t.toc} />
-  <article class="post" data-copy={t.copy} data-copied={t.copied}>
+  <article class="post" data-copy={t.copy} data-copied={t.copied} data-notes={t.notes} data-jump={t.jump}>
     <header class="post-header">
       <h1>{title}</h1>
       <p class="post-meta">
@@ -59,6 +61,8 @@ const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
     </div>
     <CiteThis post={post} lang={lang} />
   </article>
+  <Sidenotes />
+  <Previews />
 </Base>
 
 <script>

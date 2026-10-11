@@ -44,7 +44,7 @@ $$
 
 ## 定理环境 \label{sec:thm}
 
-定理的编号随章节变化, 例如本节的定理写作 2.x. 第 \ref{sec:ams} 节介绍了公式编号. 关于数论的入门, 见 \cite{serre1973} 或 \cite[第 3 章]{hua1957}.
+定理的编号随章节变化[^numbering], 例如本节的定理写作 2.x[^amsthm]. 第 \ref{sec:ams} 节介绍了公式编号. 关于数论的入门, 见 \cite{serre1973} 或 \cite[第 3 章]{hua1957}.
 
 :::definition
 设 $G$ 是群, $H \subseteq G$. 如果 $H$ 对 $G$ 的运算也构成群, 就称 $H$ 是 $G$ 的**子群**, 记作 $H \le G$.
@@ -58,7 +58,7 @@ $$
 :::
 
 :::proof
-$H$ 的左陪集构成 $G$ 的一个划分, 并且每个陪集 $gH$ 和 $H$ 之间有双射 $h \mapsto gh$. 所以
+$H$ 的左陪集[^coset]构成 $G$ 的一个划分, 并且每个陪集 $gH$ 和 $H$ 之间有双射 $h \mapsto gh$. 所以
 $$
 \abs{G} = [G : H] \cdot \abs{H}.
 $$
@@ -165,3 +165,6 @@ $$
 $$
 
 [^gauss]: 这是 Gauss 积分, 可以用极坐标计算 $\left(\int e^{-x^2} dx\right)^2$.
+[^numbering]: 和 amsthm 的 `\numberwithin{theorem}{section}` 相同.
+[^amsthm]: 定理, 引理, 命题和推论共用一个计数器.
+[^coset]: 左陪集是形如 $gH = \{ gh : h \in H \}$ 的子集. 两个左陪集要么相等, 要么不相交, 并且所有左陪集的并是 $G$. 这条注释故意写得长一些, 用来测试旁注在页边依次下推, 以及在预览卡片里的显示.

@@ -93,6 +93,8 @@ const { toc, label } = Astro.props;
     };
     const isHeading = (id: string | undefined) => !!id && headings.some((h) => h.id === id);
     document.addEventListener('click', (event) => {
+      // A link preview on a touch screen cancels the click: no jump, no pin.
+      if (event.defaultPrevented) return;
       const href = (event.target as Element).closest?.('a[href^="#"]')?.getAttribute('href');
       const id = href ? decodeURIComponent(href.slice(1)) : undefined;
       if (isHeading(id)) pin(id);
@@ -124,6 +126,13 @@ const { toc, label } = Astro.props;
       transform: translateY(-50%);
       z-index: 10;
       font-family: var(--font-sans);
+    }
+  }
+
+  /* On pages with sidenotes the text shifts left (global.css); the TOC follows it. */
+  @media (min-width: 75rem) {
+    :global(body:has(.footnotes)) .toc {
+      left: max(1.5rem, min(50vw - var(--measure) / 2 - 9rem, 100vw - var(--measure) - 28rem));
     }
   }
 

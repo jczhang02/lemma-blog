@@ -837,6 +837,198 @@ main:focus {
   text-decoration: none;
 }
 
+/* ---------- Sidenotes ---------- */
+
+/* Footnotes move into the right margin where it has room (Sidenotes.astro):
+   a 15rem column, 2.5rem from the text. Pages with notes stay centred while
+   the margin is wide enough (84rem and up) and below that shift left just
+   enough; from 75rem down the notes go back to the end of the post. */
+@media (min-width: 75rem) {
+  body:has(.footnotes) {
+    margin-left: min((100% - var(--measure) - 3rem) / 2, 100% - var(--measure) - 20.5rem);
+  }
+
+  .prose {
+    position: relative;
+  }
+
+  .has-sidenotes .sidenotes {
+    display: block;
+  }
+
+  .has-sidenotes .footnotes {
+    display: none;
+  }
+}
+
+.sidenotes {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: calc(100% + 2.5rem);
+  width: 15rem;
+}
+
+.sidenote {
+  position: absolute;
+  inset-inline: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  transition: color 0.15s;
+}
+
+.sidenote p {
+  margin: 0 0 0.5em;
+}
+
+/* Narrow columns are not justified (see Prose); long code may break anywhere. */
+:lang(zh) .prose :is(.sidenote, .preview-body) p {
+  text-align: left;
+}
+
+.sidenote code {
+  overflow-wrap: anywhere;
+}
+
+.sidenote > :last-child {
+  margin-bottom: 0;
+}
+
+.sidenote-num {
+  margin-right: 0.4em;
+  color: var(--text);
+  font-weight: 600;
+  font-variant-numeric: lining-nums;
+}
+
+/* A reference and its note, highlighted together on hover. */
+.sidenote.is-linked {
+  color: var(--text);
+}
+
+.prose sup.is-linked a {
+  color: var(--accent);
+}
+
+.baseline-mark {
+  display: inline-block;
+  width: 0;
+  height: 0;
+}
+
+/* ---------- Link previews ---------- */
+
+/* The card for a citation, \ref, \eqref or note (Previews.astro), in the
+   same raised style as the TOC cards. Long content is cut off with a fade. */
+.preview-card {
+  position: fixed;
+  z-index: 30;
+  width: min(26rem, 100vw - 1rem);
+  padding: 0.875rem 1rem;
+  border-radius: 14px;
+  background: var(--raised);
+  box-shadow: var(--shadow-raised);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(2px);
+  transition: opacity 0.12s, transform 0.12s, visibility 0s 0.12s;
+}
+
+.preview-card.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.preview-body {
+  max-height: 18rem;
+  overflow: hidden;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.preview-card.is-clipped .preview-body {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 3rem), transparent);
+}
+
+.preview-body > :first-child {
+  margin-top: 0;
+}
+
+.preview-body > :last-child {
+  margin-bottom: 0;
+}
+
+.preview-body :is(h2, h3) {
+  margin: 0 0 0.35em;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.preview-body p,
+.preview-body .thm {
+  margin: 0.5em 0;
+  text-align: left;
+}
+
+.preview-body mjx-container[display],
+.preview-body .thm > mjx-container[display]:last-child {
+  margin: 0.25em 0 0;
+  padding-bottom: 0;
+}
+
+.preview-body .thm > :last-child {
+  margin-bottom: 0;
+}
+
+.preview-body figure {
+  margin: 0;
+}
+
+.preview-body img {
+  max-height: 11rem;
+  width: auto;
+}
+
+.preview-label {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-jump {
+  display: none;
+  margin-top: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  color: var(--accent);
+}
+
+.preview-card.has-jump .preview-jump {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-card,
+  .preview-card.is-open {
+    transform: none;
+  }
+}
+
+/* Print: notes at the end of the post, as on paper; no cards. */
+@media print {
+  .sidenotes,
+  .preview-card {
+    display: none !important;
+  }
+
+  .has-sidenotes .footnotes {
+    display: block;
+  }
+}
+
 /* ---------- References and citation ---------- */
 
 .prose ol.references {
