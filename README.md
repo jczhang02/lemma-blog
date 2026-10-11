@@ -45,6 +45,7 @@ Needs TeX Live (`latex`, `dvisvgm`, tikz-cd) for TikZ diagrams. Compiled diagram
 - `plugins/shiki-themes.mjs`: Vitesse code themes with token colors raised to 4.5:1 contrast.
 - `src/references.bib`: Zotero export (Better BibTeX, collection G.Blog, kept updated); do not
   edit. `src/references-manual.bib`: entries not in Zotero.
-- `src/styles/global.css`: all design tokens (colors, fonts) at the top.
+- `DESIGN.md`: the visual system (tokens, layout, components, rules); `src/styles/global.css`
+  holds the same tokens at the top.
 - `src/styles/mathjax.css`: generated; rerun `bun scripts/gen-mathjax-css.mjs` after a MathJax upgrade.
 - `src/i18n.ts`: site name and UI strings.
