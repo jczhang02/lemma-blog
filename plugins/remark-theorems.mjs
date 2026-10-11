@@ -19,7 +19,8 @@
 //
 // (the caption can also go in brackets: :::figure[Caption]{#fig:x}).
 // `\ref{id}` in prose becomes a link with the number of a section, theorem,
-// figure or table; other \ref and \eqref are left for MathJax.
+// figure or table (or the text of an unnumbered heading); other \ref and
+// \eqref are left for MathJax.
 import { visit, SKIP } from 'unist-util-visit';
 
 // Defaults; options.labels (lemma.config.mjs) replaces them per language.
@@ -99,6 +100,8 @@ export default function remarkTheorems({ labels: custom = {} } = {}) {
     const labels = { ...LABELS[lang], ...custom[lang] };
     const numbered = file.data.astro?.frontmatter?.numbering !== false;
     const numbers = new Map();
+    // Labels of unnumbered headings, with the heading text.
+    const names = new Map();
     let section = 0;
     let subsection = 0;
     let counter = 0;
@@ -125,9 +128,12 @@ export default function remarkTheorems({ labels: custom = {} } = {}) {
       if (node.type === 'heading' && node.depth >= 2) {
         const label = takeLabel(node);
         if (label) claim(label);
-        // h4-h6 are not numbered; their label only sets the id.
+        // h4-h6 are not numbered; their label sets the id, and \ref shows the heading text.
         if (!numbered || node.depth > 3) {
-          if (label) node.data = { hProperties: { id: label } };
+          if (label) {
+            node.data = { hProperties: { id: label } };
+            names.set(label, structuredClone(node.children));
+          }
           return;
         }
         if (node.depth === 2) {
@@ -144,7 +150,7 @@ export default function remarkTheorems({ labels: custom = {} } = {}) {
         return;
       }
       if (node.type !== 'containerDirective') return;
-      if (!(node.name in labels)) {
+      if (!Object.hasOwn(labels, node.name)) {
         console.warn(`[theorems] ${file.path}: unknown environment :::${node.name}`);
         return;
       }
@@ -203,9 +209,13 @@ export default function remarkTheorems({ labels: custom = {} } = {}) {
       let last = 0;
       for (const m of node.value.matchAll(REF)) {
         const n = numbers.get(m[1]);
-        if (n === undefined) continue;
+        const name = names.get(m[1]);
+        if (n === undefined && name === undefined) continue;
+        // A heading without a number is named instead, as \nameref does.
+        if (n === undefined) console.warn(`[theorems] ${file.path}: \\ref{${m[1]}} points to an unnumbered heading; shown as its text`);
         if (m.index > last) parts.push(text(node.value.slice(last, m.index)));
-        parts.push({ type: 'link', url: `#${m[1]}`, data: { hProperties: { className: ['xref'] } }, children: [text(n)] });
+        const children = n === undefined ? structuredClone(name) : [text(n)];
+        parts.push({ type: 'link', url: `#${m[1]}`, data: { hProperties: { className: ['xref'] } }, children });
         last = m.index + m[0].length;
       }
       if (!parts.length) return;

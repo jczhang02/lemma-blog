@@ -2,6 +2,8 @@
   "name": "lemma-blog",
   "type": "module",
   "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -39,6 +41,7 @@
     "hast-util-to-text": "^4.0.2",
     "lxgw-wenkai-screen-webfont": "^1.7.0",
     "remark-directive": "^4.0.0",
+    "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "sharp": "^0.35.5",
     "shiki": "^4.4.3",

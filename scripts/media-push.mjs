@@ -50,7 +50,15 @@ for (const path of videos(root)) {
   const ext = extname(rel);
   const key = `posts/${rel.slice(0, -ext.length)}.${hash.slice(0, 10)}${ext}`;
   console.log(`uploading ${rel} (${(size / 2 ** 20).toFixed(1)} MiB) -> ${R2.origin}/${key}`);
-  execFileSync('cf', ['r2', 'objects', 'put', key, '--bucket-name', R2.bucket, '--file', path, '--content-type', VIDEO[ext.toLowerCase()], '-q'], { stdio: 'inherit' });
+  // On a failure, go on: the uploads that worked are still recorded below.
+  try {
+    execFileSync('cf', ['r2', 'objects', 'put', key, '--bucket-name', R2.bucket, '--file', path, '--content-type', VIDEO[ext.toLowerCase()], '-q'], { stdio: 'inherit' });
+  } catch (e) {
+    console.error(e.code === 'ENOENT' ? 'media:push needs the cf CLI: install it and run cf auth login' : `${rel}: upload failed`);
+    failed = true;
+    if (e.code === 'ENOENT') break;
+    continue;
+  }
   manifest[rel] = { key, size, sha256: hash };
 }
 writeFileSync(manifestUrl, JSON.stringify(manifest, null, 2) + '\n');
@@ -59,10 +67,17 @@ writeFileSync(manifestUrl, JSON.stringify(manifest, null, 2) + '\n');
 const HEAD = '# Videos hosted on R2 (bun run media:push)';
 const lines = readFileSync(gitignore, 'utf8').split('\n');
 const start = lines.indexOf(HEAD);
-const kept = start < 0 ? lines : lines.slice(0, start);
-while (kept.at(-1) === '') kept.pop();
+// The old block is HEAD and the paths under it; rules after it stay.
+let end = start + 1;
+while (start >= 0 && lines[end]?.startsWith('/src/content/posts/')) end++;
+const before = start < 0 ? lines : lines.slice(0, start);
+const after = start < 0 ? [] : lines.slice(end);
+while (before.at(-1) === '') before.pop();
+while (after[0] === '') after.shift();
+while (after.at(-1) === '') after.pop();
 const listed = Object.keys(manifest).sort().map((rel) => `/src/content/posts/${rel}`);
-writeFileSync(gitignore, [...kept, ...(listed.length ? ['', HEAD, ...listed] : []), ''].join('\n'));
+const block = listed.length ? ['', HEAD, ...listed] : [];
+writeFileSync(gitignore, [...before, ...block, ...(after.length ? ['', ...after] : []), ''].join('\n'));
 for (const rel of Object.keys(manifest)) {
   try {
     execFileSync('git', ['ls-files', '--error-unmatch', join(root, rel)], { stdio: 'ignore' });

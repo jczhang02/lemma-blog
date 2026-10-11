@@ -40,9 +40,11 @@ function definitions(macros = {}) {
     .join('\n');
 }
 
+// The dvisvgm option makes pgf write SVG specials; the default (dvips) driver
+// gives an empty page for shadings.
 function document(kind, body, macros) {
   return [
-    '\\documentclass{standalone}',
+    '\\documentclass[dvisvgm]{standalone}',
     '\\usepackage{amsmath,amssymb,mathtools,tikz,tikz-cd}',
     '\\usetikzlibrary{arrows.meta,calc,positioning}',
     definitions(macros),
@@ -68,8 +70,13 @@ async function compile(source) {
       const at = log.search(/^! /m);
       return { error: at < 0 ? e.message : log.slice(at).split('\n').slice(0, 4).join('\n  ') };
     }
-    await run('dvisvgm', [...DVISVGM, '-o', 'd.svg', 'd.dvi'], { cwd: dir });
-    return { svg: readFileSync(join(dir, 'd.svg'), 'utf8') };
+    const { stdout, stderr } = await run('dvisvgm', [...DVISVGM, '-o', 'd.svg', 'd.dvi'], { cwd: dir });
+    const svg = readFileSync(join(dir, 'd.svg'), 'utf8');
+    // Not an error to dvisvgm, but nothing to show; not cached, so it is tried again.
+    if (/page is empty/.test(stdout + stderr) || /<svg[^>]*\b(?:width|height)=(['"])0(?:\.0*)?pt\1/.test(svg)) {
+      return { error: 'empty diagram (dvisvgm produced no graphics)' };
+    }
+    return { svg };
   } catch (e) {
     return { error: e.code === 'ENOENT' ? 'dvisvgm not found' : e.message };
   } finally {
@@ -85,6 +92,7 @@ function inline(svg, hash, label) {
     .replace(/<\?xml[^>]*>|<!--[\s\S]*?-->/g, '')
     .replace(/\bid=(['"])/g, `id=$1${prefix}`)
     .replace(/href=(['"])#/g, `href=$1#${prefix}`)
+    .replace(/url\((['"]?)#/g, `url($1#${prefix}`)
     .replace(/(fill|stroke)=(['"])(?:#000(?:000)?|black)\2/g, '$1=$2currentColor$2')
     .replace(/(fill|stroke)=(['"])(?:#fff(?:fff)?|white)\2/g, 'style=$2$1:var(--bg)$2');
   const [root] = fromHtml(html, { fragment: true }).children.filter((n) => n.type === 'element');

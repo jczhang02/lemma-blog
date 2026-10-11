@@ -35,7 +35,8 @@ function readable(hex, bg) {
   if (contrast(seen, bg) >= MIN) return hex;
   const target = luminance(bg) > 0.5 ? [0, 0, 0] : [255, 255, 255];
   let color = seen;
-  for (let t = 0.01; contrast(color, bg) < MIN; t += 0.01) color = seen.map((c, i) => c + (target[i] - c) * t);
+  // Tested as rounded, since the hex output is: rounding can lose the last bit of contrast.
+  for (let t = 0.01; contrast(color.map(Math.round), bg) < MIN; t += 0.01) color = seen.map((c, i) => c + (target[i] - c) * t);
   return toHex(color);
 }
 

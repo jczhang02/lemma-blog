@@ -20,8 +20,10 @@ const DEFAULT_STYLE = new URL('./ams-numeric.csl', import.meta.url);
 
 const CITE = /\\cite(?:\[([^\]]*)\])?\{([^}]+)\}/g;
 // citation-js mangles TeX in titles, so math is swapped for tokens before
-// parsing and put back as inline math (rendered by MathJax) afterwards.
-const TOKEN = /mathph(\d+)x/g;
+// parsing and put back as inline math (rendered by MathJax) afterwards. The
+// braces around a token keep its case in title-case styles; TOKEN also ignores
+// case, as a fallback.
+const TOKEN = /mathph(\d+)x/gi;
 
 const HEADING = { zh: '参考文献', en: 'References' };
 
@@ -34,7 +36,8 @@ function load(urls) {
   const math = [];
   const data = [];
   for (const url of urls.filter((u) => existsSync(u))) {
-    const bib = readFileSync(url, 'utf8').replace(/\$([^$]+)\$/g, (_, tex) => `mathph${math.push(tex) - 1}x`);
+    // \$ is a literal dollar sign, not math.
+    const bib = readFileSync(url, 'utf8').replace(/(?<!\\)\$((?:\\.|[^$\\])+)\$/g, (_, tex) => `{mathph${math.push(tex) - 1}x}`);
     // An empty export (no entries yet) is valid; citation-js rejects it.
     if (!/@\w+\s*\{/.test(bib)) continue;
     for (const entry of new Cite(bib).data) {

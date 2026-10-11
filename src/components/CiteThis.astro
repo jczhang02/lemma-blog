@@ -11,10 +11,14 @@ const t = ui[lang];
 const url = new URL(postUrl(post), Astro.site).href;
 const year = post.data.date.getUTCFullYear();
 const key = `${SITE.authorBibtex.split(',')[0].toLowerCase()}${year}${slugOf(post).replace(/[^\w-]/g, '')}`;
+// Titles are plain text, so LaTeX's special characters are escaped (one pass,
+// so the braces it adds are not escaped again).
+const TEX: Record<string, string> = { '\\': '\\textbackslash{}', '~': '\\textasciitilde{}', '^': '\\textasciicircum{}' };
+const tex = (s: string) => s.replace(/[\\&%#_${}~^]/g, (c) => TEX[c] ?? `\\${c}`);
 // Double braces keep BibTeX from changing the title's case.
 const bibtex = `@misc{${key},
   author = {${SITE.authorBibtex}},
-  title  = {{${post.data.title}}},
+  title  = {{${tex(post.data.title)}}},
   year   = {${year}},
   url    = {${url}},
   note   = {${lang === 'zh' ? '博客文章' : 'Blog post'}},

@@ -22,7 +22,7 @@ const PACKAGES = [
 const BUILTIN = new Set(['ams', 'newcommand', 'configmacros']);
 
 let ready;
-function init(macros, packages) {
+function init(macros = {}, packages = PACKAGES) {
   ready ??= MathJax.init({
     loader: {
       load: ['input/tex', 'output/svg', ...packages.filter((p) => !BUILTIN.has(p)).map((p) => `[tex]/${p}`)],
@@ -131,6 +131,8 @@ async function render(item, file, warn = true) {
         if (el.tagName === 'a') links.push(el);
       });
       for (const a of links) a.properties.ariaLabel = glyphText(a);
+      // An img's children are presentational, so its links would be hidden.
+      if (links.length) svg.properties.role = 'group';
       if (i && !links.length) svg.properties.ariaHidden = 'true';
       else svg.properties.ariaLabel = label;
     });

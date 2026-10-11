@@ -10,8 +10,19 @@ const macro = z.union([
   z.tuple([z.string(), z.number(), z.string()]),
 ]);
 
+const files = glob({ pattern: '**/{zh,en}.md', base: './src/content/posts' });
+
 const posts = defineCollection({
-  loader: glob({ pattern: '**/{zh,en}.md', base: './src/content/posts' }),
+  // A build leaves drafts out of the store, so their images are not bundled
+  // either (pages already skip them). The dev server keeps them for preview.
+  loader: {
+    name: 'posts',
+    load: async (context) => {
+      await files.load(context);
+      if (!import.meta.env.PROD) return;
+      for (const [id, entry] of context.store.entries()) if (entry.data.draft) context.store.delete(id);
+    },
+  },
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),

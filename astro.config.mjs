@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
+import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkDirective from 'remark-directive';
 
@@ -52,8 +53,11 @@ const url = (f) => new URL(f, import.meta.url);
 const posts = url('./src/content/posts/');
 const tikzCache = url('./tikz-cache/');
 const manifest = url('./src/media-r2.json');
+// Video sizes from ffprobe, cached and committed like tikz-cache/. Not watched:
+// the plugin writes it.
+const dimensions = url('./src/media-dimensions.json');
 const { macros, packages } = lemma.math;
-const media = { posts, manifest, maxBytes: lemma.media.maxBytes, r2: lemma.media.r2 };
+const media = { posts, manifest, dimensions, maxBytes: lemma.media.maxBytes, r2: lemma.media.r2 };
 // Code colors are checked against the code block background of each theme.
 const themes = await codeThemes(lemma.code.themes, { light: lemma.theme.colors.light.surface, dark: lemma.theme.colors.dark.surface });
 // hreflang codes of the supported locales.
@@ -92,7 +96,12 @@ export default defineConfig({
     processor: unified({
       // Off: punctuation stays exactly as typed (no curly quotes, no -- to en dash).
       smartypants: false,
+      // GFM is added below instead, without single-tilde strikethrough: `~` is a
+      // TeX tie (\cite[Thm.~3]{key}, Section~\ref{x}), and two of them in one
+      // paragraph would strike out the text between. ~~text~~ still works.
+      gfm: false,
       remarkPlugins: [
+        [remarkGfm, { singleTilde: false }],
         remarkMath,
         remarkDirective,
         [remarkTikz, { cache: tikzCache, macros }],
