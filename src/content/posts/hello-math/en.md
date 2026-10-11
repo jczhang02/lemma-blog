@@ -1,6 +1,6 @@
 ---
-title: A Math Rendering Test
-description: Checks how MathJax 4 renders on this site, including AMS environments, the physics package, and custom macros.
+title: The Lemma Theme
+description: "What the theme typesets: numbered equations, theorems, cross-references, citations, figures and diagrams."
 date: 2026-10-10
 tags: [meta, Group Theory]
 draft: true
@@ -9,7 +9,7 @@ macros:
   Gal: '\operatorname{Gal}'
 ---
 
-This post checks math rendering. Inline math goes between single dollar signs, for example $\Gal(\overline{\Q}/\Q)$ and $\abs{x - y} < \eps$. Here `\abs` and `\Gal` come from this post's frontmatter; `\Q` and `\eps` are site-wide macros.
+This post shows what the Lemma theme can typeset. Inline math goes between single dollar signs, for example $\Gal(\overline{\Q}/\Q)$ and $\abs{x - y} < \eps$. Here `\abs` and `\Gal` come from this post's frontmatter; `\Q` and `\eps` are site-wide macros.
 
 ## Numbered equations
 

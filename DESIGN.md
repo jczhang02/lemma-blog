@@ -45,6 +45,10 @@ typography:
     fontFamily: "Source Serif 4 Variable, LXGW WenKai Screen, serif"
     fontSize: "1.125rem"
     lineHeight: 1.75
+  small:
+    fontFamily: "Source Serif 4 Variable, Noto Serif SC Variable, serif"
+    fontSize: "0.9375rem"
+    lineHeight: 1.6
   label:
     fontFamily: "Inter Variable, Noto Sans SC Variable, sans-serif"
     fontSize: "0.875rem"
@@ -54,6 +58,7 @@ typography:
     fontSize: "0.875em"
     lineHeight: 1.6
 rounded:
+  tick: "1px"
   focus: "2px"
   inline: "4px"
   button: "6px"
@@ -177,7 +182,7 @@ Flat by default. The only elevation is the floating card, used for TOC section c
 
 ## Shapes
 
-Small, quiet radii that grow with the size of the thing: 2px focus rings, 4px inline code and video, 6px buttons, 8px code blocks, 14px floating cards, a circle for the avatar. Boxes are rare: tables use horizontal rules only (booktabs), notes get a short rule above them, and theorems are set by type, not by frames.
+Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focus rings, 4px inline code and video, 6px buttons, 8px code blocks, 14px floating cards, a circle for the avatar. Boxes are rare: tables use horizontal rules only (booktabs), notes get a short rule above them, and theorems are set by type, not by frames.
 
 ## Components
 

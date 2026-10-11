@@ -1,6 +1,6 @@
 ---
-title: 公式渲染测试
-description: 检查 MathJax 4 在本站的渲染效果, 包括 AMS 环境, physics 宏包和自定义宏.
+title: Lemma 主题示例
+description: "本主题支持的写作元素一览: 编号公式, 定理环境, 交叉引用, 文献, 旁注, 图表和交换图."
 date: 2026-10-10
 tags: [meta, 代数]
 draft: true
@@ -9,9 +9,9 @@ macros:
   Gal: '\operatorname{Gal}'
 ---
 
-这篇文章用来检查公式渲染. 行内公式写在单个美元符号之间, 例如 $\Gal(\overline{\Q}/\Q)$ 和 $\abs{x - y} < \eps$. 文中的 `\abs` 和 `\Gal` 定义在本文的 frontmatter 里, `\Q` 和 `\eps` 是全站宏.
+这篇文章展示 Lemma 主题支持的写作元素. 行内公式写在单个美元符号之间, 例如 $\Gal(\overline{\Q}/\Q)$ 和 $\abs{x - y} < \eps$. 文中的 `\abs` 和 `\Gal` 定义在本文的 frontmatter 里, `\Q` 和 `\eps` 是全站宏.
 
-> 引用块用正文的宋体, 颜色较浅. 引用中的公式也正常: $e^{i\pi} + 1 = 0$.
+> Euler 恒等式 $e^{i\pi} + 1 = 0$ 把五个最基本的常数联系在了一起.
 
 ## AMS 环境与编号 \label{sec:ams}
 
@@ -65,7 +65,7 @@ $$
 :::
 
 :::lemma
-若 $\abs{G} = p$ 是素数, 则 $G$ 是循环群. 这里的冒号测试: $f:X \to Y$, $\phi:G\to H$.
+若 $\abs{G} = p$ 是素数, 则 $G$ 是循环群.
 :::
 
 :::proof
@@ -73,7 +73,7 @@ $$
 :::
 
 :::remark
-定理 \ref{thm:lagrange} 的逆命题不成立 (参见 \cite{serre1973, greentao2008}): $A_4$ 没有 6 阶子群. 普通文字里的冒号不受影响, 例如 std::vector 和 note:this.
+定理 \ref{thm:lagrange} 的逆命题不成立 (参见 \cite{serre1973, greentao2008}): $A_4$ 没有 6 阶子群.
 :::
 
 ## 字体与箭头
@@ -146,8 +146,8 @@ $$
 群同态 $\varphi\colon G \to H$. 透明背景的黑线图在深色模式下自动反色.
 :::
 
-:::figure[一段测试视频 (3 秒).]{#fig:clip}
-![测试视频](./test-clip.mp4)
+:::figure[一段短视频 (3 秒).]{#fig:clip}
+![示例视频](./test-clip.mp4)
 :::
 
 ## 代码
@@ -164,7 +164,11 @@ $$
 \left( \sum_{k=1}^{n} a_k b_k \right)^2 \le \left( \sum_{k=1}^{n} a_k^2 \right) \left( \sum_{k=1}^{n} b_k^2 \right) \quad \text{for all } a_1, \dots, a_n, b_1, \dots, b_n \in \R
 $$
 
+## 杂项
+
+映射常写作 $f:X \to Y$ 或 $\phi:G\to H$. 正文里的冒号照常显示, 例如 std::vector 和 key:value.
+
 [^gauss]: 这是 Gauss 积分, 可以用极坐标计算 $\left(\int e^{-x^2} dx\right)^2$.
 [^numbering]: 和 amsthm 的 `\numberwithin{theorem}{section}` 相同.
 [^amsthm]: 定理, 引理, 命题和推论共用一个计数器.
-[^coset]: 左陪集是形如 $gH = \{ gh : h \in H \}$ 的子集. 两个左陪集要么相等, 要么不相交, 并且所有左陪集的并是 $G$. 这条注释故意写得长一些, 用来测试旁注在页边依次下推, 以及在预览卡片里的显示.
+[^coset]: 左陪集是形如 $gH = \{ gh : h \in H \}$ 的子集. 两个左陪集要么相等, 要么不相交, 并且所有左陪集的并是 $G$. 每个陪集都与 $H$ 等势, 所以陪集的个数是 $\abs{G} / \abs{H}$.
