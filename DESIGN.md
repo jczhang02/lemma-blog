@@ -53,6 +53,10 @@ typography:
     fontFamily: "Inter Variable, Noto Sans SC Variable, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 400
+  label-small:
+    fontFamily: "Inter Variable, Noto Sans SC Variable, sans-serif"
+    fontSize: "0.8125rem"
+    fontWeight: 400
   code:
     fontFamily: "JetBrains Mono Variable, ui-monospace, monospace"
     fontSize: "0.875em"
@@ -89,7 +93,7 @@ components:
   copy-button:
     backgroundColor: "{colors.paper}"
     textColor: "{colors.muted}"
-    typography: "{typography.label}"
+    typography: "{typography.label-small}"
     rounded: "{rounded.button}"
     padding: "0.25rem 0.625rem"
   sidenote:
@@ -109,12 +113,12 @@ The token values above are set in `lemma.config.mjs` (`theme`, `code`), which ge
 
 **Creative North Star: "The Typeset Notebook"**
 
-A personal research blog (AI for PDE, and mathematics around it) in Chinese and English. Each post should read like a carefully typeset paper on a screen: serif text on warm paper, numbered sections and theorems, captions where print puts them, citations that resolve. The chrome around it is quiet sans-serif and stays out of the way. The look is clean and modern rather than antique: nothing imitates paper texture, and there are no ornaments.
+A personal research blog (AI for PDE, and mathematics around it) in Chinese and English. Each post should read like a carefully typeset paper on a screen: serif text on warm paper, numbered sections and theorems, captions where print puts them, citations that resolve. The labels around it (dates, meta lines, footer) are quiet sans-serif and stay out of the way. The look is clean and modern rather than antique: nothing imitates paper texture, and there are no ornaments.
 
 Depth is minimal. The page is flat; only content that floats above it (TOC cards, link previews) is lifted, and all of it in the same way. Color is almost entirely neutral, with one terracotta accent for links and the current state.
 
 **Key Characteristics:**
-- Serif reading text, sans-serif chrome, a one-column 46rem measure.
+- Serif reading text and header, sans-serif labels, a one-column 46rem measure.
 - Warm paper and ink neutrals, one terracotta accent.
 - Paper conventions where they help reading: numbered sections and theorems, booktabs tables, figure captions below and table captions above, AMS-style references, an abstract and keywords under the title.
 - Supporting content shown in place: margin sidenotes, link preview cards, a tick-mark TOC with section cards.
@@ -147,7 +151,7 @@ Warm, low-chroma neutrals carry everything; the accent is the only saturated col
 **Label Font:** Inter (with Noto Sans SC)
 **Mono Font:** JetBrains Mono (the Nerd Font build when installed locally)
 
-**Character:** A text serif with optical sizes for reading, a neutral grotesque for everything around it. Latin fonts come first in every stack, so English and digits never fall back to the CJK font.
+**Character:** A text serif with optical sizes for reading, a neutral grotesque for the labels around it. Latin fonts come first in every stack, so English and digits never fall back to the CJK font.
 
 ### Hierarchy
 - **Display** (500, clamp(2rem, 5vw, 2.75rem), 1.2): post titles.
@@ -155,7 +159,8 @@ Warm, low-chroma neutrals carry everything; the accent is the only saturated col
 - **Title** (500, 1.25rem, 1.5): post titles in lists; the home tagline is 1.75rem serif.
 - **Body** (400, 1.125rem, 1.75): article text, 46rem measure. Abstract and keywords 1rem / 0.9375rem, indented from both sides.
 - **Small** (0.9375rem): captions, references, footnotes, tables, preview cards; sidenotes 0.875rem.
-- **Label** (0.875rem sans): dates, post facts, footer, navigation.
+- **Label** (0.875rem sans): dates, post facts, footer.
+- **Label Small** (0.8125rem sans): copy buttons.
 
 **The Justify Rule.** Chinese body text is justified from 48rem up and ragged below that, and always ragged in sidenotes and cards. Latin text is never justified.
 
@@ -189,7 +194,7 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 ## Components
 
 ### Navigation
-- **Header:** 32px circular avatar and serif wordmark on the left; sans links (Posts, language switch EN/中) and a sun/moon theme toggle on the right. Links are muted and turn terracotta on hover.
+- **Header:** 32px circular avatar and serif wordmark on the left; serif links at 1rem (Posts, language switch EN/中) and a sun/moon theme toggle on the right. Links are muted and turn terracotta on hover.
 - **Footer:** © line, then Email, GitHub and RSS links; wraps to two rows at 320px.
 - **Tap targets:** small text links get a 2.75rem hit area through padding and matching negative margins.
 

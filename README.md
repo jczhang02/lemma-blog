@@ -30,7 +30,7 @@
 
 ## Quick Start
 
-Needs [Bun](https://bun.sh) 1.2+ (or Node 22.12+). TikZ diagrams also need TeX Live (`latex`, `dvisvgm`, `tikz-cd`).
+Needs [Bun](https://bun.sh) 1.2+: the `new`, `media:push` and `deploy` scripts run with it. `dev`, `build` and `preview` also run with npm on Node 22.12+. TikZ diagrams also need TeX Live (`latex`, `dvisvgm`, `tikz-cd`).
 
 ```bash
 git clone https://github.com/jczhang02/lemma-blog.git && cd lemma-blog
@@ -184,7 +184,7 @@ TikZ diagrams use the same fonts and size as the formulas around them and switch
 
 `bun run deploy` writes the wrangler config from `lemma.config.mjs` (`deploy`: Worker name, account ID, domain) to `.wrangler/deploy.jsonc`, builds the site, and uploads `dist/` as Cloudflare Workers static assets (no Worker code, so requests are free and unlimited). It signs in with the `cf` CLI login (`cf auth login`) when `cf` is installed, and otherwise with wrangler's own (`bunx wrangler login`). Extra arguments go to wrangler, for example `bun run deploy --dry-run`.
 
-Any static host works too: the output in `dist/` is plain HTML, CSS and fonts. Files over 25 MiB are not accepted by Cloudflare, which is why large videos go to R2 with `bun run media:push`: it uploads them under a content hash, records them in `src/media-r2.json`, and keeps them out of git.
+Any static host works too: the output in `dist/` is plain HTML, CSS and fonts. Files over 25 MiB are not accepted by Cloudflare, which is why large videos go to R2 with `bun run media:push`: it uploads them under a content hash, records them in `src/media-r2.json`, and keeps them out of git. It uploads with the `cf` CLI, so install `cf` and run `cf auth login` first.
 
 On jczhang.cc, the R2 host has edge caching for a year (query strings ignored), a WAF rule that blocks query strings and non-GET/HEAD requests, and a rate limit of 100 requests per 10 seconds per IP, so the only metered item stays near zero.
 
@@ -210,4 +210,4 @@ Client-side code is small and lives in `src/components/` (TOC, sidenotes, previe
 
 ## License
 
-The code is [MIT](LICENSE). The posts, the avatar and the site icons are mine and not covered by it; `plugins/ams-numeric.csl` comes from the [CSL styles repository](https://github.com/citation-style-language/styles) under CC BY-SA 3.0.
+The code is [MIT](LICENSE). The posts (except the sample post `hello-math`), the avatar and the site icons are mine and not covered by it; `plugins/ams-numeric.csl` comes from the [CSL styles repository](https://github.com/citation-style-language/styles) under CC BY-SA 3.0.

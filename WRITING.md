@@ -130,7 +130,7 @@ C \arrow[r, "k"'] & D
 ```
 
 - 视频小于 25 MiB 时, 直接放进文章文件夹.
-- 视频更大时, 先运行 `bun run media:push`. 它会上传到 R2 (`media.jczhang.cc`), 并让 git 忽略这个文件. 文章里的写法不变.
+- 视频更大时, 先运行 `bun run media:push`. 它会上传到 R2 (`media.jczhang.cc`), 并让 git 忽略这个文件. 文章里的写法不变. 上传要用 `cf` 命令行工具: 先安装 `cf`, 再运行 `cf auth login`.
 - 压缩建议: H.264, 1080p 以内. `ffmpeg -i in.mov -c:v libx264 -crf 26 -preset slow -an out.mp4`.
 
 ## 其他
