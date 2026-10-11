@@ -4,9 +4,10 @@
 // folder at /media/posts/<post>/<file>: by middleware in dev, and copied into
 // the build output after a build.
 //
-// Cloudflare Pages takes files up to 25 MiB. Larger videos go to R2 with
-// `bun run media:push`, which uploads them, lists them in src/media-r2.json
-// and keeps them out of git; posts still write `![caption](./clip.mp4)`.
+// Cloudflare takes files up to 25 MiB (options.maxBytes). Larger videos go to
+// R2 (options.r2) with `bun run media:push`, which uploads them, lists them in
+// src/media-r2.json and keeps them out of git; posts still write
+// `![caption](./clip.mp4)`. Settings come from lemma.config.mjs (media).
 import { cpSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,17 +15,16 @@ import sirv from 'sirv';
 
 export const VIDEO = { '.mp4': 'video/mp4', '.webm': 'video/webm', '.m4v': 'video/x-m4v', '.mov': 'video/quicktime', '.ogv': 'video/ogg' };
 const BASE = '/media/posts';
-// Cloudflare Pages rejects larger files.
-export const MAX_BYTES = 25 * 1024 * 1024;
-export const R2 = { bucket: 'blog-media', origin: 'https://media.jczhang.cc' };
 
 export const isVideo = (path) => Object.hasOwn(VIDEO, extname(path).toLowerCase());
 
 /** Videos on R2: { "<post>/<file>": { key, size, sha256 } }. */
 export const readManifest = (url) => (existsSync(url) ? JSON.parse(readFileSync(url, 'utf8')) : {});
 
-/** Remark plugin. @param {{ posts: URL, manifest: URL }} options */
-export default function remarkMedia({ posts, manifest }) {
+const mib = (bytes) => `${Math.round(bytes / 2 ** 20)} MiB`;
+
+/** Remark plugin. @param {{ posts: URL, manifest: URL, maxBytes: number, r2: { origin: string } }} options */
+export default function remarkMedia({ posts, manifest, maxBytes, r2 }) {
   const root = fileURLToPath(posts);
   const remote = readManifest(manifest);
   return (tree, file) => {
@@ -45,10 +45,10 @@ export default function remarkMedia({ posts, manifest }) {
             if (remote[key]) {
               // The local copy is absent in CI (not in git); that is fine.
               if (size !== undefined && size !== remote[key].size) console.warn(`[media] ${file.path}: ${child.url} changed since upload; run bun run media:push`);
-              src = `${R2.origin}/${remote[key].key}`;
+              src = `${r2.origin}/${remote[key].key}`;
             } else {
               if (size === undefined) console.warn(`[media] ${file.path}: missing ${child.url}`);
-              else if (size > MAX_BYTES) console.warn(`[media] ${file.path}: ${child.url} is over 25 MiB; run bun run media:push`);
+              else if (size > maxBytes) console.warn(`[media] ${file.path}: ${child.url} is over ${mib(maxBytes)}; run bun run media:push`);
               src = `${BASE}/${key}`;
             }
           }

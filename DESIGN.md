@@ -103,6 +103,8 @@ components:
 
 # Design System: Chengrui Zhang
 
+The token values above are set in `lemma.config.mjs` (`theme`, `code`), which generates the CSS custom properties; keep the two in step.
+
 ## Overview
 
 **Creative North Star: "The Typeset Notebook"**

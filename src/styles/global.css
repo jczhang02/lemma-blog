@@ -1,45 +1,8 @@
 /* ---------- Tokens ---------- */
 
-:root {
-  color-scheme: light;
-
-  /* Fonts. Latin font first, so English glyphs never come from the CJK font. */
-  --font-sans: 'Inter Variable', 'Noto Sans SC Variable', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-serif: 'Source Serif 4 Variable', 'Noto Serif SC Variable', 'Songti SC', 'STSong', serif;
-  --font-kai: 'Source Serif 4 Variable', 'LXGW WenKai Screen', 'Kaiti SC', 'STKaiti', serif;
-  /* The Nerd Font is used if installed locally; visitors get the same letterforms from the webfont. */
-  --font-mono: 'JetBrainsMono Nerd Font Mono', 'JetBrainsMono Nerd Font', 'JetBrains Mono Variable', ui-monospace, Menlo, Consolas, 'Noto Sans SC Variable', monospace;
-
-  --measure: 46rem;
-  --text-base: 1.125rem;
-  --leading: 1.75;
-
-  /* Light: warm paper. */
-  --bg: #faf9f5;
-  --text: #191917;
-  --muted: #6b6a64;
-  --rule: #e6e3d9;
-  --surface: #f2f0e8;
-  --accent: #b5532f;
-  --selection: #ead9cc;
-  /* Floating surfaces (popovers): lighter paper lifted by shadow. */
-  --raised: #fffefb;
-  --shadow-raised: 0 1px 2px rgb(25 25 23 / 0.06), 0 12px 32px -8px rgb(25 25 23 / 0.2);
-}
-
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --bg: #171715;
-  --text: #e9e6de;
-  --muted: #9c998f;
-  --rule: #2e2d29;
-  --surface: #201f1c;
-  --accent: #e08b66;
-  --selection: #4a3328;
-  /* Shadows barely read on dark; a faint ring carries the edge instead. */
-  --raised: #22211e;
-  --shadow-raised: 0 0 0 1px rgb(255 255 255 / 0.07), 0 16px 40px -8px rgb(0 0 0 / 0.6);
-}
+/* The design tokens (--bg, --text, --accent, --font-serif, --measure, ...)
+   and color-scheme, for light and :root[data-theme='dark'], are generated
+   from lemma.config.mjs (theme) by plugins/lemma-theme.mjs. */
 
 /* ---------- Base ---------- */
 

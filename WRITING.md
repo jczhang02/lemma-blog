@@ -54,7 +54,7 @@ $$
 ```
 
 - `\eqref` 和 `\ref` 可以直接写在正文里, 不用加 `$`. 引用写在公式前面也可以.
-- 全站宏在 `src/math-macros.mjs`, 比如 `\R`, `\set{...}`, `\inner{u}{v}`.
+- 全站宏在 `lemma.config.mjs` 的 `math.macros` 里, 比如 `\R`, `\set{...}`, `\inner{u}{v}`.
 - 已加载 physics, mathtools, cases, mhchem 等宏包. 用了未定义的宏, 构建时会给出 `[mathjax]` 警告.
 
 ## 定理

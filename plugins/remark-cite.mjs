@@ -13,8 +13,10 @@ import { fromHtml } from 'hast-util-from-html';
 import { select } from 'hast-util-select';
 import { visit } from 'unist-util-visit';
 
-// AMS numeric, from the CSL styles repository (CC BY-SA 3.0).
-plugins.config.get('@csl').styles.add('ams-numeric', readFileSync(new URL('./ams-numeric.csl', import.meta.url), 'utf8'));
+// The reference list style: options.style (a CSL file URL), by default AMS
+// numeric from the CSL styles repository (CC BY-SA 3.0).
+const STYLE = 'lemma';
+const DEFAULT_STYLE = new URL('./ams-numeric.csl', import.meta.url);
 
 const CITE = /\\cite(?:\[([^\]]*)\])?\{([^}]+)\}/g;
 // citation-js mangles TeX in titles, so math is swapped for tokens before
@@ -58,8 +60,9 @@ function restoreMath(tree, math) {
   });
 }
 
-/** @param {{ bibliographies: URL[] }} options */
-export default function remarkCite({ bibliographies }) {
+/** @param {{ bibliographies: URL[], style?: URL }} options */
+export default function remarkCite({ bibliographies, style = DEFAULT_STYLE }) {
+  plugins.config.get('@csl').styles.add(STYLE, readFileSync(style, 'utf8'));
   return (tree, file) => {
     const lang = /[/\\]en\.md$/.test(file.path ?? '') ? 'en' : 'zh';
     const order = [];
@@ -103,7 +106,7 @@ export default function remarkCite({ bibliographies }) {
 
     const entries = lib.cite.format('bibliography', {
       format: 'html',
-      style: 'ams-numeric',
+      style: STYLE,
       lang: 'en-US',
       entry: order,
       nosort: true,

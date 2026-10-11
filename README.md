@@ -47,23 +47,42 @@ bun run media:push       # upload videos over 25 MiB to R2
 
 ## Make it yours
 
-Everything specific to this blog lives in the files below; the rest is theme.
+Every setting lives in one file, [`lemma.config.mjs`](lemma.config.mjs); the rest is theme. A running dev server picks up edits to it, re-rendering every post.
 
-| What | Where | Notes |
-| --- | --- | --- |
-| Name, author, email, GitHub | `src/i18n.ts` → `SITE` | `authorBibtex` is used in the "cite this post" block |
-| Tagline and UI text | `src/i18n.ts` → `ui.zh`, `ui.en` | |
-| Domain | `astro.config.mjs` → `site` | canonical URLs, Open Graph, sitemap, RSS |
-| Colors, widths | `src/styles/global.css` → `:root` | light and dark tokens; the system is described in [`DESIGN.md`](DESIGN.md) |
-| Fonts | `src/layouts/Base.astro` (imports), `--font-*` in `global.css` | serif text, sans UI, LXGW WenKai for Chinese theorem statements |
-| Code colors | `astro.config.mjs` → `codeThemes(...)`, `plugins/shiki-themes.mjs` | pass your code background colors; low-contrast tokens are raised to 4.5:1 |
-| Avatar and icons | `src/assets/avatar.jpg`, `public/favicon.ico`, `public/icon-192.png`, `public/apple-touch-icon.png` | |
-| Math macros | `src/math-macros.mjs`; `macros:` in a post's frontmatter | |
-| MathJax packages | `plugins/rehype-mathjax4.mjs` | |
-| Bibliography | `src/references.bib`, `src/references-manual.bib`, `plugins/ams-numeric.csl` | see below |
-| Theorem names | `plugins/remark-theorems.mjs` → `LABELS` | Chinese and English labels for each kind |
-| Large videos | `plugins/media.mjs` → `R2` | bucket name and public origin |
-| Deployment | `wrangler.jsonc` | Worker name, account ID, custom domain |
+```js
+export default {
+  site: {
+    url: 'https://jczhang.cc',
+    title: 'Chengrui Zhang',
+    description: { zh: '方程, 模型, 以及其他.', en: 'Equations, models, and other things.' },
+    avatar: 'src/assets/avatar.jpg',
+    links: { email: 'jczhang@live.it', github: 'jczhang02' },
+    // ...
+  },
+  theme: {
+    colors: { light: { bg: '#faf9f5', accent: '#b5532f', /* ... */ }, dark: { /* ... */ } },
+    fonts: { stacks: { /* sans, serif, kai, mono */ }, imports: ['@fontsource-variable/inter', /* ... */] },
+    layout: { measure: '46rem', textBase: '1.125rem', leading: 1.75 },
+  },
+  math: { macros: { R: '\\mathbb{R}', /* ... */ }, packages: ['ams', 'physics', /* ... */] },
+  // also: locales, code, bibliography, theorems, reading, media, deploy
+};
+```
+
+| Section | What it sets |
+| --- | --- |
+| `site` | URL (canonical links, Open Graph, sitemap, RSS), name, author (also as BibTeX `Last, First`), tagline per language, avatar, footer links, icons |
+| `locales` | default language and the language list (pages exist for `zh` and `en`) |
+| `theme` | light and dark colors, font stacks and the font packages to load, text width and size; [`DESIGN.md`](DESIGN.md) describes the system |
+| `code` | Shiki themes; token colors are raised to 4.5:1 against the code background |
+| `math` | site-wide TeX macros and the MathJax packages loaded up front |
+| `bibliography` | BibTeX files and the CSL style of the reference list |
+| `theorems` | names of theorem-like environments, figures and tables, per language |
+| `reading` | reading speeds behind "约 8 分钟 / 8 min read" |
+| `media` | size limit for bundled videos and the R2 bucket for larger ones |
+| `deploy` | Cloudflare Worker name, account ID and domain |
+
+A few things are files by nature: the avatar image under `src/assets/`, the icons in `public/`, the posts in `src/content/posts/`, and the BibTeX files.
 
 **Bibliography.** `src/references.bib` is written by Zotero: with [Better BibTeX](https://retorque.re/zotero-better-bibtex/), export a collection to that path and tick *Keep updated*. That setting lives in your Zotero, not in this repository. Entries you keep outside Zotero go in `src/references-manual.bib`; a key in both files is taken from the first.
 
@@ -163,7 +182,7 @@ TikZ diagrams use the same fonts and size as the formulas around them and switch
 <details>
 <summary><strong>Deploying</strong></summary>
 
-`bun run deploy` builds the site and uploads `dist/` with wrangler as Cloudflare Workers static assets (no Worker code, so requests are free and unlimited). It signs in with the `cf` CLI login (`cf auth login`); with plain wrangler, run `bunx wrangler login` once and `bunx wrangler deploy` after `bun run build`. Set your Worker name, account ID and domain in `wrangler.jsonc`.
+`bun run deploy` writes the wrangler config from `lemma.config.mjs` (`deploy`: Worker name, account ID, domain) to `.wrangler/deploy.jsonc`, builds the site, and uploads `dist/` as Cloudflare Workers static assets (no Worker code, so requests are free and unlimited). It signs in with the `cf` CLI login (`cf auth login`) when `cf` is installed, and otherwise with wrangler's own (`bunx wrangler login`). Extra arguments go to wrangler, for example `bun run deploy --dry-run`.
 
 Any static host works too: the output in `dist/` is plain HTML, CSS and fonts. Files over 25 MiB are not accepted by Cloudflare, which is why large videos go to R2 with `bun run media:push`: it uploads them under a content hash, records them in `src/media-r2.json`, and keeps them out of git.
 

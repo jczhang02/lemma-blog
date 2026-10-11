@@ -22,6 +22,7 @@
 // figure or table; other \ref and \eqref are left for MathJax.
 import { visit, SKIP } from 'unist-util-visit';
 
+// Defaults; options.labels (lemma.config.mjs) replaces them per language.
 const LABELS = {
   zh: {
     theorem: '定理', lemma: '引理', proposition: '命题', corollary: '推论',
@@ -91,9 +92,11 @@ function takeLabel(heading) {
   }
 }
 
-export default function remarkTheorems() {
+/** @param {{ labels?: Record<string, Record<string, string>> }} options */
+export default function remarkTheorems({ labels: custom = {} } = {}) {
   return (tree, file) => {
-    const labels = LABELS[langOf(file)];
+    const lang = langOf(file);
+    const labels = { ...LABELS[lang], ...custom[lang] };
     const numbered = file.data.astro?.frontmatter?.numbering !== false;
     const numbers = new Map();
     let section = 0;

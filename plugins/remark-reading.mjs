@@ -1,8 +1,8 @@
 // Reading time and section count for the line under a post's title, passed
 // to templates as remarkPluginFrontmatter.readingMinutes / .sections.
 //
-// Prose is timed by script: Chinese at 400 characters a minute, Latin text at
-// 230 words a minute. Math takes longer than its length suggests, so each
+// Prose is timed by script: Chinese characters and Latin words per minute
+// (by default 400 and 230). Math takes longer than its length suggests, so each
 // formula, diagram and theorem-like block adds a fixed time. Must run before
 // remark-cite, which appends the reference list (not counted).
 import { visit } from 'unist-util-visit';
@@ -10,16 +10,17 @@ import { visit } from 'unist-util-visit';
 const HAN = /\p{Script=Han}/gu;
 const WORD = /[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)*/gu;
 
-const SECONDS = {
-  han: 60 / 400,
-  word: 60 / 230,
-  inlineMath: 2,
-  math: 12,
-  environment: 8,
-  codeLine: 2,
+// Defaults; lemma.config.mjs (reading) passes its own.
+const DEFAULTS = {
+  hanPerMinute: 400,
+  wordsPerMinute: 230,
+  seconds: { inlineMath: 2, math: 12, environment: 8, codeLine: 2 },
 };
 
-export default function remarkReading() {
+/** @param {Partial<typeof DEFAULTS>} options */
+export default function remarkReading(options = {}) {
+  const { hanPerMinute, wordsPerMinute, seconds: each } = { ...DEFAULTS, ...options };
+  const SECONDS = { han: 60 / hanPerMinute, word: 60 / wordsPerMinute, ...DEFAULTS.seconds, ...each };
   return (tree, file) => {
     let seconds = 0;
     let sections = 0;

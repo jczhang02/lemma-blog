@@ -10,7 +10,8 @@ import { toText } from 'hast-util-to-text';
 import { visit } from 'unist-util-visit';
 import { visitParents } from 'unist-util-visit-parents';
 
-// Loaded up front; anything else is still reachable through \require or autoload.
+// Loaded up front unless options.packages says otherwise; anything else is
+// still reachable through \require or autoload.
 const PACKAGES = [
   'ams', 'newcommand', 'configmacros', 'begingroup', 'mathtools', 'physics',
   'cancel', 'cases', 'empheq', 'mhchem', 'bussproofs', 'amscd', 'extpfeil',
@@ -21,14 +22,14 @@ const PACKAGES = [
 const BUILTIN = new Set(['ams', 'newcommand', 'configmacros']);
 
 let ready;
-function init(macros) {
+function init(macros, packages) {
   ready ??= MathJax.init({
     loader: {
-      load: ['input/tex', 'output/svg', ...PACKAGES.filter((p) => !BUILTIN.has(p)).map((p) => `[tex]/${p}`)],
+      load: ['input/tex', 'output/svg', ...packages.filter((p) => !BUILTIN.has(p)).map((p) => `[tex]/${p}`)],
     },
     tex: {
       // Without noundefined, an unknown macro is an error (as in LaTeX), so the build warns.
-      packages: { '[+]': PACKAGES, '[-]': ['noundefined'] },
+      packages: { '[+]': packages, '[-]': ['noundefined'] },
       tags: 'ams',
       macros,
     },
@@ -167,10 +168,10 @@ function wrapRefs(tree) {
   });
 }
 
-/** @param {{ macros?: Record<string, string | [string, number, string?]> }} options */
+/** @param {{ macros?: Record<string, string | [string, number, string?]>, packages?: string[] }} options */
 export default function rehypeMathJax4(options = {}) {
   return async (tree, file) => {
-    await init(options.macros ?? {});
+    await init(options.macros ?? {}, options.packages ?? PACKAGES);
     wrapRefs(tree);
     const items = [];
     visitParents(tree, 'element', (node, ancestors) => {

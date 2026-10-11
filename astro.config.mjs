@@ -7,12 +7,18 @@ import { unified } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import remarkDirective from 'remark-directive';
 
+// Every site setting comes from lemma.config.mjs.
+//
 // Local modules are imported with a hash of their sources (and of the data
 // files they read), for two reasons:
 // - Node caches imports for the life of the process, and Astro re-imports only
 //   this file on change; without the hash a running dev server keeps old plugin code.
 // - Astro caches rendered posts until the config changes; the hash is part of
 //   the config (plugin options), so an edit re-renders every post.
+const read = (f) => (existsSync(new URL(f, import.meta.url)) ? readFileSync(new URL(f, import.meta.url)) : '');
+const hash = (files) => createHash('sha1').update(files.map(read).join('')).digest('hex').slice(0, 12);
+const CONFIG = './lemma.config.mjs';
+const { default: lemma } = await import(`${CONFIG}?v=${hash([CONFIG])}`);
 const MODULES = [
   './plugins/remark-tikz.mjs',
   './plugins/remark-theorems.mjs',
@@ -24,18 +30,11 @@ const MODULES = [
   './plugins/rehype-footnotes.mjs',
   './plugins/media.mjs',
   './plugins/shiki-themes.mjs',
-  './src/math-macros.mjs',
+  './plugins/lemma-theme.mjs',
 ];
-// references.bib is exported by Zotero (Better BibTeX, kept updated): do not
-// edit it. Entries not in Zotero go in references-manual.bib.
-const BIB = ['./src/references.bib', './src/references-manual.bib'];
-const bibliographies = BIB.map((f) => new URL(f, import.meta.url));
-const DATA = ['./plugins/ams-numeric.csl', ...BIB, './src/media-r2.json'];
-const LOCAL = [...MODULES, ...DATA];
-const version = createHash('sha1')
-  .update(LOCAL.map((f) => (existsSync(new URL(f, import.meta.url)) ? readFileSync(new URL(f, import.meta.url)) : '')).join(''))
-  .digest('hex')
-  .slice(0, 12);
+const DATA = [lemma.bibliography.style, ...lemma.bibliography.files, './src/media-r2.json'];
+const LOCAL = [CONFIG, ...MODULES, ...DATA];
+const version = hash(LOCAL);
 const [
   { default: remarkTikz },
   { default: remarkTheorems },
@@ -47,33 +46,45 @@ const [
   { default: rehypeFootnotes },
   { default: remarkMedia, mediaIntegration },
   { default: codeThemes },
-  { default: macros },
+  { default: lemmaTheme },
 ] = await Promise.all(MODULES.map((f) => import(`${f}?v=${version}`)));
-const posts = new URL('./src/content/posts/', import.meta.url);
-const tikzCache = new URL('./tikz-cache/', import.meta.url);
-const manifest = new URL('./src/media-r2.json', import.meta.url);
-// The code block backgrounds (--surface in src/styles/global.css); keep in sync.
-const themes = await codeThemes({ light: '#f2f0e8', dark: '#201f1c' });
+const url = (f) => new URL(f, import.meta.url);
+const posts = url('./src/content/posts/');
+const tikzCache = url('./tikz-cache/');
+const manifest = url('./src/media-r2.json');
+const { macros, packages } = lemma.math;
+const media = { posts, manifest, maxBytes: lemma.media.maxBytes, r2: lemma.media.r2 };
+// Code colors are checked against the code block background of each theme.
+const themes = await codeThemes(lemma.code.themes, { light: lemma.theme.colors.light.surface, dark: lemma.theme.colors.dark.surface });
+// hreflang codes of the supported locales.
+const HREFLANG = { zh: 'zh-CN', en: 'en' };
 
 export default defineConfig({
-  site: 'https://jczhang.cc',
+  site: lemma.site.url,
   integrations: [
+    // Colors, font stacks, layout tokens and font files from the config.
+    lemmaTheme(lemma.theme),
     // hreflang alternates pair /posts/x/ with /en/posts/x/.
-    sitemap({ i18n: { defaultLocale: 'zh', locales: { zh: 'zh-CN', en: 'en' } } }),
-    mediaIntegration({ posts, manifest }),
-    // Restart the dev server when a local plugin or the macros file changes.
+    sitemap({
+      i18n: {
+        defaultLocale: lemma.locales.default,
+        locales: Object.fromEntries(lemma.locales.list.map((l) => [l, HREFLANG[l]])),
+      },
+    }),
+    mediaIntegration(media),
+    // Restart the dev server when the config, a local plugin or a data file changes.
     {
       name: 'watch-local-modules',
       hooks: {
-        'astro:config:setup': ({ addWatchFile }) => LOCAL.forEach((f) => addWatchFile(new URL(f, import.meta.url))),
+        'astro:config:setup': ({ addWatchFile }) => LOCAL.forEach((f) => addWatchFile(url(f))),
       },
     },
   ],
   // Markdown images get a srcset and are scaled down for small screens.
   image: { layout: 'constrained' },
   i18n: {
-    locales: ['zh', 'en'],
-    defaultLocale: 'zh',
+    locales: lemma.locales.list,
+    defaultLocale: lemma.locales.default,
     routing: { prefixDefaultLocale: false },
   },
   markdown: {
@@ -81,8 +92,16 @@ export default defineConfig({
     processor: unified({
       // Off: punctuation stays exactly as typed (no curly quotes, no -- to en dash).
       smartypants: false,
-      remarkPlugins: [remarkMath, remarkDirective, [remarkTikz, { cache: tikzCache, macros }], remarkTheorems, remarkReading, [remarkCite, { bibliographies }], [remarkMedia, { posts, manifest }]],
-      rehypePlugins: [[rehypeMathJax4, { macros, version }], rehypeToc, rehypeTables, rehypeFootnotes],
+      remarkPlugins: [
+        remarkMath,
+        remarkDirective,
+        [remarkTikz, { cache: tikzCache, macros }],
+        [remarkTheorems, { labels: lemma.theorems.labels }],
+        [remarkReading, lemma.reading],
+        [remarkCite, { bibliographies: lemma.bibliography.files.map(url), style: url(lemma.bibliography.style) }],
+        [remarkMedia, media],
+      ],
+      rehypePlugins: [[rehypeMathJax4, { macros, packages, version }], rehypeToc, rehypeTables, rehypeFootnotes],
     }),
     shikiConfig: {
       themes,

@@ -1,12 +1,14 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import lemma from '../lemma.config.mjs';
 
+// Site settings, from lemma.config.mjs.
 export const SITE = {
-  title: 'Chengrui Zhang',
-  author: 'Chengrui Zhang',
+  title: lemma.site.title,
+  author: lemma.site.author,
   // Author as BibTeX expects it ("Last, First"), for the "cite this post" block.
-  authorBibtex: 'Zhang, Chengrui',
-  email: 'jczhang@live.it',
-  github: 'jczhang02',
+  authorBibtex: lemma.site.authorBibtex,
+  email: lemma.site.links.email,
+  github: lemma.site.links.github,
 };
 
 export type Lang = 'zh' | 'en';
@@ -14,7 +16,7 @@ export const LANGS: Lang[] = ['zh', 'en'];
 
 export const ui = {
   zh: {
-    description: '方程, 模型, 以及其他.',
+    description: lemma.site.description.zh,
     posts: '文章',
     noPosts: '还没有文章.',
     email: '邮箱',
@@ -40,7 +42,7 @@ export const ui = {
     sectionCount: (n: number) => `${n} 节`,
   },
   en: {
-    description: 'Equations, models, and other things.',
+    description: lemma.site.description.en,
     posts: 'Posts',
     noPosts: 'No posts yet.',
     email: 'Email',

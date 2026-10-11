@@ -1,6 +1,7 @@
-// Vitesse code themes with every token color made readable on the site's code
-// background (--surface in global.css): colors below 4.5:1 contrast are
-// darkened (light) or lightened (dark) until they reach it. Hue stays the same.
+// Shiki code themes (Vitesse by default) with every token color made readable
+// on the site's code background (the surface color of lemma.config.mjs):
+// colors below 4.5:1 contrast are darkened (light) or lightened (dark) until
+// they reach it. Hue stays the same.
 import { bundledThemes } from 'shiki';
 
 const MIN = 4.5;
@@ -48,10 +49,13 @@ async function adjust(name, background) {
   return theme;
 }
 
-/** @param {{ light: string, dark: string }} backgrounds the --surface colors. */
-export default async function codeThemes(backgrounds) {
+/**
+ * @param {{ light: string, dark: string }} names bundled Shiki theme names.
+ * @param {{ light: string, dark: string }} backgrounds the code block backgrounds.
+ */
+export default async function codeThemes(names, backgrounds) {
   return {
-    light: await adjust('vitesse-light', backgrounds.light),
-    dark: await adjust('vitesse-dark', backgrounds.dark),
+    light: await adjust(names.light, backgrounds.light),
+    dark: await adjust(names.dark, backgrounds.dark),
   };
 }

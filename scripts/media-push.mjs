@@ -1,5 +1,6 @@
-// Uploads post videos over 25 MiB to R2 (Cloudflare Pages takes no larger
-// files), records them in src/media-r2.json and keeps them out of git.
+// Uploads post videos over media.maxBytes (25 MiB; Cloudflare takes no larger
+// files) to the R2 bucket of lemma.config.mjs, records them in
+// src/media-r2.json and keeps them out of git.
 // Run after adding or changing a large video: bun run media:push
 //
 // Keys carry a hash of the content, so a changed video gets a new URL and
@@ -9,7 +10,10 @@ import { createHash } from 'node:crypto';
 import { createReadStream, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MAX_BYTES, R2, VIDEO, isVideo, readManifest } from '../plugins/media.mjs';
+import { VIDEO, isVideo, readManifest } from '../plugins/media.mjs';
+import lemma from '../lemma.config.mjs';
+
+const { maxBytes: MAX_BYTES, r2: R2 } = lemma.media;
 
 const root = fileURLToPath(new URL('../src/content/posts/', import.meta.url));
 const manifestUrl = new URL('../src/media-r2.json', import.meta.url);
