@@ -85,10 +85,15 @@ export default {
         // opsz: Source Serif 4 adapts its letterforms to the size (text vs. display).
         '@fontsource-variable/source-serif-4/opsz.css',
         '@fontsource-variable/source-serif-4/opsz-italic.css',
-        '@fontsource-variable/noto-sans-sc',
-        '@fontsource-variable/noto-serif-sc',
         '@fontsource-variable/jetbrains-mono',
         '@fontsource-variable/jetbrains-mono/wght-italic.css',
+      ],
+      // CJK font CSS (hundreds of unicode-range subsets) goes in a stylesheet of
+      // its own, so the main stylesheet stays small and a style edit does not
+      // make visitors download the font CSS again. Loaded on every page.
+      cjkImports: [
+        '@fontsource-variable/noto-sans-sc',
+        '@fontsource-variable/noto-serif-sc',
         'lxgw-wenkai-screen-webfont/lxgwwenkaiscreen.css',
       ],
     },

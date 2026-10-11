@@ -61,7 +61,7 @@ export default {
   },
   theme: {
     colors: { light: { bg: '#faf9f5', accent: '#b5532f', /* ... */ }, dark: { /* ... */ } },
-    fonts: { stacks: { /* sans, serif, kai, mono */ }, imports: ['@fontsource-variable/inter', /* ... */] },
+    fonts: { stacks: { /* sans, serif, kai, mono */ }, imports: ['@fontsource-variable/inter', /* ... */], cjkImports: [/* ... */] },
     layout: { measure: '46rem', textBase: '1.125rem', leading: 1.75 },
   },
   math: { macros: { R: '\\mathbb{R}', /* ... */ }, packages: ['ams', 'physics', /* ... */] },
@@ -73,7 +73,7 @@ export default {
 | --- | --- |
 | `site` | URL (canonical links, Open Graph, sitemap, RSS), name, author (also as BibTeX `Last, First`), tagline per language, avatar, footer links, icons |
 | `locales` | default language and the language list (pages exist for `zh` and `en`) |
-| `theme` | light and dark colors, font stacks and the font packages to load, text width and size; [`DESIGN.md`](DESIGN.md) describes the system |
+| `theme` | light and dark colors, font stacks and the font packages to load (the CJK ones go in a stylesheet of their own), text width and size; [`DESIGN.md`](DESIGN.md) describes the system |
 | `code` | Shiki themes; token colors are raised to 4.5:1 against the code background |
 | `math` | site-wide TeX macros and the MathJax packages loaded up front |
 | `bibliography` | BibTeX files and the CSL style of the reference list |

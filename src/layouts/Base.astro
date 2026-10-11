@@ -3,6 +3,8 @@
 // lemma.config.mjs through plugins/lemma-theme.mjs.
 import 'virtual:lemma/fonts';
 import 'virtual:lemma/tokens.css';
+// The CJK fonts are a stylesheet of their own: the link below.
+import cjkFonts from 'virtual:lemma/cjk-fonts.css?url';
 import '../styles/mathjax.css';
 import '../styles/global.css';
 import { Image } from 'astro:assets';
@@ -59,6 +61,7 @@ const locale = { zh: 'zh_CN', en: 'en_US' };
     {alternate && <link rel="alternate" hreflang={lang === 'zh' ? 'zh-CN' : 'en'} href={canonical} />}
     {alternate && <link rel="alternate" hreflang={other === 'zh' ? 'zh-CN' : 'en'} href={new URL(alternate, Astro.site).href} />}
     <meta name="color-scheme" content="light dark" />
+    <link rel="stylesheet" href={cjkFonts} />
     <script is:inline>
       // Runs before paint, so the page never flashes the wrong theme.
       (() => {
