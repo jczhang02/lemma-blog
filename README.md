@@ -8,7 +8,19 @@ bun run dev          # http://localhost:4321, drafts included
 bun run build        # output in dist/, drafts left out
 bun run new <slug>   # start a post (draft) in src/content/posts/<slug>/zh.md; --en for en.md
 bun run media:push   # upload videos over 25 MiB to R2 (see plugins/media.mjs)
+bun run deploy       # build and publish to https://jczhang.cc
 ```
+
+## Hosting (Cloudflare)
+
+- Site: Workers static assets, no Worker code (`wrangler.jsonc`), custom domain `jczhang.cc`;
+  `www.jczhang.cc` redirects there (zone redirect rule). Asset requests are free and unlimited.
+  `bun run deploy` signs wrangler in with the `cf` CLI login (`cf auth login`).
+- Videos over 25 MiB: R2 bucket `blog-media` at `media.jczhang.cc` (r2.dev URL off). Zone rules
+  for that host keep R2 reads, the only metered item, near zero: edge cache for a year with
+  query strings ignored, a WAF rule blocking query strings and non-GET/HEAD, and a rate limit
+  of 100 requests per 10 s per IP.
+- Budget email alerts at $1, $5 and $8. Cloudflare has no hard spending cap.
 
 ## Writing
 
