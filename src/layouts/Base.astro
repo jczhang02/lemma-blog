@@ -20,9 +20,11 @@ interface Props {
   alternate?: string;
   /** Publication date, for posts (Open Graph type "article"). */
   published?: Date;
+  /** Keep the page out of search results (the 404 page): no canonical URL. */
+  noindex?: boolean;
 }
 
-const { lang, title, description = ui[lang].description, alternate, published } = Astro.props;
+const { lang, title, description = ui[lang].description, alternate, published, noindex } = Astro.props;
 const t = ui[lang];
 const pageTitle = title ? `${title} · ${SITE.title}` : SITE.title;
 const other = otherLang(lang);
@@ -43,12 +45,12 @@ const locale = { zh: 'zh_CN', en: 'en_US' };
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta property="og:type" content={published ? 'article' : 'website'} />
     <meta property="og:site_name" content={SITE.title} />
     <meta property="og:title" content={title ?? SITE.title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={new URL(icons.png192, Astro.site).href} />
     <meta property="og:locale" content={locale[lang]} />
     {alternate && <meta property="og:locale:alternate" content={locale[other]} />}
