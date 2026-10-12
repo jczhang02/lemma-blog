@@ -16,8 +16,8 @@ import remarkDirective from 'remark-directive';
 //   this file on change; without the hash a running dev server keeps old plugin code.
 // - Astro caches rendered posts until the config changes; the hash is part of
 //   the config (plugin options), so an edit re-renders every post.
-const read = (f) => (existsSync(new URL(f, import.meta.url)) ? readFileSync(new URL(f, import.meta.url)) : '');
-const hash = (files) => createHash('sha1').update(files.map(read).join('')).digest('hex').slice(0, 12);
+const read = (/** @type {string} */ f) => (existsSync(new URL(f, import.meta.url)) ? readFileSync(new URL(f, import.meta.url)) : '');
+const hash = (/** @type {string[]} */ files) => createHash('sha1').update(files.map(read).join('')).digest('hex').slice(0, 12);
 const CONFIG = './lemma.config.mjs';
 const { default: lemma } = await import(`${CONFIG}?v=${hash([CONFIG])}`);
 const MODULES = [
@@ -53,7 +53,7 @@ const [
   { aboutIntegration, SAMPLE },
   { searchIntegration },
 ] = await Promise.all(MODULES.map((f) => import(`${f}?v=${version}`)));
-const url = (f) => new URL(f, import.meta.url);
+const url = (/** @type {string} */ f) => new URL(f, import.meta.url);
 const posts = url('./src/content/posts/');
 const tikzCache = url('./tikz-cache/');
 const manifest = url('./src/media-r2.json');
@@ -80,7 +80,7 @@ export default defineConfig({
     sitemap({
       i18n: {
         defaultLocale: lemma.locales.default,
-        locales: Object.fromEntries(lemma.locales.list.map((l) => [l, HREFLANG[l]])),
+        locales: Object.fromEntries(lemma.locales.list.map((/** @type {keyof typeof HREFLANG} */ l) => [l, HREFLANG[l]])),
       },
     }),
     mediaIntegration(media),

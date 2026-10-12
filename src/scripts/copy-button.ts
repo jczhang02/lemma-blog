@@ -6,7 +6,7 @@
 export function copyButtons(root: HTMLElement, selector: string, copied: string) {
   const labels = new WeakMap<HTMLButtonElement, string>();
   // One reset timer per button, so a second click restarts the 1.5 s.
-  const timers = new WeakMap<HTMLButtonElement, number>();
+  const timers = new WeakMap<HTMLButtonElement, ReturnType<typeof setTimeout>>();
   root.addEventListener('click', async (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>(selector);
     const pre = button?.previousElementSibling;

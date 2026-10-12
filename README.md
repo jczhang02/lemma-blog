@@ -45,6 +45,7 @@ Search in `bun run dev` uses the index of the last `bun run build`, which has no
 ```bash
 bun run new my-post      # src/content/posts/my-post/zh.md, a draft; --en for en.md
 bun run build            # static site in dist/, drafts left out
+bun run check            # type-check the TypeScript and .astro files
 bun run deploy           # build and upload to Cloudflare (see Deploying)
 bun run media:push       # upload videos over 25 MiB to R2
 ```

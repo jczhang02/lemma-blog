@@ -90,7 +90,7 @@ const current = (href: string) => (Astro.url.pathname.replace(/\/?$/, '/') === h
     <a class="skip-link" href="#main">{t.skipToContent}</a>
     <header class="site-header">
       <a class="wordmark" href={`${prefix(lang)}/`}>
-        <Image class="wordmark-avatar" src={avatar} alt="" width={32} height={32} layout="none" densities={[1, 2, 3]} loading="eager" />
+        <Image class="wordmark-avatar" src={avatar} alt="" width={32} height={32} layout="fixed" loading="eager" />
         <span class="wordmark-name">{SITE.title}</span>
       </a>
       <nav>

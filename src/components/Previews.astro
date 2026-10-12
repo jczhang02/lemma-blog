@@ -28,8 +28,8 @@
   document.body.append(card);
 
   let current: Element | undefined;
-  let openTimer: number | undefined;
-  let closeTimer: number | undefined;
+  let openTimer: ReturnType<typeof setTimeout> | undefined;
+  let closeTimer: ReturnType<typeof setTimeout> | undefined;
 
   const hrefOf = (a: Element) => a.getAttribute('href') ?? a.getAttribute('xlink:href') ?? '';
 

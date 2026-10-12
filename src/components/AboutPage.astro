@@ -42,11 +42,8 @@ const doiUrl = (id: string) => (/^https?:/.test(id) ? id : `https://doi.org/${id
 // entry of that year only. A selectedOnly section without a list draws on
 // the papers of the others.
 const papers = sections.flatMap((s) => (s.kind === 'publications' && s.publications) || []);
-const shown = sections.flatMap((s) => {
-  if (s.kind === 'items') return s.items.length ? [{ heading: s.heading, items: s.items, pubs: [] }] : [];
-  const own = s.publications ?? (s.selectedOnly ? papers : []);
-  const list = (s.selectedOnly ? own.filter((p) => p.selected) : own).toSorted((a, b) => (b.year ?? 0) - (a.year ?? 0));
-  const pubs = list.map((p, i) => {
+const rows = (list: typeof papers) =>
+  list.map((p, i) => {
     const links = [
       ...(p.pdf ? [{ label: 'PDF', href: resolveHref(p.pdf) }] : []),
       ...(p.arxiv ? [{ label: 'arXiv', href: arxivUrl(p.arxiv) }] : []),
@@ -61,6 +58,12 @@ const shown = sections.flatMap((s) => {
       links,
     };
   });
+type Item = Extract<(typeof sections)[number], { kind: 'items' }>['items'][number];
+type Shown = { heading: string; items: Item[]; pubs: ReturnType<typeof rows> };
+const shown = sections.flatMap((s): Shown[] => {
+  if (s.kind === 'items') return s.items.length ? [{ heading: s.heading, items: s.items, pubs: [] }] : [];
+  const own = s.publications ?? (s.selectedOnly ? papers : []);
+  const pubs = rows((s.selectedOnly ? own.filter((p) => p.selected) : own).toSorted((a, b) => (b.year ?? 0) - (a.year ?? 0)));
   return pubs.length ? [{ heading: s.heading, items: [], pubs }] : [];
 });
 

@@ -12,6 +12,7 @@
     "dev:sample": "LEMMA_ABOUT=sample astro dev --port 4399",
     "build": "astro build",
     "preview": "astro preview",
+    "check": "astro check",
     "astro": "astro",
     "new": "bun scripts/new-post.mjs",
     "media:push": "bun scripts/media-push.mjs",
@@ -52,6 +53,8 @@
     "unist-util-visit-parents": "^6.0.2"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6",
     "wrangler": "^4.149.0"
   }
 }
