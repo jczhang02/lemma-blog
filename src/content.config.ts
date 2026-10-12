@@ -1,7 +1,5 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import { z } from 'astro/zod';
 import { ABOUT_DIR, TEMPLATE } from '../plugins/about.mjs';
 
@@ -91,18 +89,6 @@ const publications = z
   })
   .strict()
   .refine((s) => s.publications !== undefined || s.selectedOnly, 'a section needs `items`, `publications` or `selectedOnly: true`');
-// The first template's `publications: true` (papers from a .bib) still
-// validates, with the other keys it had, so an old file builds; it shows
-// nothing, with a warning.
-const legacyPublications = z
-  .object({
-    kind: z.literal('legacy'),
-    heading: z.string().optional(),
-    publications: z.literal(true),
-    selectedOnly: z.unknown().optional(),
-    links: z.unknown().optional(),
-  })
-  .strict();
 const items = z
   .object({
     kind: z.literal('items'),
@@ -114,10 +100,10 @@ const items = z
 // A section's kind follows from its keys, and the section is checked as that
 // kind only. A union would try each kind in turn: a paper with a bad field
 // then made the section pass as an empty list of items, and vanish.
-const sectionKind = (s: Record<string, unknown>) => ('items' in s ? 'items' : s.publications === true ? 'legacy' : 'publications');
+const sectionKind = (s: Record<string, unknown>) => ('items' in s ? 'items' : 'publications');
 const section = z.preprocess(
   (s) => (s && typeof s === 'object' && !Array.isArray(s) ? { ...s, kind: sectionKind(s as Record<string, unknown>) } : s),
-  z.discriminatedUnion('kind', [items, publications, legacyPublications]),
+  z.discriminatedUnion('kind', [items, publications]),
 );
 
 const aboutFiles = glob({ pattern: '{zh,en}.md', base: ABOUT_DIR });
@@ -129,11 +115,6 @@ const about = defineCollection({
     name: 'about',
     load: async (context) => {
       await aboutFiles.load(context);
-      // Leftovers of the first template; files are named, never read.
-      if (existsSync(join(ABOUT_DIR, 'publications.bib'))) context.logger.warn(`${ABOUT_DIR.slice(2)}/publications.bib is ignored: list the papers in YAML (see WRITING.md)`);
-      for (const [id, entry] of context.store.entries())
-        if ((entry.data.sections as { kind: string }[] | undefined)?.some((s) => s.kind === 'legacy'))
-          context.logger.warn(`${id}.md: a section with \`publications: true\` shows nothing; list the papers in YAML (see WRITING.md)`);
       if (!import.meta.env.PROD) return;
       for (const [id, entry] of context.store.entries()) {
         if (!`${entry.body}${JSON.stringify(entry.data)}`.includes(TEMPLATE)) continue;

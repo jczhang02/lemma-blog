@@ -1,9 +1,2 @@
-# ripgrep and fd skip the About page content (private to its author) and the
-# copies a build makes of it, even when a search names dist/ or node_modules/
-# explicitly (.gitignore alone does not cover that).
+# ripgrep and fd skip the About page content; see AGENTS.md.
 src/content/about/
-dist/about/
-dist/en/about/
-.astro/
-node_modules/.astro/
-node_modules/.vite/

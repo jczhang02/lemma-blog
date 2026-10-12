@@ -183,11 +183,11 @@ A section is a list of items when it has `items`, of papers otherwise. A misspel
 
 Papers are sorted newest first, the year shown once per year; the link row reads PDF · arXiv · DOI, then the extra links, and a BibTeX copy button when `bibtex` is given. A selectedOnly section without its own list takes the selected papers of the file's other publications sections.
 
-The template marks its placeholders with `ABOUT_TEMPLATE`. A production build leaves out a file whose body or field values still hold the marker, with a warning; that language's page goes live once the marker is gone from both (YAML comments do not count). Files from the first template still build: a `publications: true` section shows nothing and a leftover `publications.bib` is ignored, each with a warning; replace the section with a YAML list and delete the file.
+The template marks its placeholders with `ABOUT_TEMPLATE`. A production build leaves out a file whose body or field values still hold the marker, with a warning; that language's page goes live once the marker is gone from both (YAML comments do not count).
 
 `src/about.sample/` is a fictitious profile with the same layout, for working on the page without the real one: `bun run dev:sample` (port 4399) or `LEMMA_ABOUT=sample bun run build`. `bun run deploy` refuses to run while `LEMMA_ABOUT` is set, or while `NODE_ENV` is set to anything but `production` (drafts and the marker check depend on a production build).
 
-The real folder is for its author only: [`AGENTS.md`](AGENTS.md) tells coding agents to keep out of it and its build copies, `.claude/settings.json` denies Claude Code's file tools access to them, `.ignore` keeps it out of `rg`, and `.gitattributes` keeps its text out of `git diff` and `git log -p`.
+Coding agents keep out of the real folder unless its author asks: [`AGENTS.md`](AGENTS.md) says so, `.ignore` keeps it out of `rg` and `fd`, and `.gitattributes` keeps its text out of `git diff`.
 
 ## Features in detail
 

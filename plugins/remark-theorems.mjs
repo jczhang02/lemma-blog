@@ -22,7 +22,6 @@
 // figure or table (or the text of an unnumbered heading); other \ref and
 // \eqref are left for MathJax.
 import { visit, SKIP } from 'unist-util-visit';
-import { isAboutFile } from './about.mjs';
 
 // Defaults; options.labels (lemma.config.mjs) replaces them per language.
 const LABELS = {
@@ -100,8 +99,6 @@ export default function remarkTheorems({ labels: custom = {} } = {}) {
     const lang = langOf(file);
     const labels = { ...LABELS[lang], ...custom[lang] };
     const numbered = file.data.astro?.frontmatter?.numbering !== false;
-    // The about page's warnings name the file only (plugins/about.mjs).
-    const quiet = isAboutFile(file.path);
     const numbers = new Map();
     // Labels of unnumbered headings, with the heading text.
     const names = new Map();
@@ -111,7 +108,7 @@ export default function remarkTheorems({ labels: custom = {} } = {}) {
     const floats = { figure: 0, table: 0 };
     const ids = new Set();
     const claim = (id) => {
-      if (ids.has(id)) console.warn(`[theorems] ${file.path}: duplicate label${quiet ? '' : ` ${id}`}`);
+      if (ids.has(id)) console.warn(`[theorems] ${file.path}: duplicate label ${id}`);
       ids.add(id);
     };
 
@@ -154,7 +151,7 @@ export default function remarkTheorems({ labels: custom = {} } = {}) {
       }
       if (node.type !== 'containerDirective') return;
       if (!Object.hasOwn(labels, node.name)) {
-        console.warn(`[theorems] ${file.path}: unknown environment${quiet ? '' : ` :::${node.name}`}`);
+        console.warn(`[theorems] ${file.path}: unknown environment :::${node.name}`);
         return;
       }
 
@@ -215,7 +212,7 @@ export default function remarkTheorems({ labels: custom = {} } = {}) {
         const name = names.get(m[1]);
         if (n === undefined && name === undefined) continue;
         // A heading without a number is named instead, as \nameref does.
-        if (n === undefined) console.warn(`[theorems] ${file.path}: ${quiet ? 'a \\ref' : `\\ref{${m[1]}}`} points to an unnumbered heading; shown as its text`);
+        if (n === undefined) console.warn(`[theorems] ${file.path}: \\ref{${m[1]}} points to an unnumbered heading; shown as its text`);
         if (m.index > last) parts.push(text(node.value.slice(last, m.index)));
         const children = n === undefined ? structuredClone(name) : [text(n)];
         parts.push({ type: 'link', url: `#${m[1]}`, data: { hProperties: { className: ['xref'] } }, children });

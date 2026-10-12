@@ -12,7 +12,6 @@ import '@citation-js/plugin-csl';
 import { fromHtml } from 'hast-util-from-html';
 import { select } from 'hast-util-select';
 import { visit } from 'unist-util-visit';
-import { isAboutFile } from './about.mjs';
 
 // The reference list style: options.style (a CSL file URL), by default AMS
 // numeric from the CSL styles repository (CC BY-SA 3.0).
@@ -84,8 +83,7 @@ export default function remarkCite({ bibliographies, style = DEFAULT_STYLE }) {
           const key = raw.trim();
           if (i) parts.push(text(', '));
           if (!lib.ids.has(key)) {
-            // The about page's warnings name the file only (plugins/about.mjs).
-            console.warn(`[cite] ${file.path}: unknown key${isAboutFile(file.path) ? '' : ` ${key}`}`);
+            console.warn(`[cite] ${file.path}: unknown key ${key}`);
             parts.push(text('?'));
             return;
           }

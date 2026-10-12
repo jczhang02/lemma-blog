@@ -196,21 +196,11 @@ sections:
 ```
 
 - 作者列表里, `self` 列出的名字加粗. `'Zhang, San'` 也匹配 `San Zhang`; 名字后面的 `*` 之类的符号不影响匹配.
-- `publications.bib` 不再使用. 文件夹里还有这个文件时, 构建会给出一行警告, 不会读取它.
 
 ### 模板标记
 
 模板里的占位内容都带着 `ABOUT_TEMPLATE`. 正式构建 (`bun run build`, `bun run deploy`) 时, 正文或字段值里只要还有这个标记, 这一语言的关于页就不生成, 页头也没有 "关于" 链接, 构建给出一行警告. YAML 注释里的标记不算. 把所有占位内容换掉, 正文和字段值里的标记全部删除后, 页面才会上线. `bun run dev` 不受影响, 可以边写边看.
 
-### 从第一版模板升级
-
-第一版模板从 `publications.bib` 读取论文. 现在要改两处:
-
-1. 把 `publications: true` 那一节 (连同它的 `selectedOnly` 和 `links`) 换成上面的 YAML 列表.
-2. 删除 `publications.bib`.
-
-改之前构建不会失败: `publications: true` 的板块什么也不显示, 并给出警告.
-
 ### 隐私
 
-这个文件夹只放真实内容, agent 不会读取它. 调整关于页的样式时, 用 `src/about.sample/` 里的虚构资料: `bun run dev:sample` (端口 4399). `LEMMA_ABOUT` 有值时, `bun run deploy` 会拒绝运行, 虚构资料不会上线.
+这个文件夹只放真实内容. 除非你要求, agent 不会主动查看它 (见 `AGENTS.md`). 调整关于页的样式时, 用 `src/about.sample/` 里的虚构资料: `bun run dev:sample` (端口 4399). `LEMMA_ABOUT` 有值时, `bun run deploy` 会拒绝运行, 虚构资料不会上线.

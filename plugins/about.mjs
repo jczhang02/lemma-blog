@@ -7,9 +7,6 @@
 // as cv.pdf. LEMMA_ABOUT=sample switches to src/about.sample/, a fictitious
 // profile for testing the layout; scripts/deploy.mjs refuses to run with
 // LEMMA_ABOUT set.
-//
-// Warnings name files only, never their content, so a build log shows nothing
-// of the profile itself. The Markdown plugins hold to this too (isAboutFile).
 import { cpSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,28 +24,6 @@ export const SAMPLE = mode === 'sample';
 export const TEMPLATE = 'ABOUT_TEMPLATE';
 // Files linked from the page are served here, for both languages.
 const FILES = '/about';
-
-/** True for a file of either about folder, whatever the mode: a warning about it must not quote it (TeX, keys). @param {string | undefined} path */
-export const isAboutFile = (path) => /[/\\]src[/\\](?:content[/\\]about|about\.sample)[/\\]/.test(path ?? '');
-
-// Vite serves any file under the root on request (/src/content/about/zh.md?raw,
-// /@fs/...), linked or not. Deny both about folders and the build's copies of
-// the page in every mode. Setting deny replaces Vite's defaults, so they come
-// first. The content collection reads the folder from disk and linked files
-// are served by the middleware below, so neither needs Vite; an image in the
-// bio does not show in dev, though.
-const DENY = [
-  '.env',
-  '.env.*',
-  '*.{crt,pem}',
-  '**/.git/**',
-  '**/src/content/about/**',
-  '**/src/about.sample/**',
-  '**/dist/about/**',
-  '**/dist/en/about/**',
-  '**/.astro/**',
-  '**/node_modules/.astro*/**',
-];
 
 // A relative href (`cv.pdf`, `./cv.pdf`, `cv.pdf#page=2`) names a file in the about folder.
 const LOCAL = /^(?![a-z][a-z\d+.-]*:|[/#?])/i;
@@ -96,9 +71,8 @@ export function aboutIntegration() {
   return {
     name: 'about-files',
     hooks: {
-      'astro:config:setup': ({ config, updateConfig }) => {
+      'astro:config:setup': ({ config }) => {
         dir = fileURLToPath(new URL(`${ABOUT_DIR}/`, config.root));
-        updateConfig({ vite: { server: { fs: { deny: DENY } } } });
       },
       'astro:server:setup': ({ server }) => {
         const serve = sirv(dir, { dev: true });

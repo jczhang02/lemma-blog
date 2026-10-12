@@ -43,7 +43,6 @@ const doiUrl = (id: string) => (/^https?:/.test(id) ? id : `https://doi.org/${id
 // the papers of the others.
 const papers = sections.flatMap((s) => (s.kind === 'publications' && s.publications) || []);
 const shown = sections.flatMap((s) => {
-  if (s.kind === 'legacy') return [];
   if (s.kind === 'items') return s.items.length ? [{ heading: s.heading, items: s.items, pubs: [] }] : [];
   const own = s.publications ?? (s.selectedOnly ? papers : []);
   const list = (s.selectedOnly ? own.filter((p) => p.selected) : own).toSorted((a, b) => (b.year ?? 0) - (a.year ?? 0));
