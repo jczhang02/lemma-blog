@@ -206,6 +206,13 @@ main:focus {
   stroke-linejoin: round;
 }
 
+/* The translate glyph fills its whole box, unlike the others: drawn in a
+   larger box (see Base.astro) it matches their size, and a heavier stroke
+   keeps its lines as thick as theirs. */
+.icon-button .icon-lang {
+  stroke-width: 2.1;
+}
+
 [data-theme='light'] .icon-sun,
 [data-theme='dark'] .icon-moon {
   display: none;
