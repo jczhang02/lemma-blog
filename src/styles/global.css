@@ -297,6 +297,43 @@ main:focus {
   margin: 0;
 }
 
+/* site.intro.formula, in place of the tagline: on one line, as a slogan is. */
+.intro-formula {
+  white-space: nowrap;
+}
+
+/* TaglineCurve.astro: a curve mark before the tagline, in Ink on a faint track. */
+.intro:has(.tagline-curve) {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.tagline-curve {
+  flex: none;
+  width: 4rem;
+  height: 4rem;
+  overflow: visible;
+}
+
+.tagline-curve path {
+  fill: none;
+  stroke: var(--text);
+  stroke-opacity: 0.1;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tagline-curve .tagline-level {
+  stroke-opacity: 0.16;
+  stroke-width: 1.5;
+}
+
+.tagline-curve circle {
+  fill: var(--text);
+}
+
 .empty {
   margin: 0;
   color: var(--muted);

@@ -43,7 +43,7 @@ const [
   { default: remarkTheorems },
   { default: remarkReading },
   { default: remarkCite },
-  { default: rehypeMathJax4 },
+  { default: rehypeMathJax4, mathIntegration },
   { default: rehypeToc },
   { default: rehypeTables },
   { default: rehypeFootnotes },
@@ -76,6 +76,8 @@ export default defineConfig({
   integrations: [
     // Colors, font stacks, layout tokens and font files from the config.
     lemmaTheme(lemma.theme),
+    // The home page formula, rendered like the math in posts.
+    mathIntegration({ formula: lemma.site.intro.formula, macros, packages }),
     // hreflang alternates pair /posts/x/ with /en/posts/x/.
     sitemap({
       i18n: {

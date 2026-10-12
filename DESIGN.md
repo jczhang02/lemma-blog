@@ -165,7 +165,7 @@ Warm, low-chroma neutrals carry everything; the accent is the only saturated col
 ### Hierarchy
 - **Display** (500, clamp(2rem, 5vw, 2.75rem), 1.2): post titles.
 - **Headline** (600, 1.625rem, 1.35): numbered section headings (h2); h3 at 1.25rem.
-- **Title** (500, 1.25rem, 1.5): post titles in lists; the home tagline is 1.75rem serif.
+- **Title** (500, 1.25rem, 1.5): post titles in lists; the home intro (formula or tagline) is 1.75rem.
 - **Body** (400, 1.125rem, 1.75): article text, 46rem measure. Abstract and keywords 1rem / 0.9375rem, indented from both sides.
 - **Small** (0.9375rem): captions, references, footnotes, tables, preview cards; sidenotes 0.875rem.
 - **Label** (0.875rem sans): dates, post facts, footer.
@@ -237,6 +237,10 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 ### Code block
 - **Style:** Vellum background, 1px Hairline border, 8px radius, JetBrains Mono.
 - **Copy button:** top right; appears on hover or focus on pointer devices and always on touch (the code moves down to make room). Shows 已复制 / Copied for 1.5s.
+
+### Home intro
+- **Formula** (`site.intro.formula`): TeX set by MathJax like the math in posts, at 1.75rem, Ink, labelled with its TeX for screen readers. Without one, the site description shows as text in serif 1.75rem; it serves the meta description and RSS either way.
+- **Curve mark** (`site.intro.curve`, optional): a 4rem square before the formula or text, after paidax01's math curve loaders. A comet of 60 Ink dots, each smaller and fainter than the one before, runs along a closed curve over its track in Ink at 10%; the curve breathes and, for some, slowly turns. The default, `monge-ampere`, is a level set of a solution of det D²u = 1 (a quadratic with det A = 1), with two inner level sets as 1.5-unit lines at 16%: the ellipses stretch and turn, their areas fixed. Also ring, rose, Lissajous, lemniscate and spirograph. It runs while on screen. Not the accent: it is not interactive. With reduced motion or without JavaScript, the first frame stays.
 
 ### Post header
 - **Order:** title; a sans meta line (date · reading time · sections, and "Read in English" on the right); the abstract, then keywords, both indented like a paper's.

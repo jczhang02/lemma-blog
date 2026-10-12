@@ -6,6 +6,7 @@
 // restart per post. Per-post macros come from frontmatter `macros`.
 import MathJax from '@mathjax/src';
 import { fromHtml } from 'hast-util-from-html';
+import { toHtml } from 'hast-util-to-html';
 import { toText } from 'hast-util-to-text';
 import { visit } from 'unist-util-visit';
 import { visitParents } from 'unist-util-visit-parents';
@@ -225,6 +226,51 @@ export default function rehypeMathJax4(options = {}) {
         }
       }
     });
+  };
+}
+
+// virtual:lemma/math, TeX from lemma.config.mjs rendered once for the
+// templates: `formula`, the home page formula (site.intro.formula) as inline
+// math, or null. Its SVG is labelled with the TeX for screen readers.
+const MATH = 'virtual:lemma/math';
+
+/** Astro integration. @param {{ formula: string | null, macros?: object, packages?: string[] }} options */
+export function mathIntegration({ formula, macros = {}, packages = PACKAGES }) {
+  const render = async (tex) => {
+    await init(macros, packages);
+    return serial(async () => {
+      MathJax.texReset();
+      await MathJax.tex2svgPromise('\\begingroupSandbox');
+      const { html, error } = await toSvg(tex, false);
+      if (error) console.warn(`[mathjax] lemma.config.mjs site.intro.formula: ${error}\n  in: ${tex}`);
+      const [rendered] = fromHtml(html, { fragment: true }).children;
+      // Inline math with break points is several <svg>s; the first carries the label.
+      rendered.children
+        .filter((c) => c.tagName === 'svg')
+        .forEach((svg, i) => (i ? (svg.properties.ariaHidden = 'true') : (svg.properties.ariaLabel = tex)));
+      return toHtml(rendered);
+    });
+  };
+  return {
+    name: 'lemma-math',
+    hooks: {
+      'astro:config:setup': ({ updateConfig }) => {
+        updateConfig({
+          vite: {
+            plugins: [
+              {
+                name: 'lemma-math',
+                resolveId: (id) => (id === MATH ? `\0${MATH}` : undefined),
+                async load(id) {
+                  if (id !== `\0${MATH}`) return;
+                  return `export const formula = ${JSON.stringify(formula ? await render(formula) : null)};`;
+                },
+              },
+            ],
+          },
+        });
+      },
+    },
   };
 }
 

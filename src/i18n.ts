@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import lemma from '../lemma.config.mjs';
+import type { CurveName } from './scripts/curves';
 
 // Site settings, from lemma.config.mjs.
 export const SITE = {
@@ -9,6 +10,7 @@ export const SITE = {
   authorBibtex: lemma.site.authorBibtex,
   email: lemma.site.links.email,
   github: lemma.site.links.github,
+  introCurve: lemma.site.intro.curve as CurveName | null,
 };
 
 export type Lang = 'zh' | 'en';

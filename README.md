@@ -60,6 +60,7 @@ export default {
     url: 'https://jczhang.cc',
     title: 'Chengrui Zhang',
     description: { zh: '方程, 模型, 以及其他.', en: 'Equations, models, and other things.' },
+    intro: { curve: 'monge-ampere', formula: '\\det D^2 u = f' }, // the home page; null for none / the tagline
     avatar: 'src/assets/avatar.jpg',
     links: { email: 'jczhang@live.it', github: 'jczhang02' },
     // ...

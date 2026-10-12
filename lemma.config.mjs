@@ -19,6 +19,16 @@ export default {
       zh: '方程, 模型, 以及其他.',
       en: 'Equations, models, and other things.',
     },
+    // The home page, above the posts:
+    // - curve: a mark of dots running along a curve: 'monge-ampere' (level
+    //   sets of det D^2 u = 1), 'ring', 'rose', 'lissajous', 'lemniscate',
+    //   'spirograph', or null for none.
+    // - formula: TeX shown beside it in place of the tagline (the tagline
+    //   still serves the meta description and RSS); null shows the tagline.
+    intro: {
+      curve: 'monge-ampere',
+      formula: '\\det D^2 u = f',
+    },
     // Header avatar, relative to the repository root; must be under src/assets/.
     avatar: 'src/assets/avatar.jpg',
     // Footer links.
