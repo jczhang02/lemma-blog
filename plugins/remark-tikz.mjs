@@ -18,6 +18,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { isAboutFile } from './about.mjs';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { fromHtml } from 'hast-util-from-html';
@@ -127,7 +128,8 @@ export default function remarkTikz({ cache, macros: siteMacros = {} }) {
           const out = await compile(source);
           if (out.error) {
             // Left as a code block, so the diagram's source is still shown.
-            console.warn(`[tikz] ${file.path}: ${out.error}\n  in: ${node.value.split('\n')[0]}`);
+            // The about page's warnings name the file only (plugins/about.mjs).
+            console.warn(isAboutFile(file.path) ? `[tikz] ${file.path}: a diagram does not compile` : `[tikz] ${file.path}: ${out.error}\n  in: ${node.value.split('\n')[0]}`);
             return;
           }
           mkdirSync(dir, { recursive: true });

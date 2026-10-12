@@ -12,6 +12,7 @@ import '@citation-js/plugin-csl';
 import { fromHtml } from 'hast-util-from-html';
 import { select } from 'hast-util-select';
 import { visit } from 'unist-util-visit';
+import { isAboutFile } from './about.mjs';
 
 // The reference list style: options.style (a CSL file URL), by default AMS
 // numeric from the CSL styles repository (CC BY-SA 3.0).
@@ -83,7 +84,8 @@ export default function remarkCite({ bibliographies, style = DEFAULT_STYLE }) {
           const key = raw.trim();
           if (i) parts.push(text(', '));
           if (!lib.ids.has(key)) {
-            console.warn(`[cite] ${file.path}: unknown key ${key}`);
+            // The about page's warnings name the file only (plugins/about.mjs).
+            console.warn(`[cite] ${file.path}: unknown key${isAboutFile(file.path) ? '' : ` ${key}`}`);
             parts.push(text('?'));
             return;
           }
@@ -121,9 +123,11 @@ export default function remarkCite({ bibliographies, style = DEFAULT_STYLE }) {
     });
     restoreMath({ type: 'root', children: items }, lib.math);
 
+    // Left out of site search: titles of cited works would match more often
+    // than the post itself, and an excerpt from the list says little.
     tree.children.push(
-      { type: 'heading', depth: 2, data: { hProperties: { id: 'references' } }, children: [text(HEADING[lang])] },
-      { type: 'references', data: { hName: 'ol', hProperties: { className: ['references'] }, hChildren: items } },
+      { type: 'heading', depth: 2, data: { hProperties: { id: 'references', dataPagefindIgnore: '' } }, children: [text(HEADING[lang])] },
+      { type: 'references', data: { hName: 'ol', hProperties: { className: ['references'], dataPagefindIgnore: '' }, hChildren: items } },
     );
   };
 }

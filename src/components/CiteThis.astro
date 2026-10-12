@@ -25,7 +25,8 @@ const bibtex = `@misc{${key},
 }`;
 ---
 
-<section class="cite-this" aria-labelledby="cite-this">
+<!-- The same title, URL and BibTeX on every post: not for site search. -->
+<section class="cite-this" aria-labelledby="cite-this" data-pagefind-ignore>
   <h2 id="cite-this">{t.citeThis}</h2>
   <p>{SITE.author}. {post.data.title}. {year}. <a href={url}>{url}</a></p>
   <div class="cite-bibtex">

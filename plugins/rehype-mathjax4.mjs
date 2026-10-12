@@ -9,6 +9,7 @@ import { fromHtml } from 'hast-util-from-html';
 import { toText } from 'hast-util-to-text';
 import { visit } from 'unist-util-visit';
 import { visitParents } from 'unist-util-visit-parents';
+import { isAboutFile } from './about.mjs';
 
 // Loaded up front unless options.packages says otherwise; anything else is
 // still reachable through \require or autoload.
@@ -115,7 +116,8 @@ function glyphText(node) {
 // Render one item and put the SVG in place of the item (or of its last render).
 async function render(item, file, warn = true) {
   const { html, error } = await toSvg(item.tex, item.display);
-  if (error && warn) console.warn(`[mathjax] ${file.path}: ${error}\n  in: ${item.tex}`);
+  // The about page's warnings name the file only (plugins/about.mjs).
+  if (error && warn) console.warn(isAboutFile(file.path) ? `[mathjax] ${file.path}: a formula does not render` : `[mathjax] ${file.path}: ${error}\n  in: ${item.tex}`);
   const [rendered] = fromHtml(html, { fragment: true }).children;
   rendered.properties ??= {};
   rendered.properties.dataTex = item.tex;
@@ -197,7 +199,7 @@ export default function rehypeMathJax4(options = {}) {
       // One macro at a time, so a broken one is named and does not drop the rest.
       for (const [name, def] of toNewcommands(fm.macros)) {
         const { error } = await toSvg(def, false);
-        if (error) console.warn(`[mathjax] ${file.path}: frontmatter macro \\${name}: ${error}`);
+        if (error) console.warn(isAboutFile(file.path) ? `[mathjax] ${file.path}: a frontmatter macro does not render` : `[mathjax] ${file.path}: frontmatter macro \\${name}: ${error}`);
       }
 
       const tags = MathJax.startup.input[0].parseOptions.tags;
@@ -214,12 +216,12 @@ export default function rehypeMathJax4(options = {}) {
       for (const item of items.filter((item) => item.forward)) {
         const unknown = item.refs.filter((key) => !Object.hasOwn(tags.allLabels, key));
         for (const key of unknown) {
-          if (!warned.has(key)) console.warn(`[mathjax] ${file.path}: unknown label ${key}`);
+          if (!warned.has(key)) console.warn(`[mathjax] ${file.path}: unknown label${isAboutFile(file.path) ? '' : ` ${key}`}`);
           warned.add(key);
         }
         if (unknown.length) continue;
         if (/\\(?:label|tag|begin)\b/.test(item.tex)) {
-          console.warn(`[mathjax] ${file.path}: forward reference in math that may hold a label or number, shown as ???\n  in: ${item.tex}`);
+          console.warn(`[mathjax] ${file.path}: forward reference in math that may hold a label or number, shown as ???${isAboutFile(file.path) ? '' : `\n  in: ${item.tex}`}`);
         } else {
           await render(item, file, false);
         }

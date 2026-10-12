@@ -10,6 +10,19 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import lemma from '../lemma.config.mjs';
 
+// LEMMA_ABOUT=sample builds the fictitious sample profile as the about page;
+// that must never go live.
+if (process.env.LEMMA_ABOUT !== undefined) {
+  console.error(`deploy: LEMMA_ABOUT is set (${process.env.LEMMA_ABOUT}). Unset it and run bun run deploy again.`);
+  process.exit(1);
+}
+// Drafts and an about page that still holds the template marker are left out
+// of production builds only.
+if (process.env.NODE_ENV !== undefined && process.env.NODE_ENV !== 'production') {
+  console.error(`deploy: NODE_ENV is set (${process.env.NODE_ENV}). Unset it and run bun run deploy again.`);
+  process.exit(1);
+}
+
 const run = (cmd, args, env) => execFileSync(cmd, args, { stdio: 'inherit', env: { ...process.env, ...env } });
 
 const { worker, accountId, domain, compatibilityDate } = lemma.deploy;

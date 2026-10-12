@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "dev:sample": "LEMMA_ABOUT=sample astro dev --port 4399",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
@@ -40,6 +41,7 @@
     "hast-util-to-html": "^9.0.5",
     "hast-util-to-text": "^4.0.2",
     "lxgw-wenkai-screen-webfont": "^1.7.0",
+    "pagefind": "^1.5",
     "remark-directive": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",

@@ -18,6 +18,7 @@ export const ui = {
   zh: {
     description: lemma.site.description.zh,
     posts: '文章',
+    about: '关于',
     noPosts: '还没有文章.',
     email: '邮箱',
     links: '链接',
@@ -25,6 +26,19 @@ export const ui = {
     readIn: 'Read in English',
     updated: '更新于',
     toggleTheme: '切换深色模式',
+    // Site search (Search.astro). {n} is the number of results.
+    search: '搜索',
+    searchPlaceholder: '搜索文章',
+    searchClose: '取消',
+    searchResults: '搜索结果',
+    searchHint: '搜索已发布的文章.',
+    searchKeys: '↑ ↓ 选择, Enter 打开, Esc 关闭',
+    searchLoading: '搜索中...',
+    searchNone: '没有找到相关的文章.',
+    searchCount: ['{n} 篇', '{n} 篇'],
+    searchNoPosts: '还没有可以搜索的文章.',
+    searchNoIndex: '搜索索引在 bun run build 后生成.',
+    searchError: '搜索暂时不可用.',
     allPosts: '全部文章',
     toc: '目录',
     skipToContent: '跳到正文',
@@ -44,6 +58,7 @@ export const ui = {
   en: {
     description: lemma.site.description.en,
     posts: 'Posts',
+    about: 'About',
     noPosts: 'No posts yet.',
     email: 'Email',
     links: 'Links',
@@ -51,6 +66,18 @@ export const ui = {
     readIn: '阅读中文版',
     updated: 'Updated',
     toggleTheme: 'Toggle dark mode',
+    search: 'Search',
+    searchPlaceholder: 'Search posts',
+    searchClose: 'Cancel',
+    searchResults: 'Search results',
+    searchHint: 'Search the published posts.',
+    searchKeys: '↑ ↓ to choose, Enter to open, Esc to close',
+    searchLoading: 'Searching...',
+    searchNone: 'No posts match.',
+    searchCount: ['{n} post', '{n} posts'],
+    searchNoPosts: 'No posts to search yet.',
+    searchNoIndex: 'The search index is built by bun run build.',
+    searchError: 'Search is not available right now.',
     allPosts: 'All posts',
     toc: 'Contents',
     skipToContent: 'Skip to content',
@@ -78,6 +105,11 @@ export const prefix = (lang: Lang) => (lang === 'zh' ? '' : `/${lang}`);
 export const langOf = (post: CollectionEntry<'posts'>) => post.id.split('/').at(-1) as Lang;
 export const slugOf = (post: CollectionEntry<'posts'>) => post.id.split('/').slice(0, -1).join('/');
 export const postUrl = (post: CollectionEntry<'posts'>) => `${prefix(langOf(post))}/posts/${slugOf(post)}/`;
+
+// The about page of a language exists when its file does (src/content/about/<lang>.md).
+// getCollection, since getEntry warns about a missing entry.
+export const aboutUrl = (lang: Lang) => `${prefix(lang)}/about/`;
+export const hasAbout = async (lang: Lang) => (await getCollection('about')).some((e) => e.id === lang);
 
 export async function getPosts(lang: Lang) {
   const posts = await getCollection('posts', (p) => langOf(p) === lang && (import.meta.env.DEV || !p.data.draft));

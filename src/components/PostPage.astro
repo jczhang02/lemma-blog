@@ -23,12 +23,12 @@ const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
 
 <Base lang={lang} title={title} description={description} alternate={alternate} published={date}>
   <Toc toc={remarkPluginFrontmatter.toc ?? []} label={t.toc} />
-  <article class="post" data-copy={t.copy} data-copied={t.copied} data-notes={t.notes} data-jump={t.jump}>
+  <article class="post" data-pagefind-body data-copy={t.copy} data-copied={t.copied} data-notes={t.notes} data-jump={t.jump}>
     <header class="post-header">
-      <h1>{title}</h1>
-      <p class="post-meta">
+      <h1 data-pagefind-meta="title">{title}</h1>
+      <p class="post-meta" data-pagefind-ignore>
         <span class="post-facts">
-          <time datetime={date.toISOString()}>{formatDate(date, lang)}</time>
+          <time datetime={date.toISOString()} data-pagefind-meta="date">{formatDate(date, lang)}</time>
           {updated && <span>{t.updated} <time datetime={updated.toISOString()}>{formatDate(updated, lang)}</time></span>}
           <span>{t.readingTime(readingMinutes)}</span>
           {sections > 0 && <span>{t.sectionCount(sections)}</span>}
@@ -38,18 +38,18 @@ const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
       {
         description && (
           <p class="abstract">
-            <strong>{t.abstract}.</strong> {description}
+            <strong data-pagefind-ignore>{t.abstract}.</strong> <span data-pagefind-meta="description">{description}</span>
           </p>
         )
       }
       {
         tags.length > 0 && (
           <p class="keywords">
-            <span class="keywords-label">{t.keywords}:</span>{' '}
+            <span class="keywords-label" data-pagefind-ignore>{t.keywords}:</span>{' '}
             {tags.map((tag, i) => (
               <>
                 {i > 0 && ', '}
-                <a href={tagUrl(lang, tag)}>{tag}</a>
+                <a href={tagUrl(lang, tag)} data-pagefind-filter="tag">{tag}</a>
               </>
             ))}
           </p>
@@ -66,6 +66,8 @@ const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
 </Base>
 
 <script>
+  import { copyButtons } from '../scripts/copy-button';
+
   // Copy buttons: one on every code block, plus the BibTeX block. Each copies
   // the <pre> right before it.
   const article = document.querySelector<HTMLElement>('article.post')!;
@@ -80,23 +82,7 @@ const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
     button.textContent = article.dataset.copy!;
     block.append(pre, button);
   }
-  // One reset timer per button, so a second click restarts the 1.5 s.
-  const timers = new WeakMap<HTMLButtonElement, number>();
-  article.addEventListener('click', async (event) => {
-    const button = (event.target as Element).closest<HTMLButtonElement>('.copy-button');
-    const pre = button?.previousElementSibling;
-    if (!button || !pre) return;
-    // No clipboard (insecure origin) or no permission: leave the label as is.
-    try {
-      if (!navigator.clipboard) return;
-      await navigator.clipboard.writeText(pre.textContent ?? '');
-    } catch {
-      return;
-    }
-    button.textContent = article.dataset.copied!;
-    clearTimeout(timers.get(button));
-    timers.set(button, setTimeout(() => (button.textContent = article.dataset.copy!), 1500));
-  });
+  copyButtons(article, '.copy-button', article.dataset.copied!);
 
   // Mark sideways-scrolling blocks with the side(s) that have more content.
   // Overflowing blocks also take keyboard focus, so they can be scrolled

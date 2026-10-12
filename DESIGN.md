@@ -86,6 +86,15 @@ components:
     rounded: "{rounded.card}"
     padding: "0.75rem 1rem"
     width: "19rem"
+  search-panel:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.card}"
+    width: "min(36rem, 100vw - 1rem)"
+  search-result:
+    backgroundColor: "{colors.surface}"
+    rounded: "{rounded.block}"
+    padding: "0.625rem 0.75rem"
   code-block:
     backgroundColor: "{colors.surface}"
     rounded: "{rounded.block}"
@@ -115,7 +124,7 @@ The token values above are set in `lemma.config.mjs` (`theme`, `code`), which ge
 
 A personal research blog (AI for PDE, and mathematics around it) in Chinese and English. Each post should read like a carefully typeset paper on a screen: serif text on warm paper, numbered sections and theorems, captions where print puts them, citations that resolve. The labels around it (dates, meta lines, footer) are quiet sans-serif and stay out of the way. The look is clean and modern rather than antique: nothing imitates paper texture, and there are no ornaments.
 
-Depth is minimal. The page is flat; only content that floats above it (TOC cards, link previews) is lifted, and all of it in the same way. Color is almost entirely neutral, with one terracotta accent for links and the current state.
+Depth is minimal. The page is flat; only content that floats above it (TOC cards, link previews, the search panel) is lifted, and all of it in the same way. Color is almost entirely neutral, with one terracotta accent for links and the current state.
 
 **Key Characteristics:**
 - Serif reading text and header, sans-serif labels, a one-column 46rem measure.
@@ -136,9 +145,9 @@ Warm, low-chroma neutrals carry everything; the accent is the only saturated col
 - **Ink** (ink / ink-dark): body text and headings.
 - **Graphite** (muted / muted-dark): secondary text: dates, captions, sidenotes, metadata, counts. Meets 4.5:1 on paper in both themes.
 - **Hairline** (rule / rule-dark): borders, rules above notes, table rules, inactive TOC ticks.
-- **Vellum** (surface / surface-dark): code blocks, inline code, the BibTeX block, video placeholders.
+- **Vellum** (surface / surface-dark): code blocks, inline code, the BibTeX block, video placeholders, the current search result (light).
 - **Lifted Paper** (raised / raised-dark): the one floating surface (cards).
-- **Highlight** (selection / selection-dark): text selection.
+- **Highlight** (selection / selection-dark): text selection, and the matches in search excerpts.
 
 **The One Accent Rule.** Terracotta marks what is interactive or current, and nothing else: no accent backgrounds, no accent headings.
 
@@ -179,13 +188,13 @@ One centered column: the body is 46rem of text plus 1.5rem gutters. The header (
 
 ## Elevation & Depth
 
-Flat by default. The only elevation is the floating card, used for TOC section cards and link previews, appearing on hover, focus or tap.
+Flat by default. The only elevation is the floating card, used for TOC section cards and link previews (appearing on hover, focus or tap) and the search panel.
 
 ### Shadow Vocabulary
 - **Raised** (`0 1px 2px rgb(25 25 23 / 0.06), 0 12px 32px -8px rgb(25 25 23 / 0.2)`): cards in light mode.
 - **Raised, dark** (`0 0 0 1px rgb(255 255 255 / 0.07), 0 16px 40px -8px rgb(0 0 0 / 0.6)`): shadows barely read on dark, so a faint ring carries the edge.
 
-**The One Floating Surface Rule.** Anything that floats uses Lifted Paper, the 14px radius and the Raised shadow. There is no second popover style.
+**The One Floating Surface Rule.** Anything that floats uses Lifted Paper, the 14px radius and the Raised shadow. There is no second popover or dialog style.
 
 ## Shapes
 
@@ -194,9 +203,17 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 ## Components
 
 ### Navigation
-- **Header:** 32px circular avatar and serif wordmark on the left; serif links at 1rem (Posts, language switch EN/中) and a sun/moon theme toggle on the right. Links are muted and turn terracotta on hover.
+- **Header:** 32px circular avatar and serif wordmark on the left; serif links at 1rem (Posts, About, language switch EN/中) and two icon buttons on the right, search and a sun/moon theme toggle (44px hit areas, Graphite, Ink on hover). Links are muted and turn Ink on hover; the current page's link stays Ink. About appears only for a language that has an about page. Below 27rem the avatar stands alone (the name stays the link's accessible name), so the links fit at 320px with room to spare.
 - **Footer:** © line, then Email, GitHub and RSS links; wraps to two rows at 320px.
 - **Tap targets:** small text links get a 2.75rem hit area through padding and matching negative margins.
+
+### Search panel
+- **Trigger:** the search button, `/` (outside text fields) or Cmd/Ctrl+K. Pagefind's script and index load on the first open.
+- **Style:** the one floating surface, `min(36rem, 100vw - 1rem)` wide, 6rem from the top (12vh on short screens); below 36rem it spans the width 0.5rem from the top. The backdrop fades the page toward Warm Paper (60%) rather than darkening it: no second shadow or scrim color.
+- **Field:** a magnifier and a 16px sans input (phones do not zoom), a Hairline rule below. Touch screens get a 取消 / Cancel button, since they have no Escape key.
+- **Results:** up to 8 posts; the title in serif 1.0625rem / 500, then date and the matching section in sans 0.8125rem Graphite, then two lines of excerpt in serif 0.875rem Graphite with matches on Highlight. The current result (first by default; arrow keys or the pointer move it) sits on Vellum (Hairline in dark, where Vellum barely shows on Lifted Paper) with its title in terracotta. In light mode the title takes 12% Ink (`color-mix(in srgb, accent 88%, text)`), since plain terracotta on Vellum is 4.34:1, below 4.5:1; mixed it is 5.1:1, still the same hue. Dark mode keeps the plain accent (5.3:1 on Hairline). A result links to its best-matching section.
+- **States:** one sans line in Graphite: a hint (plus key hints on pointer devices), "searching" after 300ms, no results, no posts yet (an empty index), and in dev, no index until a build.
+- **Motion:** fades in with a 4px drop in 0.16s; with reduced motion, the fade only.
 
 ### TOC
 - **Ticks:** 2px bars in Hairline, shorter for h3; the current one is full length in Ink.
@@ -223,6 +240,13 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 
 ### Post header
 - **Order:** title; a sans meta line (date · reading time · sections, and "Read in English" on the right); the abstract, then keywords, both indented like a paper's.
+
+### About page
+- **Head:** the name in Display, the tagline in serif Graphite, a link row, then the bio as body text.
+- **Link row:** sans links in Graphite, separated by middle dots that stay with the link before them (a wrapped row never starts with a dot); terracotta on hover. 0.875rem under the name, 0.8125rem under an entry. The BibTeX copy button is set as one more link and shows 已复制 / Copied for 1.5s.
+- **Sections:** an unnumbered Headline, then entries in two columns like the post list: the date in a 6rem sans column (Graphite, tabular numbers) on the title's baseline, and the entry in serif: title at 1.125rem / 500 (an ordinary link when it has one), a Graphite subtitle and a note at 0.9375rem, a link row. Below 40rem the date moves above its entry.
+- **Publications:** newest first, the year on the first entry of each year only. Authors in Graphite with the owner's name in bold Ink; the venue in italic, upright when it is Chinese. No cards, boxes or fills.
+- **Print:** black on white with no header, footer or copy buttons; the links under the name print as their addresses; no entry is split across pages.
 
 ## Do's and Don'ts
 

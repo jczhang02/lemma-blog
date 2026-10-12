@@ -32,6 +32,8 @@ const MODULES = [
   './plugins/media.mjs',
   './plugins/shiki-themes.mjs',
   './plugins/lemma-theme.mjs',
+  './plugins/about.mjs',
+  './plugins/search.mjs',
 ];
 const DATA = [lemma.bibliography.style, ...lemma.bibliography.files, './src/media-r2.json'];
 const LOCAL = [CONFIG, ...MODULES, ...DATA];
@@ -48,6 +50,8 @@ const [
   { default: remarkMedia, mediaIntegration },
   { default: codeThemes },
   { default: lemmaTheme },
+  { aboutIntegration, SAMPLE },
+  { searchIntegration },
 ] = await Promise.all(MODULES.map((f) => import(`${f}?v=${version}`)));
 const url = (f) => new URL(f, import.meta.url);
 const posts = url('./src/content/posts/');
@@ -65,6 +69,10 @@ const HREFLANG = { zh: 'zh-CN', en: 'en' };
 
 export default defineConfig({
   site: lemma.site.url,
+  // The sample about page (LEMMA_ABOUT=sample) keeps a content cache of its
+  // own; switching modes also changes this config, which clears the dev
+  // server's content store, so neither profile is ever in the other's cache.
+  cacheDir: SAMPLE ? './node_modules/.astro-sample' : './node_modules/.astro',
   integrations: [
     // Colors, font stacks, layout tokens and font files from the config.
     lemmaTheme(lemma.theme),
@@ -76,6 +84,10 @@ export default defineConfig({
       },
     }),
     mediaIntegration(media),
+    // Files the about page links to (cv.pdf); LEMMA_ABOUT=sample serves the sample profile.
+    aboutIntegration(),
+    // Pagefind index of the posts after a build (dist/pagefind/), served in dev from the last build.
+    searchIntegration(),
     // Restart the dev server when the config, a local plugin or a data file changes.
     {
       name: 'watch-local-modules',

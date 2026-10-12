@@ -1,5 +1,6 @@
 // GFM footnotes: localise the (screen-reader-only) heading and back-link
-// labels, which remark-rehype emits in English for every post.
+// labels, which remark-rehype emits in English for every post. The back
+// links (↩) are kept out of site search excerpts.
 import { visit } from 'unist-util-visit';
 
 const LABELS = {
@@ -15,6 +16,7 @@ export default function rehypeFootnotes() {
         node.children = [{ type: 'text', value: labels.heading }];
       } else if (node.properties?.dataFootnoteBackref !== undefined) {
         node.properties.ariaLabel = labels.back;
+        node.properties.dataPagefindIgnore = '';
       }
     });
   };

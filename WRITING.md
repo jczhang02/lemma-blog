@@ -137,3 +137,80 @@ C \arrow[r, "k"'] & D
 - 脚注: `正文[^1]`, 然后 `[^1]: 注释内容.`
 - 代码块: 用三个反引号, 写上语言, 比如 ` ```python `. 页面上有复制按钮.
 - 用 `.md`, 不要用 `.mdx`. MDX 会把 `{` 和 `<` 当成代码, TeX 会出错.
+- 站内搜索只搜已发布的文章 (不含草稿), 索引在 `bun run build` 时生成. `bun run dev` 用的是上一次 build 的索引, 所以刚写的内容要 build 之后才搜得到. 公式搜不到, 行内公式在搜索摘要里显示为 "…"; 参考文献列表也不进索引.
+
+## 关于页
+
+关于页 (`/about/` 和 `/en/about/`) 的内容都在 `src/content/about/` 里:
+
+- `zh.md`, `en.md`: frontmatter 写姓名, 链接和各个板块 (包括论文), 正文写简介. 每个字段的说明写在文件里的注释中. 删掉其中一个, 对应语言就没有关于页, 页头也没有 "关于" 链接.
+- 其他文件 (例如 `cv.pdf`): 在 frontmatter 里用相对路径链接 (`href: cv.pdf`, 论文的 `pdf: paper.pdf` 或 `url: paper.pdf`, 可以带 `#page=2`), 发布在 `/about/cv.pdf`. 没有被链接的文件不会发布, `zh.md` 和 `en.md` 本身也不会.
+
+```yaml
+sections:
+  - heading: 教育经历
+    items:
+      - when: 2023 – 今
+        title: 博士研究生, 某某大学
+        subtitle: '数学系 · 导师: 某某教授'
+        links:
+          - { label: 课题组, href: 'https://example.com' }
+```
+
+条目字段: `when` (左栏时间, 原样显示), `title` (必填), `subtitle`, `note`, `href`, `links`. 值里有 "冒号 + 空格" 时要加引号.
+
+字段名写错, 或者值的类型不对 (比如 `year: '2025'`, 没加引号的 arXiv 编号), 构建会报错, 并指出是哪个字段, 例如 `sections.3.publications.2.year`. 顶层的 `tagline:`, `links:`, `self:`, `sections:` 后面留空, 等于没写.
+
+### 论文
+
+论文直接写在 frontmatter 里, 一篇一项, 按年份倒序显示. 下面这段可以整段复制:
+
+```yaml
+  - heading: 代表论文
+    selectedOnly: true          # 没有自己的列表: 显示下面各板块里 selected: true 的论文
+  - heading: 全部论文
+    publications:
+      - title: 'Neural Operators for Burgers'' Equation: A Study'
+        authors: [张三, Some Coauthor, Another Author]   # 按显示的样子写
+        venue: Journal of Computational Physics          # 可选, 西文斜体, 中文正体
+        year: 2026                                       # 可选, 没有年份的排在最后
+        note: Oral                                       # 可选, 写在 venue 后面
+        selected: true                                   # 可选, 放进 "代表论文"
+        url: 'https://example.com/paper'                 # 可选, 标题的链接
+        pdf: paper.pdf                                   # 可选, 网址或本文件夹里的文件
+        arxiv: '2601.00001'                              # 可选, 编号 (加引号) 或网址
+        doi: 10.0000/example                             # 可选, 编号或网址
+        links:                                           # 可选, 排在 PDF · arXiv · DOI 后面
+          - { label: 代码, href: 'https://github.com/example/code' }
+        bibtex: |                                        # 可选, 有它才显示 "BibTeX" 复制按钮
+          @article{zhang2026burgers,
+            title = {Neural Operators for Burgers' Equation: A Study},
+            author = {Zhang, San and Coauthor, Some and Author, Another},
+            journal = {Journal of Computational Physics},
+            year = {2026},
+          }
+      - title: 偏微分方程的谱方法
+        authors: [张三, 李四]
+        venue: '中国科学: 数学'
+        year: 2025
+```
+
+- 作者列表里, `self` 列出的名字加粗. `'Zhang, San'` 也匹配 `San Zhang`; 名字后面的 `*` 之类的符号不影响匹配.
+- `publications.bib` 不再使用. 文件夹里还有这个文件时, 构建会给出一行警告, 不会读取它.
+
+### 模板标记
+
+模板里的占位内容都带着 `ABOUT_TEMPLATE`. 正式构建 (`bun run build`, `bun run deploy`) 时, 正文或字段值里只要还有这个标记, 这一语言的关于页就不生成, 页头也没有 "关于" 链接, 构建给出一行警告. YAML 注释里的标记不算. 把所有占位内容换掉, 正文和字段值里的标记全部删除后, 页面才会上线. `bun run dev` 不受影响, 可以边写边看.
+
+### 从第一版模板升级
+
+第一版模板从 `publications.bib` 读取论文. 现在要改两处:
+
+1. 把 `publications: true` 那一节 (连同它的 `selectedOnly` 和 `links`) 换成上面的 YAML 列表.
+2. 删除 `publications.bib`.
+
+改之前构建不会失败: `publications: true` 的板块什么也不显示, 并给出警告.
+
+### 隐私
+
+这个文件夹只放真实内容, agent 不会读取它. 调整关于页的样式时, 用 `src/about.sample/` 里的虚构资料: `bun run dev:sample` (端口 4399). `LEMMA_ABOUT` 有值时, `bun run deploy` 会拒绝运行, 虚构资料不会上线.

@@ -26,6 +26,8 @@
 - **Diagrams**: `tikzcd` and `tikz` code blocks are compiled by LaTeX into inline SVG that follows the text color.
 - **Bilingual**: Chinese at `/`, English at `/en/`, translations linked both ways, careful CJK typesetting (mixed-script spacing, justified Chinese).
 - **Comfortable to read**: a tick-mark table of contents with section cards, light and dark themes with no flash, reading time, copy buttons, edge fades on wide content, 44px tap targets, WCAG AA contrast.
+- **Search**: a search panel (`/` or Cmd/Ctrl+K) over a [Pagefind](https://pagefind.app) index of the posts, built with the site; Chinese is split into words. No server, nothing loaded until the panel is first opened.
+- **About page**: a CV-like profile from one folder: name, links and bio in Markdown, sections of dated entries and publications in YAML; prints as a clean CV.
 - **Static and private**: no trackers, no third-party scripts; deploys as static files.
 
 ## Quick Start
@@ -37,6 +39,8 @@ git clone https://github.com/jczhang02/lemma-blog.git && cd lemma-blog
 bun install
 bun run dev              # http://localhost:4321, drafts included
 ```
+
+Search in `bun run dev` uses the index of the last `bun run build`, which has no drafts.
 
 ```bash
 bun run new my-post      # src/content/posts/my-post/zh.md, a draft; --en for en.md
@@ -134,7 +138,56 @@ As Theorem \ref{thm:exist} shows in Section \ref{sec:setting}, ...[^1]
 | Video | `![caption](./clip.mp4)` |
 | Footnotes | `text[^1]` and `[^1]: note` |
 
-Write `.md`, not `.mdx`: MDX reads `{`, `}` and `<` as JSX and breaks TeX. The build prints `[mathjax]`, `[cite]`, `[theorems]`, `[tikz]` and `[media]` warnings with the file name; drafts are checked too. A longer cheat sheet, in Chinese, is in [`WRITING.md`](WRITING.md).
+Write `.md`, not `.mdx`: MDX reads `{`, `}` and `<` as JSX and breaks TeX. The build prints `[mathjax]`, `[cite]`, `[theorems]`, `[tikz]` and `[media]` warnings with the file name; drafts are checked too. For the about page they give the file name only, never its TeX, labels or keys. A longer cheat sheet, in Chinese, is in [`WRITING.md`](WRITING.md).
+
+## About page
+
+`/about/` and `/en/about/` are built from `src/content/about/`, a folder that holds content only:
+
+| File | What it holds |
+| --- | --- |
+| `zh.md`, `en.md` | frontmatter: `title`, `name`, `tagline`, `links`, `self`, `sections` (publications included); the body is the bio. Without a file, that language has no about page and no About link. |
+| any other file | linked by a relative `href`, `pdf` or `url` (`cv.pdf`, `cv.pdf#page=2`), published at `/about/cv.pdf`. Files nobody links to are not published, and neither are `zh.md` and `en.md`. |
+
+```yaml
+links:
+  - { label: CV, href: cv.pdf }
+self: ['Zhang, Chengrui', '张三']   # bold in author lists; default site.authorBibtex
+sections:
+  - heading: Education
+    items:
+      - { when: 2023 – now, title: PhD in Mathematics, subtitle: Example University, href: 'https://…' }
+  - heading: Selected publications
+    selectedOnly: true              # no list: the selected papers of the sections below
+  - heading: Publications
+    publications:
+      - title: A Paper Title
+        authors: [Some Coauthor, Chengrui Zhang]
+        venue: Journal of Examples
+        year: 2026
+        selected: true
+        arxiv: '2601.00001'           # an id (quoted) or a URL; doi likewise
+        doi: 10.0000/example
+        links: [{ label: Code, href: 'https://…' }]
+        bibtex: |
+          @article{zhang2026paper, ... }
+```
+
+| Field | |
+| --- | --- |
+| item | `when`, `title`, `subtitle`, `note`, `href`, `links`; only `title` is required |
+| paper | `title` (required), `authors` (as printed), `venue`, `year`, `note`, `selected`, `url` (the title's link), `pdf`, `arxiv`, `doi`, `links`, `bibtex` |
+| section | `heading` with `items`, or with `publications` and an optional `selectedOnly` |
+
+A section is a list of items when it has `items`, of papers otherwise. A misspelt key or a value of the wrong type (`year: '2025'`, an unquoted arXiv id) fails the build with an error that names the field, such as `sections.3.publications.2.year`. A top-level `tagline:`, `links:`, `self:` or `sections:` left empty counts as not given.
+
+Papers are sorted newest first, the year shown once per year; the link row reads PDF · arXiv · DOI, then the extra links, and a BibTeX copy button when `bibtex` is given. A selectedOnly section without its own list takes the selected papers of the file's other publications sections.
+
+The template marks its placeholders with `ABOUT_TEMPLATE`. A production build leaves out a file whose body or field values still hold the marker, with a warning; that language's page goes live once the marker is gone from both (YAML comments do not count). Files from the first template still build: a `publications: true` section shows nothing and a leftover `publications.bib` is ignored, each with a warning; replace the section with a YAML list and delete the file.
+
+`src/about.sample/` is a fictitious profile with the same layout, for working on the page without the real one: `bun run dev:sample` (port 4399) or `LEMMA_ABOUT=sample bun run build`. `bun run deploy` refuses to run while `LEMMA_ABOUT` is set, or while `NODE_ENV` is set to anything but `production` (drafts and the marker check depend on a production build).
+
+The real folder is for its author only: [`AGENTS.md`](AGENTS.md) tells coding agents to keep out of it and its build copies, `.claude/settings.json` denies Claude Code's file tools access to them, `.ignore` keeps it out of `rg`, and `.gitattributes` keeps its text out of `git diff` and `git log -p`.
 
 ## Features in detail
 
@@ -164,6 +217,10 @@ A column of ticks in the left margin, one per section, the current one long and 
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/toc-dark.webp">
   <img src="docs/img/toc-light.webp" alt="TOC ticks with a section card" width="480">
 </picture>
+
+### Search
+
+The search button in the header, `/` or Cmd/Ctrl+K opens a panel that searches the published posts of the page's language and links each result to its best-matching section. After `bun run build`, `plugins/search.mjs` runs Pagefind (the extended build, which splits Chinese into words) over the post pages in `dist/` and writes the index to `dist/pagefind/`, one per language. Only the article is indexed: title, abstract, keywords, text and notes. The meta line, the reference list and the "cite this post" block are left out, and formulas are not searchable: inline ones show as "…" in excerpts, display ones not at all. The panel loads Pagefind's script from `/pagefind/` on first open; the dev server serves the index of the last build there.
 
 ### Diagrams and code
 
@@ -200,11 +257,13 @@ Markdown goes through Astro's unified pipeline with local plugins:
 - `plugins/remark-reading.mjs`: reading time and section count.
 - `plugins/remark-cite.mjs`: `\cite` and the reference list (citation-js, AMS numeric CSL).
 - `plugins/media.mjs`: video embedding, dev serving, build copy, R2 URLs.
+- `plugins/about.mjs`: the about folder (and its sample switch), its template marker, and the files it links to.
+- `plugins/search.mjs`: the Pagefind index of the posts after a build, and its dev serving.
 - `plugins/rehype-mathjax4.mjs`: MathJax 4 to SVG, per-post macro sandbox, forward references.
 - `plugins/rehype-toc.mjs`: TOC entries with rendered math and section previews.
 - `plugins/rehype-tables.mjs`, `plugins/rehype-footnotes.mjs`: table wrappers, localized footnotes.
 
-Client-side code is small and lives in `src/components/` (TOC, sidenotes, previews, copy buttons). `astro.config.mjs` imports the plugins with a hash of their sources, so editing a plugin re-renders every post in a running dev server.
+Client-side code is small and lives in `src/components/` (TOC, sidenotes, previews, search, copy buttons). `astro.config.mjs` imports the plugins with a hash of their sources, so editing a plugin re-renders every post in a running dev server.
 
 </details>
 

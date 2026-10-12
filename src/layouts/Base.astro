@@ -8,9 +8,10 @@ import cjkFonts from 'virtual:lemma/cjk-fonts.css?url';
 import '../styles/mathjax.css';
 import '../styles/global.css';
 import { Image } from 'astro:assets';
+import Search from '../components/Search.astro';
 import type { ImageMetadata } from 'astro';
 import lemma from '../../lemma.config.mjs';
-import { SITE, ui, prefix, otherLang, type Lang } from '../i18n';
+import { SITE, ui, prefix, otherLang, aboutUrl, hasAbout, type Lang } from '../i18n';
 
 interface Props {
   lang: Lang;
@@ -36,6 +37,8 @@ const avatar = images[`/${lemma.site.avatar}`]?.default;
 if (!avatar) throw new Error(`lemma.config.mjs: site.avatar ${lemma.site.avatar} is not an image under src/assets/`);
 const { icons } = lemma.site;
 const locale = { zh: 'zh_CN', en: 'en_US' };
+const about = (await hasAbout(lang)) && aboutUrl(lang);
+const current = (href: string) => (Astro.url.pathname.replace(/\/?$/, '/') === href ? 'page' : undefined);
 ---
 
 <!doctype html>
@@ -88,12 +91,16 @@ const locale = { zh: 'zh_CN', en: 'en_US' };
     <header class="site-header">
       <a class="wordmark" href={`${prefix(lang)}/`}>
         <Image class="wordmark-avatar" src={avatar} alt="" width={32} height={32} layout="none" densities={[1, 2, 3]} loading="eager" />
-        {SITE.title}
+        <span class="wordmark-name">{SITE.title}</span>
       </a>
       <nav>
         <a href={`${prefix(lang)}/`}>{t.posts}</a>
+        {about && <a href={about} aria-current={current(about)}>{t.about}</a>}
         <a href={switchTo} hreflang={other} lang={other}>{other === 'en' ? 'EN' : '中'}</a>
-        <button class="theme-toggle" type="button" aria-label={t.toggleTheme} title={t.toggleTheme}>
+        <button class="icon-button search-button" type="button" aria-label={t.search} title={`${t.search} (/)`} aria-haspopup="dialog" aria-keyshortcuts="/ Control+K Meta+K">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.4-4.4" /></svg>
+        </button>
+        <button class="icon-button theme-toggle" type="button" aria-label={t.toggleTheme} title={t.toggleTheme}>
           <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>
           <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" /></svg>
         </button>
@@ -110,6 +117,7 @@ const locale = { zh: 'zh_CN', en: 'en_US' };
         <a href={`${prefix(lang)}/rss.xml`}>{t.rss}</a>
       </nav>
     </footer>
+    <Search lang={lang} />
     <script>
       const toggle = document.querySelector<HTMLButtonElement>('.theme-toggle');
       const pressed = () => toggle?.setAttribute('aria-pressed', String(document.documentElement.dataset.theme === 'dark'));

@@ -1,0 +1,177 @@
+---
+// A CV-like profile: name, tagline, links and a short bio, then sections of
+// dated entries. All content comes from the about folder (plugins/about.mjs);
+// this file only lays it out.
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { SITE, aboutUrl, hasAbout, otherLang, ui, type Lang } from '../i18n';
+import { resolveHref } from '../../plugins/about.mjs';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui[lang];
+const entry = (await getEntry('about', lang))!;
+const { Content } = await render(entry);
+const { title, name, tagline, links, sections } = entry.data;
+const other = otherLang(lang);
+const alternate = (await hasAbout(other)) ? aboutUrl(other) : undefined;
+
+// Names compared without case, accents, spaces or punctuation, and in either
+// order for a "Family, Given" form: "Qiao, Lin" also matches "Lin Qiao*".
+const nameKey = (s: string) =>
+  s
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]/gu, '');
+const self = new Set(
+  (entry.data.self ?? [SITE.authorBibtex]).flatMap((n) => {
+    const [family, given] = n.split(',', 2);
+    return given === undefined ? [nameKey(n)] : [nameKey(n), nameKey(`${given} ${family}`)];
+  }),
+);
+
+// arXiv ids and DOIs may be written bare or as URLs.
+const arxivUrl = (id: string) => (/^https?:/.test(id) ? id : `https://arxiv.org/abs/${id.replace(/^arxiv:/i, '')}`);
+const doiUrl = (id: string) => (/^https?:/.test(id) ? id : `https://doi.org/${id.replace(/^doi:/i, '')}`);
+
+// Sections in order, empty ones left out. Publications go newest first
+// (undated last, YAML order within a year), and a year is shown on the first
+// entry of that year only. A selectedOnly section without a list draws on
+// the papers of the others.
+const papers = sections.flatMap((s) => (s.kind === 'publications' && s.publications) || []);
+const shown = sections.flatMap((s) => {
+  if (s.kind === 'legacy') return [];
+  if (s.kind === 'items') return s.items.length ? [{ heading: s.heading, items: s.items, pubs: [] }] : [];
+  const own = s.publications ?? (s.selectedOnly ? papers : []);
+  const list = (s.selectedOnly ? own.filter((p) => p.selected) : own).toSorted((a, b) => (b.year ?? 0) - (a.year ?? 0));
+  const pubs = list.map((p, i) => {
+    const links = [
+      ...(p.pdf ? [{ label: 'PDF', href: resolveHref(p.pdf) }] : []),
+      ...(p.arxiv ? [{ label: 'arXiv', href: arxivUrl(p.arxiv) }] : []),
+      ...(p.doi ? [{ label: 'DOI', href: doiUrl(p.doi) }] : []),
+      ...p.links.map((l) => ({ label: l.label, href: resolveHref(l.href) })),
+    ];
+    return {
+      ...p,
+      when: p.year !== list[i - 1]?.year ? p.year?.toString() : undefined,
+      href: p.url ? resolveHref(p.url) : links[0]?.href,
+      authors: p.authors.map((name) => ({ name, self: self.has(nameKey(name)) })),
+      links,
+    };
+  });
+  return pubs.length ? [{ heading: s.heading, items: [], pubs }] : [];
+});
+
+const HAN = /\p{Script=Han}/u;
+// For paper: an address in place of its label (jczhang.cc/about/cv.pdf).
+const printed = (href: string) =>
+  href.startsWith('mailto:')
+    ? href.slice(7)
+    : new URL(resolveHref(href), Astro.site).href.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+---
+
+<Base lang={lang} title={title} description={tagline} alternate={alternate}>
+  <article class="about" data-copied={t.copied}>
+    <header class="about-header">
+      <h1>{name}</h1>
+      {tagline && <p class="about-tagline">{tagline}</p>}
+      {
+        links.length > 0 && (
+          <ul class="link-row about-links">
+            {links.map((l) => (
+              <li>
+                <a href={resolveHref(l.href)}>
+                  {/* No space between: one would widen the gap before the dot in print. */}
+                  <span class="link-label">{l.label}</span><span class="link-print">{printed(l.href)}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+    <div class="prose about-bio">
+      <Content />
+    </div>
+    {
+      shown.map((s) => (
+        <section class="about-section">
+          <h2>{s.heading}</h2>
+          <ul class="entries">
+            {s.items.map((item) => (
+              <li class="entry">
+                {item.when && <span class="entry-when">{item.when}</span>}
+                <div class="entry-body">
+                  <p class="entry-title">{item.href ? <a href={resolveHref(item.href)}>{item.title}</a> : item.title}</p>
+                  {item.subtitle && <p class="entry-subtitle">{item.subtitle}</p>}
+                  {item.note && <p class="entry-note">{item.note}</p>}
+                  {item.links.length > 0 && (
+                    <ul class="link-row">
+                      {item.links.map((l) => (
+                        <li>
+                          <a href={resolveHref(l.href)}>{l.label}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </li>
+            ))}
+            {s.pubs.map((p) => (
+              <li class="entry">
+                {p.when && <span class="entry-when">{p.when}</span>}
+                <div class="entry-body">
+                  <p class="entry-title">{p.href ? <a href={p.href}>{p.title}</a> : p.title}</p>
+                  {p.authors.length > 0 && (
+                    <p class="pub-authors">
+                      {p.authors.map((a, i) => (
+                        <>
+                          {i > 0 && ', '}
+                          {a.self ? <strong>{a.name}</strong> : a.name}
+                        </>
+                      ))}
+                    </p>
+                  )}
+                  {(p.venue || p.note) && (
+                    <p class="entry-subtitle">
+                      {p.venue && <cite lang={HAN.test(p.venue) ? 'zh' : 'en'}>{p.venue}</cite>}
+                      {p.venue && p.note && '. '}
+                      {p.note}
+                    </p>
+                  )}
+                  {(p.links.length > 0 || p.bibtex) && (
+                    <ul class="link-row">
+                      {p.links.map((l) => (
+                        <li>
+                          <a href={l.href}>{l.label}</a>
+                        </li>
+                      ))}
+                      {p.bibtex && (
+                        <li class="bibtex">
+                          <pre hidden>{p.bibtex.trim()}</pre>
+                          <button class="bibtex-copy" type="button" aria-live="polite">
+                            <span class="sr-only">{t.copy} </span>BibTeX
+                          </button>
+                        </li>
+                      )}
+                    </ul>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </article>
+</Base>
+
+<script>
+  import { copyButtons } from '../scripts/copy-button';
+
+  const about = document.querySelector<HTMLElement>('article.about')!;
+  copyButtons(about, '.bibtex-copy', about.dataset.copied!);
+</script>
