@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(/src/content/about/**)",
+      "Edit(/src/content/about/**)",
+      "Read(/dist/about/**)",
+      "Read(/dist/en/about/**)",
+      "Read(/.astro/**)",
+      "Read(/node_modules/.astro/**)",
+      "Read(/node_modules/.vite/**)"
+    ]
+  }
+}
