@@ -143,6 +143,11 @@ Write `.md`, not `.mdx`: MDX reads `{`, `}` and `<` as JSX and breaks TeX. The b
 
 ## About page
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/about-dark.webp">
+  <img src="docs/img/about-light.webp" alt="The About page of the sample profile: name, bio and dated entries" width="800">
+</picture>
+
 `/about/` and `/en/about/` are built from `src/content/about/`, a folder that holds content only:
 
 | File | What it holds |
@@ -222,6 +227,11 @@ A column of ticks in the left margin, one per section, the current one long and 
 ### Search
 
 The search button in the header, `/` or Cmd/Ctrl+K opens a panel that searches the published posts of the page's language and links each result to its best-matching section. After `bun run build`, `plugins/search.mjs` runs Pagefind (the extended build, which splits Chinese into words) over the post pages in `dist/` and writes the index to `dist/pagefind/`, one per language. Only the article is indexed: title, abstract, keywords, text and notes. The meta line, the reference list and the "cite this post" block are left out, and formulas are not searchable: inline ones show as "…" in excerpts, display ones not at all. The panel loads Pagefind's script from `/pagefind/` on first open; the dev server serves the index of the last build there.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/search-dark.webp">
+  <img src="docs/img/search-light.webp" alt="The search panel with a result and its highlighted excerpt" width="900">
+</picture>
 
 ### Diagrams and code
 
