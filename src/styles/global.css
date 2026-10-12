@@ -1323,10 +1323,17 @@ main:focus {
   line-height: 1.5;
 }
 
+/* In: drops a little into place as it fades in. Out (data-closing, set by
+   Search.astro until the animation ends): faster, rising as it fades. */
 .search[open] {
   display: flex;
   flex-direction: column;
-  animation: search-in 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top center;
+  animation: search-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.search[data-closing] {
+  animation: search-out 0.12s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 .search::backdrop {
@@ -1334,18 +1341,35 @@ main:focus {
 }
 
 .search[open]::backdrop {
-  animation: search-fade 0.16s;
+  animation: search-fade 0.2s;
+}
+
+.search[data-closing]::backdrop {
+  animation: search-fade-out 0.12s forwards;
 }
 
 @keyframes search-in {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+@keyframes search-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
   }
 }
 
 @keyframes search-fade {
   from {
+    opacity: 0;
+  }
+}
+
+@keyframes search-fade-out {
+  to {
     opacity: 0;
   }
 }
@@ -1522,6 +1546,10 @@ main:focus {
 @media (prefers-reduced-motion: reduce) {
   .search[open] {
     animation-name: search-fade;
+  }
+
+  .search[data-closing] {
+    animation-name: search-fade-out;
   }
 }
 

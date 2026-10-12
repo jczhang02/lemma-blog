@@ -213,7 +213,7 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 - **Field:** a magnifier and a 16px sans input (phones do not zoom), a Hairline rule below. Touch screens get a 取消 / Cancel button, since they have no Escape key.
 - **Results:** up to 8 posts; the title in serif 1.0625rem / 500, then date and the matching section in sans 0.8125rem Graphite, then two lines of excerpt in serif 0.875rem Graphite with matches on Highlight. The current result (first by default; arrow keys or the pointer move it) sits on Vellum (Hairline in dark, where Vellum barely shows on Lifted Paper) with its title in terracotta. In light mode the title takes 12% Ink (`color-mix(in srgb, accent 88%, text)`), since plain terracotta on Vellum is 4.34:1, below 4.5:1; mixed it is 5.1:1, still the same hue. Dark mode keeps the plain accent (5.3:1 on Hairline). A result links to its best-matching section.
 - **States:** one sans line in Graphite: a hint (plus key hints on pointer devices), "searching" after 300ms, no results, no posts yet (an empty index), and in dev, no index until a build.
-- **Motion:** fades in with a 4px drop in 0.16s; with reduced motion, the fade only.
+- **Motion:** opens with a fade, an 8px drop and a 0.98 to 1 scale in 0.2s (ease-out), and closes faster, in 0.12s, rising 6px as it fades; the backdrop fades with it. Following a result closes at once, so the page is not scrolled back to the search button. With reduced motion, the fades only.
 
 ### TOC
 - **Ticks:** 2px bars in Hairline, shorter for h3; the current one is full length in Ink.

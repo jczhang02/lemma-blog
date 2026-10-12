@@ -191,7 +191,33 @@ const strings = {
     }
   }
 
+  // Closing plays the panel's exit animation first (data-closing in
+  // global.css). A result that is followed closes at once instead: focus
+  // goes back to the search button on close, and a late close would scroll
+  // the page back up to it after the jump.
+  let closing = 0;
+  function dismiss() {
+    if (!dialog.open || dialog.dataset.closing !== undefined) return;
+    const run = ++closing;
+    dialog.dataset.closing = '';
+    // The panel's and its backdrop's animations only (their target is the dialog).
+    const exits = dialog.getAnimations({ subtree: true }).filter((a) => (a.effect as KeyframeEffect | null)?.target === dialog);
+    Promise.allSettled(exits.map((a) => a.finished)).then(() => {
+      if (run === closing) closeNow();
+    });
+  }
+  function closeNow() {
+    closing++;
+    delete dialog.dataset.closing;
+    dialog.close();
+  }
+
   function open() {
+    // Opened again while it closes: stay open.
+    if (dialog.dataset.closing !== undefined) {
+      closing++;
+      delete dialog.dataset.closing;
+    }
     if (!dialog.open) dialog.showModal();
     // The last query stays; typing replaces it.
     input.select();
@@ -201,7 +227,7 @@ const strings = {
   const go = (i: number) => {
     const option = options[i];
     if (!option || !dialog.open) return;
-    dialog.close();
+    closeNow();
     option.click();
   };
 
@@ -225,14 +251,19 @@ const strings = {
       searching.then(() => run === latest && go(active));
     }
   });
-  // Escape that cancels an input method's text does not close the panel.
-  dialog.addEventListener('keydown', (event) => event.key === 'Escape' && event.isComposing && event.preventDefault());
+  // Escape closes with the animation; Escape that cancels an input method's
+  // text does not close the panel at all.
+  dialog.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    if (!event.isComposing) dismiss();
+  });
   list.addEventListener('pointermove', (event) => {
     const i = options.indexOf((event.target as Element).closest<HTMLAnchorElement>('.search-result')!);
     if (i >= 0 && i !== active) select(i);
   });
   // A result on this page (another section) only moves the page.
-  list.addEventListener('click', (event) => (event.target as Element).closest('.search-result') && dialog.close());
+  list.addEventListener('click', (event) => (event.target as Element).closest('.search-result') && closeNow());
 
   // A click outside the panel closes it. The backdrop is part of the
   // dialog element, so compare with the panel's box; a press that starts
@@ -243,9 +274,9 @@ const strings = {
     return event.target === dialog && (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom);
   };
   dialog.addEventListener('pointerdown', (event) => (pressedOutside = outside(event)));
-  dialog.addEventListener('click', (event) => pressedOutside && outside(event) && dialog.close());
+  dialog.addEventListener('click', (event) => pressedOutside && outside(event) && dismiss());
 
-  dialog.querySelector('.search-close')!.addEventListener('click', () => dialog.close());
+  dialog.querySelector('.search-close')!.addEventListener('click', dismiss);
   document.querySelector('.search-button')?.addEventListener('click', open);
   const typing = (target: EventTarget | null) => target instanceof HTMLElement && (target.isContentEditable || target.matches('input, textarea, select'));
   addEventListener('keydown', (event) => {
@@ -253,7 +284,7 @@ const strings = {
     const mod = event.metaKey || event.ctrlKey;
     if (mod && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'k') {
       event.preventDefault();
-      if (dialog.open) dialog.close();
+      if (dialog.open && dialog.dataset.closing === undefined) dismiss();
       else open();
     } else if (event.key === '/' && !mod && !event.altKey && !dialog.open && !typing(event.target)) {
       event.preventDefault();
