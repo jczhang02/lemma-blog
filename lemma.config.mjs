@@ -145,11 +145,10 @@ export default {
   },
 
   bibliography: {
-    // BibTeX files, relative to the repository root; missing files are
-    // skipped, and a key in several files is taken from the first.
-    // references.bib is exported by Zotero (Better BibTeX, kept updated): do
-    // not edit it. Entries not in Zotero go in references-manual.bib.
-    files: ['./src/references.bib', './src/references-manual.bib'],
+    // BibTeX files with the entries posts cite, relative to the repository
+    // root; missing files are skipped, and a key in several files is taken
+    // from the first.
+    files: ['./src/bibliography.bib'],
     // CSL style for the reference list (AMS numeric, from the CSL styles repository, CC BY-SA 3.0).
     style: './plugins/ams-numeric.csl',
   },

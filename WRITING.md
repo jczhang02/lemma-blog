@@ -77,9 +77,8 @@ $$
 见 \cite{evans2010}, \cite{a, b}, \cite[第 6 章]{evans2010}.
 ```
 
-- 文献来自 Zotero 的 **G.Blog** 分类: Better BibTeX 会自动导出到 `src/references.bib`. 不要手动编辑这个文件.
-- citekey 在 Zotero 条目上可以看到 (Better BibTeX 的 Citation Key 字段).
-- Zotero 里没有的条目, 写进 `src/references-manual.bib`.
+- 文献条目写在 `src/bibliography.bib` 里, 是普通的 BibTeX, 直接编辑即可. citekey 就是条目里 `@article{key,` 的 `key`.
+- 也可以用文献管理软件导出 BibTeX, 再把文件加进 `lemma.config.mjs` 的 `bibliography.files`.
 - 文末自动生成 "参考文献", 按首次引用的顺序编号. key 不存在时, 构建会给出 `[cite]` 警告.
 
 ## 图, 表, 交换图

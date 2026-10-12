@@ -21,7 +21,7 @@
 
 - **Real LaTeX, rendered at build time**: MathJax 4 turns formulas into SVG, so pages ship no math JavaScript. AMS environments, `physics`, `mathtools`, `mhchem`, `cases`, blackboard and script alphabets; site-wide and per-post macros; build warnings for any TeX error or undefined macro.
 - **Paper structure**: numbered sections, theorem-like environments numbered per section, proofs with ∎, `\label` / `\ref` / `\eqref` with forward references, numbered figures and tables with captions where print puts them, booktabs tables.
-- **Citations from BibTeX**: `\cite{key}` becomes a numbered link and an AMS-style reference list; entries come from a Zotero export.
+- **Citations from BibTeX**: `\cite{key}` becomes a numbered link and an AMS-style reference list; entries come from plain BibTeX files.
 - **Read in place**: footnotes become sidenotes in the margin on wide screens; citations, cross-references and notes open a preview card on hover, focus or tap.
 - **Diagrams**: `tikzcd` and `tikz` code blocks are compiled by LaTeX into inline SVG that follows the text color.
 - **Bilingual**: Chinese at `/`, English at `/en/`, translations linked both ways, careful CJK typesetting (mixed-script spacing, justified Chinese).
@@ -84,7 +84,7 @@ export default {
 
 A few things are files by nature: the avatar image under `src/assets/`, the icons in `public/`, the posts in `src/content/posts/`, and the BibTeX files.
 
-**Bibliography.** `src/references.bib` is written by Zotero: with [Better BibTeX](https://retorque.re/zotero-better-bibtex/), export a collection to that path and tick *Keep updated*. That setting lives in your Zotero, not in this repository. Entries you keep outside Zotero go in `src/references-manual.bib`; a key in both files is taken from the first.
+**Bibliography.** Cited entries live in `src/bibliography.bib`, an ordinary BibTeX file you edit by hand. `bibliography.files` can list more files (a key in several is taken from the first); any tool that writes BibTeX, such as a reference manager's export, can fill one of them.
 
 ## Writing
 
