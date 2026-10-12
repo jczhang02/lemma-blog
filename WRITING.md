@@ -157,6 +157,8 @@ sections:
           - { label: 课题组, href: 'https://example.com' }
 ```
 
+姓名下面的 `links` 会显示链接的去向: `mailto:` 显示邮箱地址, `https://github.com/<用户名>` 显示用户名, 其他链接显示 `label`, 前面各有一个图标. 有关于页的语言, 页脚就不再显示邮箱和 GitHub.
+
 条目字段: `when` (左栏时间, 原样显示), `title` (必填), `subtitle`, `note`, `href`, `links`. 值里有 "冒号 + 空格" 时要加引号.
 
 字段名写错, 或者值的类型不对 (比如 `year: '2025'`, 没加引号的 arXiv 编号), 构建会报错, 并指出是哪个字段, 例如 `sections.3.publications.2.year`. 顶层的 `tagline:`, `links:`, `self:`, `sections:` 后面留空, 等于没写.

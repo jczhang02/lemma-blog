@@ -145,14 +145,14 @@ Write `.md`, not `.mdx`: MDX reads `{`, `}` and `<` as JSX and breaks TeX. The b
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/about-dark.webp">
-  <img src="docs/img/about-light.webp" alt="The About page of the sample profile: name, bio and dated entries" width="800">
+  <img src="docs/img/about-light.webp" alt="The About page of the sample profile: name, contact links, bio and dated entries" width="800">
 </picture>
 
 `/about/` and `/en/about/` are built from `src/content/about/`, a folder that holds content only:
 
 | File | What it holds |
 | --- | --- |
-| `zh.md`, `en.md` | frontmatter: `title`, `name`, `tagline`, `links`, `self`, `sections` (publications included); the body is the bio. Without a file, that language has no about page and no About link. |
+| `zh.md`, `en.md` | frontmatter: `title`, `name`, `tagline`, `links`, `self`, `sections` (publications included); the body is the bio. Without a file, that language has no about page and no About link. The `links` under the name show an email address, a GitHub user name or the label, each with an icon; with an about page, the footer drops its Email and GitHub links. |
 | any other file | linked by a relative `href`, `pdf` or `url` (`cv.pdf`, `cv.pdf#page=2`), published at `/about/cv.pdf`. Files nobody links to are not published, and neither are `zh.md` and `en.md`. |
 
 ```yaml

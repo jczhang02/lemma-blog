@@ -204,7 +204,7 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 
 ### Navigation
 - **Header:** 32px circular avatar and serif wordmark on the left; serif links at 1rem (Posts, About, language switch EN/中) and two icon buttons on the right, search and a sun/moon theme toggle (44px hit areas, Graphite, Ink on hover). Links are muted and turn Ink on hover; the current page's link stays Ink. About appears only for a language that has an about page. Below 27rem the avatar stands alone (the name stays the link's accessible name), so the links fit at 320px with room to spare.
-- **Footer:** © line, then Email, GitHub and RSS links; wraps to two rows at 320px.
+- **Footer:** © line, then Email, GitHub and RSS links; wraps to two rows at 320px. In a language with an About page, Email and GitHub are left out: the page's contact links stand in for them.
 - **Tap targets:** small text links get a 2.75rem hit area through padding and matching negative margins.
 
 ### Search panel
@@ -242,8 +242,9 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 - **Order:** title; a sans meta line (date · reading time · sections, and "Read in English" on the right); the abstract, then keywords, both indented like a paper's.
 
 ### About page
-- **Head:** the name in Display, the tagline in serif Graphite, a link row, then the bio as body text.
-- **Link row:** sans links in Graphite, separated by middle dots that stay with the link before them (a wrapped row never starts with a dot); terracotta on hover. 0.875rem under the name, 0.8125rem under an entry. The BibTeX copy button is set as one more link and shows 已复制 / Copied for 1.5s.
+- **Head:** the name in Display, the tagline in serif Graphite, the contact links, then the bio as body text.
+- **Contact links:** under the name, sans 0.9375rem, each a small icon (mail, GitHub, file, link) and what the link leads to: the email address, the GitHub user name, otherwise its label. Set as links in the text are (terracotta, faint underline that darkens on hover), so they read as links at a glance; 1.5rem apart, wrapping, no dots.
+- **Link row:** sans links in Graphite, separated by middle dots that stay with the link before them (a wrapped row never starts with a dot); terracotta on hover. 0.8125rem, under an entry. The BibTeX copy button is set as one more link and shows 已复制 / Copied for 1.5s.
 - **Sections:** an unnumbered Headline, then entries in two columns like the post list: the date in a 6rem sans column (Graphite, tabular numbers) on the title's baseline, and the entry in serif: title at 1.125rem / 500 (an ordinary link when it has one), a Graphite subtitle and a note at 0.9375rem, a link row. Below 40rem the date moves above its entry.
 - **Publications:** newest first, the year on the first entry of each year only. Authors in Graphite with the owner's name in bold Ink; the venue in italic, upright when it is Chinese. No cards, boxes or fills.
 - **Print:** black on white with no header, footer or copy buttons; the links under the name print as their addresses; no entry is split across pages.

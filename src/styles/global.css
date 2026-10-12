@@ -465,9 +465,52 @@ main:focus {
   color: var(--accent);
 }
 
+/* Contact links under the name: an icon, then the address, user name or
+   label, set as links in the text are, so they read as links at a glance. */
 .about-links {
-  margin-top: 1rem;
-  font-size: 0.875rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.about-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  /* A 2.75rem hit area, as in .link-row, without making the row taller. */
+  padding-block: round(up, (2.75rem - 1lh) / 2, 1px);
+  margin-block: calc(-1 * round(up, (2.75rem - 1lh) / 2, 1px));
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-underline-offset: 0.2em;
+  white-space: nowrap;
+}
+
+.about-links a:hover {
+  text-decoration-color: currentColor;
+}
+
+.about-links svg {
+  flex: none;
+  width: 1.05em;
+  height: 1.05em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.about-links svg .fill {
+  fill: currentColor;
+  stroke: none;
 }
 
 /* The address, for paper only (see Print). */

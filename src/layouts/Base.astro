@@ -112,8 +112,9 @@ const current = (href: string) => (Astro.url.pathname.replace(/\/?$/, '/') === h
     <footer class="site-footer">
       <span>© {new Date().getFullYear()} {SITE.title}</span>
       <nav class="footer-links" aria-label={t.links}>
-        <a href={`mailto:${SITE.email}`}>{t.email}</a>
-        <a href={`https://github.com/${SITE.github}`}>GitHub</a>
+        {/* With an about page, its contact links stand in for these. */}
+        {!about && <a href={`mailto:${SITE.email}`}>{t.email}</a>}
+        {!about && <a href={`https://github.com/${SITE.github}`}>GitHub</a>}
         <a href={`${prefix(lang)}/rss.xml`}>{t.rss}</a>
       </nav>
     </footer>
