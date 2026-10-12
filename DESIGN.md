@@ -203,7 +203,7 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 ## Components
 
 ### Navigation
-- **Header:** 32px circular avatar and serif wordmark on the left; serif links at 1rem (Posts, About, language switch EN/中) and two icon buttons on the right, search and a sun/moon theme toggle (44px hit areas, Graphite, Ink on hover). Links are muted and turn Ink on hover; the current page's link stays Ink. About appears only for a language that has an about page. Below 27rem the avatar stands alone (the name stays the link's accessible name), so the links fit at 320px with room to spare.
+- **Header:** 32px circular avatar and serif wordmark on the left; two groups on the right, 1.5rem apart: serif links at 1rem (Posts, About; 1rem apart), then three icons set close together (2.25rem from center to center): a language switch (a translate icon, named in the language it leads to: English / 中文), search and a sun/moon theme toggle (44px hit areas, Graphite, Ink on hover). Links are muted and turn Ink on hover; the current page's link stays Ink. About appears only for a language that has an about page. Below 27rem the avatar stands alone (the name stays the link's accessible name), so the links fit at 320px with room to spare.
 - **Footer:** © line, then Email, GitHub and RSS links; wraps to two rows at 320px. In a language with an About page, Email and GitHub are left out: the page's contact links stand in for them.
 - **Tap targets:** small text links get a 2.75rem hit area through padding and matching negative margins.
 

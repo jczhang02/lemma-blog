@@ -94,16 +94,23 @@ const current = (href: string) => (Astro.url.pathname.replace(/\/?$/, '/') === h
         <span class="wordmark-name">{SITE.title}</span>
       </a>
       <nav>
-        <a href={`${prefix(lang)}/`}>{t.posts}</a>
-        {about && <a href={about} aria-current={current(about)}>{t.about}</a>}
-        <a href={switchTo} hreflang={other} lang={other}>{other === 'en' ? 'EN' : '中'}</a>
-        <button class="icon-button search-button" type="button" aria-label={t.search} title={`${t.search} (/)`} aria-haspopup="dialog" aria-keyshortcuts="/ Control+K Meta+K">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.4-4.4" /></svg>
-        </button>
-        <button class="icon-button theme-toggle" type="button" aria-label={t.toggleTheme} title={t.toggleTheme}>
-          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>
-          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" /></svg>
-        </button>
+        <div class="nav-links">
+          <a href={`${prefix(lang)}/`}>{t.posts}</a>
+          {about && <a href={about} aria-current={current(about)}>{t.about}</a>}
+        </div>
+        <div class="nav-icons">
+          {/* Named in the language it leads to, as the link text used to be. */}
+          <a class="icon-button" href={switchTo} hreflang={other} lang={other} aria-label={other === 'en' ? 'English' : '中文'} title={other === 'en' ? 'English' : '中文'}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8 6 6" /><path d="m4 14 6-6 2-3" /><path d="M2 5h12" /><path d="M7 2h1" /><path d="m22 22-5-10-5 10" /><path d="M14 18h6" /></svg>
+          </a>
+          <button class="icon-button search-button" type="button" aria-label={t.search} title={`${t.search} (/)`} aria-haspopup="dialog" aria-keyshortcuts="/ Control+K Meta+K">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.4-4.4" /></svg>
+          </button>
+          <button class="icon-button theme-toggle" type="button" aria-label={t.toggleTheme} title={t.toggleTheme}>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" /></svg>
+          </button>
+        </div>
       </nav>
     </header>
     <main id="main" tabindex="-1">

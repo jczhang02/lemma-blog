@@ -127,10 +127,26 @@ main:focus {
   object-fit: cover;
 }
 
-.site-header nav {
+/* Two groups: the text links, and the icons (language, search, theme) set
+   close together. */
+.site-header nav,
+.nav-links,
+.nav-icons {
   display: flex;
   align-items: center;
+}
+
+.site-header nav {
   gap: 1.5rem;
+}
+
+.nav-links {
+  gap: 1rem;
+}
+
+/* The buttons' 44px hit areas overlap a little; their icons sit 2.25rem apart. */
+.nav-icons {
+  gap: 0.25rem;
 }
 
 .site-header nav a {
@@ -140,7 +156,7 @@ main:focus {
 
 /* Small text links get a 44px tall hit area; the negative margin keeps the
    layout as if there were no padding. */
-.site-header nav a,
+.nav-links a,
 .site-footer a,
 .tag-line a,
 .keywords a,
@@ -236,6 +252,10 @@ main:focus {
   }
 
   .site-header nav {
+    gap: 1rem;
+  }
+
+  .nav-links {
     gap: 0.875rem;
   }
 
