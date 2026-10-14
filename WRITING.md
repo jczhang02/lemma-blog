@@ -143,7 +143,7 @@ C \arrow[r, "k"'] & D
 
 关于页 (`/about/` 和 `/en/about/`) 的内容都在 `src/content/about/` 里:
 
-- `zh.md`, `en.md`: frontmatter 写姓名, 链接和各个板块 (包括论文), 正文写简介. 每个字段的说明写在文件里的注释中. 删掉其中一个, 对应语言就没有关于页, 页头也没有 "关于" 链接.
+- `zh.md`, `en.md`: frontmatter 写姓名, 链接和各个板块 (包括论文), 正文写简介. 每个字段的说明见本节和 `README.md` 的 "About page" 一节; `src/about.sample/` 里的虚构资料用到了全部板块, 可以照着写. 删掉其中一个, 对应语言就没有关于页, 页头也没有 "关于" 链接.
 - 其他文件 (例如 `cv.pdf`): 在 frontmatter 里用相对路径链接 (`href: cv.pdf`, 论文的 `pdf: paper.pdf` 或 `url: paper.pdf`, 可以带 `#page=2`), 发布在 `/about/cv.pdf`. 没有被链接的文件不会发布, `zh.md` 和 `en.md` 本身也不会.
 
 ```yaml
