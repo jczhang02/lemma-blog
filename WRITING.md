@@ -157,7 +157,38 @@ sections:
           - { label: 课题组, href: 'https://example.com' }
 ```
 
-姓名下面的 `links` 会显示链接的去向: `mailto:` 显示邮箱地址, `https://github.com/<用户名>` 显示用户名, 其他链接显示 `label`, 前面各有一个图标. 有关于页的语言, 页脚就不再显示邮箱和 GitHub.
+姓名下面的 `links` 显示为一排按钮, 按钮上写链接的去向: `mailto:` 显示邮箱地址, `https://github.com/<用户名>` 显示用户名, 其他链接显示 `label`, 前面各有一个图标. 有关于页的语言, 页脚就不再显示邮箱和 GitHub.
+
+除了条目和论文, 板块还可以用 `kind:` 指明类型, 写的顺序就是页面上的顺序. `heading` 都可以省略:
+
+```yaml
+sections:
+  - kind: now                     # 近况, 带地点和当地时间
+    text: 在写多尺度动理学的学习闭包.
+    updated: 2026 年 10 月
+    place: 北湖
+    timezone: Asia/Shanghai       # IANA 时区名
+  - kind: facts                   # 概览: 标签和值, href 可选
+    heading: 概览
+    facts:
+      - { label: 所在地, value: 北湖 }
+  - kind: activity                # 过去一年的 GitHub 贡献, 构建时获取
+    heading: 动态
+    github: jczhang02             # 可省略, 默认是 lemma.config.mjs 里的 site.links.github
+  - kind: stack                   # 兴趣与工具, 按组列出
+    heading: 兴趣与工具
+    groups:
+      - { label: 研究, tags: [算子学习, 谱方法] }
+  - kind: projects                # 软件: 标题链接到 href, 没有 href 时链接到 repo; 不写 stars 时从 GitHub 获取
+    heading: 软件
+    projects:
+      - { title: sno, note: 谱神经算子., repo: 'https://github.com/…', stars: 412, when: 2025 }
+  - kind: posts                   # 本语言最新的几篇文章
+    heading: 近期文章
+    limit: 3
+```
+
+GitHub 贡献和 stars 在 `bun run build` 时重新获取, `bun run dev` 用 6 小时内的缓存 (`node_modules/.cache/lemma/`). 获取失败时用上一次的缓存, 贡献数据超过两天的会注明 "截至" 哪一天. 完全没有缓存时, 构建会报错停止, 不会悄悄少掉贡献图; `bun run dev` 只给出一行 `[about]` 警告, 不显示这一块. `timezone` 写错时构建也会报错, 并指出是哪个字段.
 
 条目字段: `when` (左栏时间, 原样显示), `title` (必填), `subtitle`, `note`, `href`, `links`. 值里有 "冒号 + 空格" 时要加引号.
 

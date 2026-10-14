@@ -159,6 +159,7 @@ main:focus {
 .nav-links a,
 .site-footer a,
 .tag-line a,
+.about-activity figcaption a,
 .keywords a,
 .page-meta a,
 .link-row :is(a, button) {
@@ -529,36 +530,49 @@ main:focus {
   color: var(--accent);
 }
 
-/* Contact links under the name: an icon, then the address, user name or
-   label, set as links in the text are, so they read as links at a glance. */
+/* Contact links under the name: buttons on Vellum with an icon, then the
+   address, user name or label. */
 .about-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1.5rem;
-  margin: 1.25rem 0 0;
+  gap: 0.625rem 0.5rem;
+  margin: 1.5rem 0 0;
   padding: 0;
   list-style: none;
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
-  line-height: 1.6;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .about-links a {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
-  /* A 2.75rem hit area, as in .link-row, without making the row taller. */
-  padding-block: round(up, (2.75rem - 1lh) / 2, 1px);
-  margin-block: calc(-1 * round(up, (2.75rem - 1lh) / 2, 1px));
-  color: var(--accent);
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
-  text-underline-offset: 0.2em;
+  gap: 0.45em;
+  padding: 0.4375rem 0.75rem;
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
   white-space: nowrap;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+/* The button is 35px tall; its hit area reaches 2.75rem into the row gap. */
+.about-links a::before {
+  content: '';
+  position: absolute;
+  inset: -0.3125rem 0;
 }
 
 .about-links a:hover {
-  text-decoration-color: currentColor;
+  background: var(--rule);
+  color: var(--text);
+}
+
+/* Vellum barely shows on dark paper: a Hairline ring carries the edge. */
+:root[data-theme='dark'] .about-links a {
+  box-shadow: inset 0 0 0 1px var(--rule);
 }
 
 .about-links svg {
@@ -669,9 +683,278 @@ main:focus {
   margin-top: 0.25rem;
 }
 
+/* Now: a short rule above, as notes have, then what the owner is doing and
+   the local time where they are. */
+.about-section[data-kind='now'] {
+  margin-top: 2.5rem;
+}
+
+.about-section[data-kind='now']::before {
+  content: '';
+  display: block;
+  width: 3rem;
+  margin-bottom: 1rem;
+  border-top: 1px solid var(--rule);
+}
+
+.now p {
+  margin: 0;
+}
+
+.now-text {
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.now-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+}
+
+.now .now-place {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.5rem;
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.now-clock {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Facts and stack groups: a label in the date column of entries. */
+.facts {
+  margin: 0;
+}
+
+.facts > div {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  column-gap: 1.5rem;
+  align-items: first baseline;
+}
+
+.facts > div + div {
+  margin-top: 0.5rem;
+}
+
+.facts dt {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.facts dd {
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-serif);
+  line-height: 1.6;
+}
+
+.stack-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.125rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+  margin-left: 0.5em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stars svg {
+  width: 0.95em;
+  height: 0.95em;
+  fill: currentColor;
+}
+
+/* Activity (AboutActivity.astro): a column per week, days in Ink over
+   Hairline in GitHub's five levels; month names over their first week. */
+.about-activity {
+  position: relative;
+  margin: 0;
+  container-type: inline-size;
+}
+
+.activity-grid {
+  /* --all-weeks: the number of columns, set by the page. */
+  --weeks: var(--all-weeks);
+  display: grid;
+  grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
+  gap: 3px;
+  border-radius: 2px;
+  outline-offset: 4px;
+  /* A finger slides from day to day; the page still scrolls up and down. */
+  touch-action: pan-y;
+}
+
+.activity-week {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  /* This week's column is short: its days stay at the top. */
+  align-content: start;
+  gap: 3px;
+}
+
+.activity-month {
+  /* Spills over the next weeks rather than widening its own. */
+  width: 0;
+  height: 1.25rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  white-space: nowrap;
+}
+
+/* In the last two weeks it would spill out of the figure: it ends at the
+   week's right edge instead. */
+.activity-week:nth-last-child(-n + 2) .activity-month {
+  display: flex;
+  justify-content: flex-end;
+  width: auto;
+}
+
+.about-activity i {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--rule);
+}
+
+.about-activity .level-1 {
+  background: color-mix(in srgb, var(--text) 22%, var(--bg));
+}
+
+.about-activity .level-2 {
+  background: color-mix(in srgb, var(--text) 42%, var(--bg));
+}
+
+.about-activity .level-3 {
+  background: color-mix(in srgb, var(--text) 66%, var(--bg));
+}
+
+.about-activity .level-4 {
+  background: color-mix(in srgb, var(--text) 90%, var(--bg));
+}
+
+.about-activity .activity-blank {
+  visibility: hidden;
+}
+
+/* The day under the pointer, finger or arrow keys. */
+.about-activity .is-current {
+  outline: 1.5px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.about-activity figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.about-activity figcaption a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.about-activity figcaption a:hover {
+  color: var(--accent);
+}
+
+.activity-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.activity-legend i {
+  width: 0.625rem;
+}
+
+.activity-legend i:first-child {
+  margin-left: 0.25rem;
+}
+
+.activity-legend i:last-child {
+  margin-right: 0.25rem;
+}
+
+/* A day's count: the one floating surface, one line. */
+.activity-tip {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  padding: 0.375rem 0.75rem;
+  border-radius: 14px;
+  background: var(--raised);
+  box-shadow: var(--shadow-raised);
+  color: var(--text);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 3px;
+  transition: opacity 0.12s, visibility 0.12s, translate 0.12s;
+}
+
+.activity-tip.is-open {
+  opacity: 1;
+  visibility: visible;
+  translate: 0;
+}
+
+/* Narrow: the last 26 weeks, then the last 17. */
+@container (max-width: 34rem) {
+  .activity-grid {
+    --weeks: 26;
+  }
+
+  .activity-week:not(:nth-last-child(-n + 26)) {
+    display: none;
+  }
+}
+
+@container (max-width: 17rem) {
+  .activity-grid {
+    --weeks: 17;
+  }
+
+  .activity-week:not(:nth-last-child(-n + 17)) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activity-tip {
+    translate: none;
+  }
+}
+
 /* Narrow screens: the date moves above its entry. */
 @media (max-width: 40rem) {
-  .entry {
+  .entry,
+  .facts > div {
     grid-template-columns: 1fr;
   }
 
@@ -717,7 +1000,16 @@ main:focus {
     transition: none;
   }
 
-  .about-links .link-label {
+  .about-links a,
+  :root[data-theme] .about-links a {
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .about-links .link-label,
+  .about-section[data-kind='activity'],
+  .now-place {
     display: none;
   }
 

@@ -1,11 +1,16 @@
 ---
-// A CV-like profile: name, tagline, links and a short bio, then sections of
-// dated entries. All content comes from the about folder (plugins/about.mjs);
-// this file only lays it out.
+// A CV-like profile: name, tagline, links and a short bio, then blocks in
+// the order of the frontmatter: dated entries, papers, and the blocks named by
+// `kind:` (now, facts, activity, stack, projects, posts). All content comes
+// from the about folder (plugins/about.mjs); this file only lays it out.
 import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { SITE, aboutUrl, hasAbout, otherLang, ui, type Lang } from '../i18n';
+import AboutActivity from './AboutActivity.astro';
+import AboutEntry from './AboutEntry.astro';
+import AboutNow from './AboutNow.astro';
+import { SITE, aboutUrl, formatDate, getPosts, hasAbout, otherLang, postUrl, ui, type Lang } from '../i18n';
 import { resolveHref } from '../../plugins/about.mjs';
+import { contributions, stars, type Calendar } from '../../plugins/github.mjs';
 
 interface Props {
   lang: Lang;
@@ -33,6 +38,9 @@ const self = new Set(
   }),
 );
 
+// Links from the frontmatter, files in the about folder resolved.
+const resolved = (links: { label: string; href: string }[]) => links.map((l) => ({ label: l.label, href: resolveHref(l.href) }));
+
 // arXiv ids and DOIs may be written bare or as URLs.
 const arxivUrl = (id: string) => (/^https?:/.test(id) ? id : `https://arxiv.org/abs/${id.replace(/^arxiv:/i, '')}`);
 const doiUrl = (id: string) => (/^https?:/.test(id) ? id : `https://doi.org/${id.replace(/^doi:/i, '')}`);
@@ -48,7 +56,7 @@ const rows = (list: typeof papers) =>
       ...(p.pdf ? [{ label: 'PDF', href: resolveHref(p.pdf) }] : []),
       ...(p.arxiv ? [{ label: 'arXiv', href: arxivUrl(p.arxiv) }] : []),
       ...(p.doi ? [{ label: 'DOI', href: doiUrl(p.doi) }] : []),
-      ...p.links.map((l) => ({ label: l.label, href: resolveHref(l.href) })),
+      ...resolved(p.links),
     ];
     return {
       ...p,
@@ -58,14 +66,52 @@ const rows = (list: typeof papers) =>
       links,
     };
   });
-type Item = Extract<(typeof sections)[number], { kind: 'items' }>['items'][number];
-type Shown = { heading: string; items: Item[]; pubs: ReturnType<typeof rows> };
-const shown = sections.flatMap((s): Shown[] => {
-  if (s.kind === 'items') return s.items.length ? [{ heading: s.heading, items: s.items, pubs: [] }] : [];
-  const own = s.publications ?? (s.selectedOnly ? papers : []);
-  const pubs = rows((s.selectedOnly ? own.filter((p) => p.selected) : own).toSorted((a, b) => (b.year ?? 0) - (a.year ?? 0)));
-  return pubs.length ? [{ heading: s.heading, items: [], pubs }] : [];
-});
+// Every section becomes a block; items and papers become a list of entries.
+// An empty list or a posts block without posts is left out. GitHub data comes
+// fresh in a build; the dev server reuses a recent copy.
+const refresh = import.meta.env.PROD;
+type Section = (typeof sections)[number];
+type Item = Extract<Section, { kind: 'items' }>['items'][number];
+type Entries = { kind: 'entries'; heading: string; items: Item[]; pubs: ReturnType<typeof rows> };
+type Activity = Extract<Section, { kind: 'activity' }> & { calendar: Calendar };
+type RecentPosts = Extract<Section, { kind: 'posts' }> & { posts: Awaited<ReturnType<typeof getPosts>> };
+type Block = Exclude<Section, { kind: 'items' | 'publications' | 'activity' | 'posts' }> | Entries | Activity | RecentPosts;
+const blocks = (
+  await Promise.all(
+    sections.map(async (s): Promise<Block[]> => {
+      if (s.kind === 'items') return s.items.length ? [{ kind: 'entries', heading: s.heading, items: s.items, pubs: [] }] : [];
+      if (s.kind === 'publications') {
+        const own = s.publications ?? (s.selectedOnly ? papers : []);
+        const pubs = rows((s.selectedOnly ? own.filter((p) => p.selected) : own).toSorted((a, b) => (b.year ?? 0) - (a.year ?? 0)));
+        return pubs.length ? [{ kind: 'entries', heading: s.heading, items: [], pubs }] : [];
+      }
+      if (s.kind === 'activity') {
+        const user = s.github ?? SITE.github;
+        const calendar = user ? await contributions(user, { refresh }) : undefined;
+        if (calendar) return [{ ...s, calendar }];
+        // A build must not quietly drop the block; the dev server shows the page without it.
+        const why = user ? `no GitHub contributions of ${user}: none could be fetched (see the warning above) and none are cached` : 'an activity block needs `github:` or site.links.github';
+        if (import.meta.env.PROD) throw new Error(`[about] ${lang}.md: ${why}. Build with network, or remove the block.`);
+        console.warn(`[about] ${lang}.md: ${why}; the block is left out.`);
+        return [];
+      }
+      if (s.kind === 'projects') {
+        const projects = await Promise.all(s.projects.map(async (p) => ({ ...p, stars: p.stars ?? (p.repo ? await stars(p.repo, { refresh }) : undefined) })));
+        return [{ ...s, projects }];
+      }
+      if (s.kind === 'posts') {
+        const posts = (await getPosts(lang)).slice(0, s.limit);
+        return posts.length ? [{ ...s, posts }] : [];
+      }
+      return [s];
+    }),
+  )
+).flat();
+const repoName = (href: string) => href.replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/\/$/, '');
+// In the 6rem date column, a Chinese post date is written as entries write
+// theirs (2026-10-10); 2026 年 10 月 10 日 would take two lines.
+const postDate = (date: Date) => (lang === 'zh' ? date.toISOString().slice(0, 10) : formatDate(date, lang));
+const STAR = '<path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/>';
 
 // Links under the name show where they lead: an email address, a GitHub user
 // name, otherwise the label; the icon says what kind of link it is.
@@ -119,34 +165,88 @@ const printed = (href: string) =>
       <Content />
     </div>
     {
-      shown.map((s) => (
-        <section class="about-section">
-          <h2>{s.heading}</h2>
-          <ul class="entries">
-            {s.items.map((item) => (
-              <li class="entry">
-                {item.when && <span class="entry-when">{item.when}</span>}
-                <div class="entry-body">
-                  <p class="entry-title">{item.href ? <a href={resolveHref(item.href)}>{item.title}</a> : item.title}</p>
-                  {item.subtitle && <p class="entry-subtitle">{item.subtitle}</p>}
-                  {item.note && <p class="entry-note">{item.note}</p>}
-                  {item.links.length > 0 && (
-                    <ul class="link-row">
-                      {item.links.map((l) => (
-                        <li>
-                          <a href={resolveHref(l.href)}>{l.label}</a>
-                        </li>
+      blocks.map((s) => (
+        <section class="about-section" data-kind={s.kind}>
+          {s.heading && <h2>{s.heading}</h2>}
+          {s.kind === 'now' && <AboutNow lang={lang} text={s.text} updated={s.updated} place={s.place} timezone={s.timezone} />}
+          {s.kind === 'facts' && (
+            <dl class="facts">
+              {s.facts.map((f) => (
+                <div>
+                  <dt>{f.label}</dt>
+                  <dd>{f.href ? <a href={resolveHref(f.href)}>{f.value}</a> : f.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {s.kind === 'activity' && <AboutActivity lang={lang} calendar={s.calendar} />}
+          {s.kind === 'stack' && (
+            <dl class="facts">
+              {s.groups.map((g) => (
+                <div>
+                  <dt>{g.label}</dt>
+                  <dd>
+                    <ul class="stack-tags">
+                      {g.tags.map((tag) => (
+                        <li>{tag}</li>
                       ))}
                     </ul>
-                  )}
+                  </dd>
                 </div>
-              </li>
-            ))}
-            {s.pubs.map((p) => (
-              <li class="entry">
-                {p.when && <span class="entry-when">{p.when}</span>}
-                <div class="entry-body">
-                  <p class="entry-title">{p.href ? <a href={p.href}>{p.title}</a> : p.title}</p>
+              ))}
+            </dl>
+          )}
+          {s.kind === 'projects' && (
+            <ul class="entries">
+              {s.projects.map((p) => (
+                <AboutEntry when={p.when} title={p.title} href={p.href || p.repo ? resolveHref((p.href ?? p.repo)!) : undefined}>
+                  {p.note && <p class="entry-subtitle">{p.note}</p>}
+                  {p.repo && (
+                    <li slot="links">
+                      <a href={p.repo}>
+                        {repoName(p.repo)}
+                        {p.stars !== undefined && (
+                          <span class="stars">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" set:html={STAR} />
+                            {p.stars}
+                          </span>
+                        )}
+                      </a>
+                    </li>
+                  )}
+                  {p.href && p.repo && (
+                    <li slot="links">
+                      <a href={resolveHref(p.href)}>{t.site}</a>
+                    </li>
+                  )}
+                  {p.links.map((l) => (
+                    <li slot="links">
+                      <a href={resolveHref(l.href)}>{l.label}</a>
+                    </li>
+                  ))}
+                </AboutEntry>
+              ))}
+            </ul>
+          )}
+          {s.kind === 'posts' && (
+            <ul class="entries">
+              {s.posts.map((p) => (
+                <AboutEntry when={postDate(p.data.date)} datetime={p.data.date.toISOString()} title={p.data.title} href={postUrl(p)}>
+                  {p.data.description && <p class="entry-subtitle">{p.data.description}</p>}
+                </AboutEntry>
+              ))}
+            </ul>
+          )}
+          {s.kind === 'entries' && (
+            <ul class="entries">
+              {s.items.map((item) => (
+                <AboutEntry when={item.when} title={item.title} href={item.href && resolveHref(item.href)} links={resolved(item.links)}>
+                  {item.subtitle && <p class="entry-subtitle">{item.subtitle}</p>}
+                  {item.note && <p class="entry-note">{item.note}</p>}
+                </AboutEntry>
+              ))}
+              {s.pubs.map((p) => (
+                <AboutEntry when={p.when} title={p.title} href={p.href} links={p.links}>
                   {p.authors.length > 0 && (
                     <p class="pub-authors">
                       {p.authors.map((a, i) => (
@@ -164,27 +264,18 @@ const printed = (href: string) =>
                       {p.note}
                     </p>
                   )}
-                  {(p.links.length > 0 || p.bibtex) && (
-                    <ul class="link-row">
-                      {p.links.map((l) => (
-                        <li>
-                          <a href={l.href}>{l.label}</a>
-                        </li>
-                      ))}
-                      {p.bibtex && (
-                        <li class="bibtex">
-                          <pre hidden>{p.bibtex.trim()}</pre>
-                          <button class="bibtex-copy" type="button" aria-live="polite">
-                            <span class="sr-only">{t.copy} </span>BibTeX
-                          </button>
-                        </li>
-                      )}
-                    </ul>
+                  {p.bibtex && (
+                    <li slot="links" class="bibtex">
+                      <pre hidden>{p.bibtex.trim()}</pre>
+                      <button class="bibtex-copy" type="button" aria-live="polite">
+                        <span class="sr-only">{t.copy} </span>BibTeX
+                      </button>
+                    </li>
                   )}
-                </div>
-              </li>
-            ))}
-          </ul>
+                </AboutEntry>
+              ))}
+            </ul>
+          )}
         </section>
       ))
     }

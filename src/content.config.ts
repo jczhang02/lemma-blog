@@ -97,13 +97,65 @@ const items = z
     items: z.array(item).nullable().transform((v) => v ?? []),
   })
   .strict();
-// A section's kind follows from its keys, and the section is checked as that
-// kind only. A union would try each kind in turn: a paper with a bad field
-// then made the section pass as an empty list of items, and vanish.
-const sectionKind = (s: Record<string, unknown>) => ('items' in s ? 'items' : 'publications');
+// Blocks named by a `kind:` key; each is optional on the page, and its heading too.
+const optionalHeading = z.string().optional();
+// What the owner is doing now, and where: the page shows the local time
+// there (timezone: an IANA name such as Asia/Shanghai).
+const timeZone = z.string().refine((zone) => {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: zone });
+    return true;
+  } catch {
+    return false;
+  }
+}, 'an IANA time zone, such as Asia/Shanghai');
+const now = z
+  .object({ kind: z.literal('now'), heading: optionalHeading, text: z.string(), updated: when.optional(), place: z.string().optional(), timezone: timeZone.optional() })
+  .strict();
+// A year of GitHub contributions (plugins/github.mjs); by default those of
+// site.links.github in lemma.config.mjs.
+const activity = z.object({ kind: z.literal('activity'), heading: optionalHeading, github: z.string().optional() }).strict();
+// Interests, languages, tools: a label, then its words.
+const stack = z
+  .object({
+    kind: z.literal('stack'),
+    heading: optionalHeading,
+    groups: z.array(z.object({ label: z.string(), tags: z.array(z.string()) }).strict()),
+  })
+  .strict();
+// Software and other work: the title links to href, else to repo. Without
+// `stars:`, a GitHub repo's stars are fetched at build time (plugins/github.mjs).
+const project = z
+  .object({
+    title: z.string(),
+    note: z.string().optional(),
+    href: z.string().optional(),
+    repo: z.string().optional(),
+    stars: z.number().int().optional(),
+    when: when.optional(),
+    links: z.array(link).default([]),
+  })
+  .strict();
+const projects = z.object({ kind: z.literal('projects'), heading: optionalHeading, projects: z.array(project) }).strict();
+// Short facts as label and value (based in, office, languages).
+const facts = z
+  .object({
+    kind: z.literal('facts'),
+    heading: optionalHeading,
+    facts: z.array(z.object({ label: z.string(), value: z.string(), href: z.string().optional() }).strict()),
+  })
+  .strict();
+// The latest posts in the page's language.
+const recentPosts = z.object({ kind: z.literal('posts'), heading: optionalHeading, limit: z.number().int().positive().default(3) }).strict();
+
+// A section's kind is its `kind:` key, or follows from its keys (`items`,
+// else publications), and the section is checked as that kind only. A union
+// would try each kind in turn: a paper with a bad field then made the section
+// pass as an empty list of items, and vanish.
+const sectionKind = (s: Record<string, unknown>) => ('kind' in s ? s.kind : 'items' in s ? 'items' : 'publications');
 const section = z.preprocess(
   (s) => (s && typeof s === 'object' && !Array.isArray(s) ? { ...s, kind: sectionKind(s as Record<string, unknown>) } : s),
-  z.discriminatedUnion('kind', [items, publications]),
+  z.discriminatedUnion('kind', [items, publications, now, activity, stack, projects, facts, recentPosts]),
 );
 
 const aboutFiles = glob({ pattern: '{zh,en}.md', base: ABOUT_DIR });

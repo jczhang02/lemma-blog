@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import lemma from '../lemma.config.mjs';
 import type { CurveName } from './scripts/curves';
+import type { Lang } from './scripts/dates';
 
 // Site settings, from lemma.config.mjs.
 export const SITE = {
@@ -13,7 +14,7 @@ export const SITE = {
   introCurve: lemma.site.intro.curve as CurveName | null,
 };
 
-export type Lang = 'zh' | 'en';
+export type { Lang };
 export const LANGS: Lang[] = ['zh', 'en'];
 
 export const ui = {
@@ -56,6 +57,17 @@ export const ui = {
     postCount: (n: number) => `${n} 篇`,
     readingTime: (n: number) => `约 ${n} 分钟`,
     sectionCount: (n: number) => `${n} 节`,
+    // About page blocks. {n} is a count, {date} a date; the lists are the
+    // forms for one and for more (and, for days, for none first).
+    now: '近况',
+    localTime: '当地时间',
+    site: '主页',
+    activityTotal: ['过去一年在 GitHub 上有 {n} 次贡献', '过去一年在 GitHub 上有 {n} 次贡献'],
+    activityAsOf: '截至 {date}',
+    activityDay: ['{date} · 没有贡献', '{date} · 1 次贡献', '{date} · {n} 次贡献'],
+    activityKeys: '方向键选择日期',
+    less: '少',
+    more: '多',
   },
   en: {
     description: lemma.site.description.en,
@@ -95,6 +107,15 @@ export const ui = {
     postCount: (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`,
     readingTime: (n: number) => `${n} min read`,
     sectionCount: (n: number) => `${n} ${n === 1 ? 'section' : 'sections'}`,
+    now: 'Now',
+    localTime: 'local time',
+    site: 'Site',
+    activityTotal: ['{n} contribution on GitHub in the last year', '{n} contributions on GitHub in the last year'],
+    activityAsOf: 'as of {date}',
+    activityDay: ['No contributions on {date}', '1 contribution on {date}', '{n} contributions on {date}'],
+    activityKeys: 'Arrow keys choose a day',
+    less: 'Less',
+    more: 'More',
   },
 } as const;
 
@@ -119,10 +140,7 @@ export async function getPosts(lang: Lang) {
 }
 
 // Chinese dates keep a space between digits and characters: 2026 年 10 月 10 日.
-export function formatDate(date: Date, lang: Lang) {
-  if (lang === 'zh') return `${date.getUTCFullYear()} 年 ${date.getUTCMonth() + 1} 月 ${date.getUTCDate()} 日`;
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
-}
+export { formatDate } from './scripts/dates';
 
 /**
  * URL segment for a tag: lowercase, spaces and URL-reserved characters to

@@ -124,7 +124,7 @@ The token values above are set in `lemma.config.mjs` (`theme`, `code`), which ge
 
 A personal research blog (AI for PDE, and mathematics around it) in Chinese and English. Each post should read like a carefully typeset paper on a screen: serif text on warm paper, numbered sections and theorems, captions where print puts them, citations that resolve. The labels around it (dates, meta lines, footer) are quiet sans-serif and stay out of the way. The look is clean and modern rather than antique: nothing imitates paper texture, and there are no ornaments.
 
-Depth is minimal. The page is flat; only content that floats above it (TOC cards, link previews, the search panel) is lifted, and all of it in the same way. Color is almost entirely neutral, with one terracotta accent for links and the current state.
+Depth is minimal. The page is flat; only content that floats above it (TOC cards, link previews, the search panel, the About page's day card) is lifted, and all of it in the same way. Color is almost entirely neutral, with one terracotta accent for links and the current state.
 
 **Key Characteristics:**
 - Serif reading text and header, sans-serif labels, a one-column 46rem measure.
@@ -145,7 +145,7 @@ Warm, low-chroma neutrals carry everything; the accent is the only saturated col
 - **Ink** (ink / ink-dark): body text and headings.
 - **Graphite** (muted / muted-dark): secondary text: dates, captions, sidenotes, metadata, counts. Meets 4.5:1 on paper in both themes.
 - **Hairline** (rule / rule-dark): borders, rules above notes, table rules, inactive TOC ticks.
-- **Vellum** (surface / surface-dark): code blocks, inline code, the BibTeX block, video placeholders, the current search result (light).
+- **Vellum** (surface / surface-dark): code blocks, inline code, the BibTeX block, video placeholders, the current search result (light), the About page's contact buttons.
 - **Lifted Paper** (raised / raised-dark): the one floating surface (cards).
 - **Highlight** (selection / selection-dark): text selection, and the matches in search excerpts.
 
@@ -188,7 +188,7 @@ One centered column: the body is 46rem of text plus 1.5rem gutters. The header (
 
 ## Elevation & Depth
 
-Flat by default. The only elevation is the floating card, used for TOC section cards and link previews (appearing on hover, focus or tap) and the search panel.
+Flat by default. The only elevation is the floating card, used for TOC section cards and link previews (appearing on hover, focus or tap), the search panel and the day card of the About page's activity.
 
 ### Shadow Vocabulary
 - **Raised** (`0 1px 2px rgb(25 25 23 / 0.06), 0 12px 32px -8px rgb(25 25 23 / 0.2)`): cards in light mode.
@@ -247,11 +247,13 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 
 ### About page
 - **Head:** the name in Display, the tagline in serif Graphite, the contact links, then the bio as body text.
-- **Contact links:** under the name, sans 0.9375rem, each a small icon (mail, GitHub, file, link) and what the link leads to: the email address, the GitHub user name, otherwise its label. Set as links in the text are (terracotta, faint underline that darkens on hover), so they read as links at a glance; 1.5rem apart, wrapping, no dots.
+- **Contact links:** under the name, a wrapping row of buttons 0.5rem apart (0.625rem between rows): sans 0.875rem Ink on Vellum, 6px radius, 0.4375rem 0.75rem padding, each a small icon (mail, GitHub, file, link) and what the link leads to: the email address, the GitHub user name, otherwise its label. Hover turns the fill Hairline; in dark mode a Hairline ring carries the edge, since Vellum barely shows on dark paper. The 35px button reaches a 2.75rem hit area into the row gap.
 - **Link row:** sans links in Graphite, separated by middle dots that stay with the link before them (a wrapped row never starts with a dot); terracotta on hover. 0.8125rem, under an entry. The BibTeX copy button is set as one more link and shows 已复制 / Copied for 1.5s.
 - **Sections:** an unnumbered Headline, then entries in two columns like the post list: the date in a 6rem sans column (Graphite, tabular numbers) on the title's baseline, and the entry in serif: title at 1.125rem / 500 (an ordinary link when it has one), a Graphite subtitle and a note at 0.9375rem, a link row. Below 40rem the date moves above its entry.
+- **Blocks:** the frontmatter's sections in their order. Besides entries and papers: **now** (a short rule above, as notes have; a sans Graphite label with the date, the text in serif 1.125rem, then the place and its local time in sans 0.875rem, the time in Ink), **facts** and **stack** (a label in the 6rem date column, sans Graphite; the value in serif, a stack's words 1rem apart, no chips), **projects** (entries: title, note, then a link row with the repository and its stars), **posts** (entries; the date in the 6rem column, in Chinese as 2026-10-10, since 2026 年 10 月 10 日 would take two lines).
+- **Activity:** a year of GitHub contributions, a column per week (Sunday first), 3px gaps, 2px radius; GitHub's five levels as Hairline, then Ink at 22, 42, 66 and 90% over paper, never the accent. Month names (sans 0.75rem Graphite) over the week holding the 1st. Below it the total, linked to the GitHub profile, and a Less/More legend. A day's count shows in the one floating card, one line of sans 0.8125rem, above the day: after a 200ms rest on hover, on touch, or with the arrow keys once the grid has focus (↑ ↓ a day, ← → a week; Escape closes); the day gets a 1.5px terracotta outline. Days are about 10px, below the 2.75rem tap target: a touch takes the day nearest the finger and follows it as it slides sideways (the page still scrolls up and down), and the keyboard reaches every day. A calendar cached more than two days ago adds "as of" its date to the total, which is a small text link with the usual 2.75rem hit area. Narrow containers show the last 26 weeks (below 34rem) or 17 (below 17rem).
 - **Publications:** newest first, the year on the first entry of each year only. Authors in Graphite with the owner's name in bold Ink; the venue in italic, upright when it is Chinese. No cards, boxes or fills.
-- **Print:** black on white with no header, footer or copy buttons; the links under the name print as their addresses; no entry is split across pages.
+- **Print:** black on white with no header, footer, copy buttons or activity; the links under the name print as their addresses, without fills; no entry is split across pages.
 
 ## Do's and Don'ts
 

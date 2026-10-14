@@ -15,6 +15,53 @@ links:
   - { label: Office hours, href: 'https://example.org/office-hours' }
 self: ['Qiao, Lin', '乔林']
 sections:
+  # Blocks named by `kind:`. now: what you are doing, and the local time of
+  # timezone (an IANA name).
+  - kind: now
+    text: Writing up learned closures for multiscale kinetics, and teaching a reading course on spectral methods.
+    updated: Oct 2026
+    place: Northlake
+    timezone: Asia/Shanghai
+  - kind: facts
+    heading: At a glance
+    facts:
+      - { label: Based in, value: 'Northlake, China' }
+      - { label: Office, value: 'Room 412, Science Building B' }
+      - { label: Languages, value: 'Chinese, English, some German' }
+      - { label: Writes in, value: 'LaTeX, Typst, Markdown' }
+      - { label: Open to, value: 'Collaborations on operator learning', href: 'mailto:lin.qiao@example.org' }
+  # A year of GitHub contributions, fetched at build time. Without `github:`
+  # it shows those of site.links.github in lemma.config.mjs, so this
+  # fictitious profile shows the site owner's real calendar.
+  - kind: activity
+    heading: Activity
+  - kind: stack
+    heading: Interests and tools
+    groups:
+      - { label: Research, tags: [Operator learning, Spectral methods, Stiff PDEs, Multiscale kinetics, Scientific ML] }
+      - { label: Languages, tags: [Python, Julia, C++, Fortran] }
+      - { label: Tools, tags: [JAX, PyTorch, FEniCS, Dedalus, LaTeX, TikZ] }
+  # The title links to href, else to repo. Stars are written by hand here;
+  # without `stars:` they are fetched from GitHub.
+  - kind: projects
+    heading: Software
+    projects:
+      - title: sno
+        note: Spectral neural operators in JAX, with the stiff solvers and learned closures from the NeurIPS paper.
+        repo: 'https://github.com/example-lqiao/sno'
+        href: 'https://example.org/sno'
+        stars: 412
+        when: 2025
+      - title: harbor
+        note: Benchmarks for learned closures on turbulent channel flow.
+        repo: 'https://github.com/example-lqiao/harbor'
+        stars: 57
+        when: 2024
+      - title: tikz-pde
+        note: TikZ styles for meshes, stencils and phase portraits.
+        repo: 'https://github.com/example-lqiao/tikz-pde'
+        stars: 9
+        when: 2022
   - heading: Experience
     items:
       - when: 2025 – now
@@ -103,6 +150,10 @@ sections:
       - title: Learned Closures for Multiscale Kinetics
         authors: [Lin Qiao, Mira Halvorsen]
         note: In preparation
+  # The latest posts in this language.
+  - kind: posts
+    heading: Recent writing
+    limit: 3
   - heading: Talks
     items:
       - when: 2025-11-14

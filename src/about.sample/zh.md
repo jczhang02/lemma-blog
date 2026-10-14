@@ -1,11 +1,60 @@
 ---
 # 测试关于页布局用的虚构资料 (LEMMA_ABOUT=sample, bun run dev:sample). 人名, 单位和论文都是编的.
-# 中文版没有 links 字段, 用来检查可选字段缺失时的情况.
+# 中文版没有 tagline 字段, 用来检查可选字段缺失时的情况; 联系按钮用中文标签.
 title: 关于
 name: 乔林
-tagline: 博士后 · 北湖大学计算科学研究院
+links:
+  - { label: 邮箱, href: 'mailto:lin.qiao@example.org' }
+  - { label: 简历, href: cv.pdf }
+  - { label: 谷歌学术, href: 'https://scholar.example.org/citations?user=abc123' }
+  - { label: GitHub, href: 'https://github.com/example-lqiao' }
+  - { label: 知乎, href: 'https://www.zhihu.example/people/lqiao' }
 self: ['Qiao, Lin', '乔林']
 sections:
+  # 用 `kind:` 指明类型的块. now: 近况, timezone (IANA 名称) 决定显示的当地时间.
+  - kind: now
+    text: 在写多尺度动理学的学习闭包, 同时给研究生开一门谱方法的读书课.
+    updated: 2026 年 10 月
+    place: 北湖
+    timezone: Asia/Shanghai
+  - kind: facts
+    heading: 概览
+    facts:
+      - { label: 所在地, value: 北湖 }
+      - { label: 办公室, value: '理科楼 B 座 412' }
+      - { label: 语言, value: '中文, 英语, 一点德语' }
+      - { label: 写作工具, value: 'LaTeX, Typst, Markdown' }
+      - { label: 欢迎合作, value: 算子学习方向的合作, href: 'mailto:lin.qiao@example.org' }
+  # 过去一年的 GitHub 贡献, 构建时获取. 不写 `github:` 时用 lemma.config.mjs 里的
+  # site.links.github, 所以这份虚构资料显示的是站长真实的贡献. 软件的 stars 是手写的,
+  # 不写时从 GitHub 获取.
+  - kind: activity
+    heading: 动态
+  - kind: stack
+    heading: 兴趣与工具
+    groups:
+      - { label: 研究, tags: [算子学习, 谱方法, 刚性 PDE, 多尺度动理学, 科学机器学习] }
+      - { label: 语言, tags: [Python, Julia, C++, Fortran] }
+      - { label: 工具, tags: [JAX, PyTorch, FEniCS, Dedalus, LaTeX, TikZ] }
+  - kind: projects
+    heading: 软件
+    projects:
+      - title: sno
+        note: JAX 写的谱神经算子, 含 NeurIPS 论文里的刚性求解器和学习闭包.
+        repo: 'https://github.com/example-lqiao/sno'
+        href: 'https://example.org/sno'
+        stars: 412
+        when: 2025
+      - title: harbor
+        note: 湍流槽道流上学习闭包的基准测试.
+        repo: 'https://github.com/example-lqiao/harbor'
+        stars: 57
+        when: 2024
+      - title: tikz-pde
+        note: 画网格, 差分模板和相图的 TikZ 样式.
+        repo: 'https://github.com/example-lqiao/tikz-pde'
+        stars: 9
+        when: 2022
   - heading: 工作经历
     items:
       - when: 2025 – 今
@@ -64,6 +113,9 @@ sections:
         venue: arXiv preprint
         year: 2022
         arxiv: '2210.04567'
+  - kind: posts
+    heading: 近期文章
+    limit: 3
   - heading: 教学
     items: []
   - heading: 获奖

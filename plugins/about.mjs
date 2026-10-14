@@ -54,6 +54,8 @@ function linkedFiles(dir) {
       ...links(data.sections).flatMap((s) => [
         ...links(s?.items).flatMap((item) => [item, ...links(item?.links)]),
         ...links(s?.publications).flatMap((pub) => [{ href: pub?.pdf }, ...links(pub?.links)]),
+        ...links(s?.projects).flatMap((p) => [p, ...links(p?.links)]),
+        ...links(s?.facts),
       ]),
       ...links(data.sections).flatMap((s) => links(s?.publications).map((pub) => ({ href: pub?.url }))),
     ]

@@ -153,7 +153,7 @@ Write `.md`, not `.mdx`: MDX reads `{`, `}` and `<` as JSX and breaks TeX. The b
 
 | File | What it holds |
 | --- | --- |
-| `zh.md`, `en.md` | frontmatter: `title`, `name`, `tagline`, `links`, `self`, `sections` (publications included); the body is the bio. Without a file, that language has no about page and no About link. The `links` under the name show an email address, a GitHub user name or the label, each with an icon; with an about page, the footer drops its Email and GitHub links. |
+| `zh.md`, `en.md` | frontmatter: `title`, `name`, `tagline`, `links`, `self`, `sections` (publications and the blocks below included); the body is the bio. Without a file, that language has no about page and no About link. The `links` under the name are buttons that show an email address, a GitHub user name or the label, each with an icon; with an about page, the footer drops its Email and GitHub links. |
 | any other file | linked by a relative `href`, `pdf` or `url` (`cv.pdf`, `cv.pdf#page=2`), published at `/about/cv.pdf`. Files nobody links to are not published, and neither are `zh.md` and `en.md`. |
 
 ```yaml
@@ -184,7 +184,15 @@ sections:
 | --- | --- |
 | item | `when`, `title`, `subtitle`, `note`, `href`, `links`; only `title` is required |
 | paper | `title` (required), `authors` (as printed), `venue`, `year`, `note`, `selected`, `url` (the title's link), `pdf`, `arxiv`, `doi`, `links`, `bibtex` |
-| section | `heading` with `items`, or with `publications` and an optional `selectedOnly` |
+| section | `heading` with `items`, or with `publications` and an optional `selectedOnly`; or a block named by `kind:` (below) |
+| `kind: now` | `text` (required), `updated`, `place`, `timezone` (an IANA name; the page shows the local time there) |
+| `kind: facts` | `facts`: a list of `label`, `value`, optional `href` |
+| `kind: activity` | `github`: a user name, by default `site.links.github`; a year of contributions as a heatmap |
+| `kind: stack` | `groups`: a list of `label` and `tags` |
+| `kind: projects` | `projects`: a list of `title` (required), `note`, `href`, `repo`, `stars`, `when`, `links`; without `stars`, a GitHub `repo`'s stars are fetched |
+| `kind: posts` | `limit` (default 3): the latest posts in the page's language |
+
+Every block takes an optional `heading`, and blocks appear in the order written. The activity block reads the public calendar at `github.com/<user>`, and projects their stars from the GitHub API, when the site is built; the dev server reuses copies up to 6 hours old, cached in `node_modules/.cache/lemma/`. Without network a build uses the last copy (a calendar more than two days old says "as of" its date); with no copy at all, a build fails rather than drop the activity block (the dev server leaves it out with an `[about]` warning), and a project shows no stars. A day's count shows on hover, on touch (a finger slides from day to day), or with the arrow keys once the grid has focus.
 
 A section is a list of items when it has `items`, of papers otherwise. A misspelt key or a value of the wrong type (`year: '2025'`, an unquoted arXiv id) fails the build with an error that names the field, such as `sections.3.publications.2.year`. A top-level `tagline:`, `links:`, `self:` or `sections:` left empty counts as not given.
 
@@ -270,6 +278,7 @@ Markdown goes through Astro's unified pipeline with local plugins:
 - `plugins/remark-cite.mjs`: `\cite` and the reference list (citation-js, AMS numeric CSL).
 - `plugins/media.mjs`: video embedding, dev serving, build copy, R2 URLs.
 - `plugins/about.mjs`: the about folder (and its sample switch), its template marker, and the files it links to.
+- `plugins/github.mjs`: the GitHub contributions calendar for the about page's activity block, fetched and cached.
 - `plugins/search.mjs`: the Pagefind index of the posts after a build, and its dev serving.
 - `plugins/rehype-mathjax4.mjs`: MathJax 4 to SVG, per-post macro sandbox, forward references.
 - `plugins/rehype-toc.mjs`: TOC entries with rendered math and section previews.
