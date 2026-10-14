@@ -25,14 +25,18 @@ const weeks = Array.from({ length: Math.ceil(days.length / 7) }, (_, w) => {
   return { month: w > 0 && first ? formatMonth(first.date, lang) : undefined, week };
 });
 const total = calendar.days.reduce((n, d) => n + d.count, 0);
-let summary = t.activityTotal[total === 1 ? 0 : 1].replace('{n}', total.toLocaleString(numberLocale(lang)));
-// A copy cached days ago (GitHub unreachable at build) says how old it is.
+const summary = t.activityTotal[total === 1 ? 0 : 1].replace('{n}', total.toLocaleString(numberLocale(lang)));
+// A calendar more than two days old says how old it is: a copy cached days
+// ago (GitHub unreachable at build), or a page built days ago. The build
+// checks the first, the browser the second (the script below).
 const last = calendar.days.at(-1)!.date;
-if (Date.now() - Date.parse(`${last}T00:00:00Z`) > 2 * 864e5) summary += ` · ${t.activityAsOf.replace('{date}', formatDate(last, lang))}`;
+const asOf = ` · ${t.activityAsOf.replace('{date}', formatDate(last, lang))}`;
+const old = Date.now() - Date.parse(`${last}T00:00:00Z`) > 2 * 864e5;
+const label = (old: boolean) => `${summary}${old ? asOf : ''}. ${t.activityKeys}.`;
 ---
 
-<figure class="about-activity" data-lang={lang} data-day={JSON.stringify(t.activityDay)}>
-  <div class="activity-grid" style={`--all-weeks: ${weeks.length}`} tabindex="0" role="group" aria-label={`${summary}. ${t.activityKeys}.`}>
+<figure class="about-activity" data-lang={lang} data-day={JSON.stringify(t.activityDay)} data-last={last}>
+  <div class="activity-grid" style={`--all-weeks: ${weeks.length}`} tabindex="0" role="group" aria-label={label(old)} data-old-label={label(true)}>
     {
       weeks.map(({ month, week }) => (
         <div class="activity-week">
@@ -46,7 +50,7 @@ if (Date.now() - Date.parse(`${last}T00:00:00Z`) > 2 * 864e5) summary += ` · ${
   </div>
   <div class="activity-tip" role="status"></div>
   <figcaption>
-    <a href={`https://github.com/${calendar.user}`}>{summary}</a>
+    <a href={`https://github.com/${calendar.user}`}>{summary}<span class="activity-as-of" hidden={!old}>{asOf}</span></a>
     <span class="activity-legend" aria-hidden="true">
       {t.less}
       <i class="level-0"></i><i class="level-1"></i><i class="level-2"></i><i class="level-3"></i><i class="level-4"></i>
@@ -63,6 +67,11 @@ if (Date.now() - Date.parse(`${last}T00:00:00Z`) > 2 * 864e5) summary += ` · ${
     const tip = figure.querySelector<HTMLElement>('.activity-tip')!;
     const lang = figure.dataset.lang as Lang;
     const forms: string[] = JSON.parse(figure.dataset.day!);
+    // Built more than two days after its last day: say how old it is.
+    if (Date.now() - Date.parse(`${figure.dataset.last}T00:00:00Z`) > 2 * 864e5) {
+      figure.querySelector<HTMLElement>('.activity-as-of')!.hidden = false;
+      grid.setAttribute('aria-label', grid.dataset.oldLabel!);
+    }
     // Days in the shown weeks only (narrow pages hide the older ones), oldest first.
     const shown = () => [...grid.querySelectorAll<HTMLElement>('i[data-date]')].filter((cell) => cell.offsetParent);
     let current: HTMLElement | undefined;

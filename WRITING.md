@@ -188,7 +188,7 @@ sections:
     limit: 3
 ```
 
-GitHub 贡献和 stars 在 `bun run build` 时重新获取, `bun run dev` 用 6 小时内的缓存 (`node_modules/.cache/lemma/`). 获取失败时用上一次的缓存, 贡献数据超过两天的会注明 "截至" 哪一天. 完全没有缓存时, 构建会报错停止, 不会悄悄少掉贡献图; `bun run dev` 只给出一行 `[about]` 警告, 不显示这一块. `timezone` 写错时构建也会报错, 并指出是哪个字段.
+GitHub 贡献和 stars 在 `bun run build` 时重新获取, `bun run dev` 用 6 小时内的缓存 (`node_modules/.cache/lemma/`). 所以页面上的数据停在最后一次部署的那一天. 获取失败时用上一次的缓存. 贡献数据的最后一天距今超过两天时, 会注明 "截至" 哪一天: 构建时用了旧缓存, 或者页面部署后过了两天以上 (由浏览器判断), 都会这样. 完全没有缓存时, 构建会报错停止, 不会悄悄少掉贡献图; `bun run dev` 只给出一行 `[about]` 警告, 不显示这一块. `timezone` 写错时构建也会报错, 并指出是哪个字段.
 
 条目字段: `when` (左栏时间, 原样显示), `title` (必填), `subtitle`, `note`, `href`, `links`. 值里有 "冒号 + 空格" 时要加引号.
 
