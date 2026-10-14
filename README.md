@@ -146,7 +146,7 @@ Write `.md`, not `.mdx`: MDX reads `{`, `}` and `<` as JSX and breaks TeX. The b
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/about-dark.webp">
-  <img src="docs/img/about-light.webp" alt="The About page of the sample profile: name, contact links, bio and dated entries" width="800">
+  <img src="docs/img/about-light.webp" alt="The About page of the sample profile: name, contact buttons, bio, a now block, facts and a GitHub activity heatmap" width="800">
 </picture>
 
 `/about/` and `/en/about/` are built from `src/content/about/`, a folder that holds content only:
