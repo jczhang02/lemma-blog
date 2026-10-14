@@ -15,8 +15,14 @@ links:
   - { label: Office hours, href: 'https://example.org/office-hours' }
 self: ['Qiao, Lin', '乔林']
 sections:
-  # Blocks named by `kind:`. now: what you are doing, and the local time of
-  # timezone (an IANA name).
+  # Blocks named by `kind:`. activity: a year of GitHub contributions,
+  # fetched at build time and always shown right after the bio, wherever it
+  # is written. Without `github:` it shows those of site.links.github in
+  # lemma.config.mjs, so this fictitious profile shows the site owner's real
+  # calendar.
+  - kind: activity
+    heading: Activity
+  # now: what you are doing, and the local time of timezone (an IANA name).
   - kind: now
     text: Writing up learned closures for multiscale kinetics, and teaching a reading course on spectral methods.
     updated: Oct 2026
@@ -30,11 +36,6 @@ sections:
       - { label: Languages, value: 'Chinese, English, some German' }
       - { label: Writes in, value: 'LaTeX, Typst, Markdown' }
       - { label: Open to, value: 'Collaborations on operator learning', href: 'mailto:lin.qiao@example.org' }
-  # A year of GitHub contributions, fetched at build time. Without `github:`
-  # it shows those of site.links.github in lemma.config.mjs, so this
-  # fictitious profile shows the site owner's real calendar.
-  - kind: activity
-    heading: Activity
   - kind: stack
     heading: Interests and tools
     groups:

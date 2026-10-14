@@ -146,7 +146,7 @@ Write `.md`, not `.mdx`: MDX reads `{`, `}` and `<` as JSX and breaks TeX. The b
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/about-dark.webp">
-  <img src="docs/img/about-light.webp" alt="The About page of the sample profile: name, contact buttons, bio, a now block, facts and a GitHub activity heatmap" width="800">
+  <img src="docs/img/about-light.webp" alt="The About page of the sample profile: name, contact buttons, bio, a GitHub activity heatmap, a now block and facts" width="800">
 </picture>
 
 `/about/` and `/en/about/` are built from `src/content/about/`, a folder that holds content only:
@@ -187,12 +187,12 @@ sections:
 | section | `heading` with `items`, or with `publications` and an optional `selectedOnly`; or a block named by `kind:` (below) |
 | `kind: now` | `text` (required), `updated`, `place`, `timezone` (an IANA name; the page shows the local time there) |
 | `kind: facts` | `facts`: a list of `label`, `value`, optional `href` |
-| `kind: activity` | `github`: a user name, by default `site.links.github`; a year of contributions as a heatmap |
+| `kind: activity` | `github`: a user name, by default `site.links.github`; a year of contributions as a heatmap, always right after the bio |
 | `kind: stack` | `groups`: a list of `label` and `tags` |
 | `kind: projects` | `projects`: a list of `title` (required), `note`, `href`, `repo`, `stars`, `when`, `links`; without `stars`, a GitHub `repo`'s stars are fetched |
 | `kind: posts` | `limit` (default 3): the latest posts in the page's language |
 
-Every block takes an optional `heading`, and blocks appear in the order written. The activity block reads the public calendar at `github.com/<user>`, and projects their stars from the GitHub API, when the site is built; the dev server reuses copies up to 6 hours old, cached in `node_modules/.cache/lemma/`. Without network a build uses the last copy (a calendar more than two days old says "as of" its date); with no copy at all, a build fails rather than drop the activity block (the dev server leaves it out with an `[about]` warning), and a project shows no stars. A day's count shows on hover, on touch (a finger slides from day to day), or with the arrow keys once the grid has focus.
+Every block takes an optional `heading`. Activity blocks come right after the bio, wherever they are written; the other blocks appear in the order written, and the links stay under the name. The activity block reads the public calendar at `github.com/<user>`, and projects their stars from the GitHub API, when the site is built; the dev server reuses copies up to 6 hours old, cached in `node_modules/.cache/lemma/`. Without network a build uses the last copy (a calendar more than two days old says "as of" its date); with no copy at all, a build fails rather than drop the activity block (the dev server leaves it out with an `[about]` warning), and a project shows no stars. A day's count shows on hover, on touch (a finger slides from day to day), or with the arrow keys once the grid has focus.
 
 A section is a list of items when it has `items`, of papers otherwise. A misspelt key or a value of the wrong type (`year: '2025'`, an unquoted arXiv id) fails the build with an error that names the field, such as `sections.3.publications.2.year`. A top-level `tagline:`, `links:`, `self:` or `sections:` left empty counts as not given.
 

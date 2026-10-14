@@ -159,10 +159,13 @@ sections:
 
 姓名下面的 `links` 显示为一排按钮, 按钮上写链接的去向: `mailto:` 显示邮箱地址, `https://github.com/<用户名>` 显示用户名, 其他链接显示 `label`, 前面各有一个图标. 有关于页的语言, 页脚就不再显示邮箱和 GitHub.
 
-除了条目和论文, 板块还可以用 `kind:` 指明类型, 写的顺序就是页面上的顺序. `heading` 都可以省略:
+除了条目和论文, 板块还可以用 `kind:` 指明类型. GitHub 贡献图 (`activity`) 固定在简介下面, 写在哪里都一样; 其他板块按写的顺序排列. 姓名下面的链接也固定在页面顶部. `heading` 都可以省略:
 
 ```yaml
 sections:
+  - kind: activity                # 过去一年的 GitHub 贡献, 构建时获取, 固定在简介下面
+    heading: 动态
+    github: jczhang02             # 可省略, 默认是 lemma.config.mjs 里的 site.links.github
   - kind: now                     # 近况, 带地点和当地时间
     text: 在写多尺度动理学的学习闭包.
     updated: 2026 年 10 月
@@ -172,9 +175,6 @@ sections:
     heading: 概览
     facts:
       - { label: 所在地, value: 北湖 }
-  - kind: activity                # 过去一年的 GitHub 贡献, 构建时获取
-    heading: 动态
-    github: jczhang02             # 可省略, 默认是 lemma.config.mjs 里的 site.links.github
   - kind: stack                   # 兴趣与工具, 按组列出
     heading: 兴趣与工具
     groups:

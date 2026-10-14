@@ -11,7 +11,12 @@ links:
   - { label: 知乎, href: 'https://www.zhihu.example/people/lqiao' }
 self: ['Qiao, Lin', '乔林']
 sections:
-  # 用 `kind:` 指明类型的块. now: 近况, timezone (IANA 名称) 决定显示的当地时间.
+  # 用 `kind:` 指明类型的块. activity: 过去一年的 GitHub 贡献, 构建时获取, 写在哪里都
+  # 固定显示在简介下面. 不写 `github:` 时用 lemma.config.mjs 里的 site.links.github,
+  # 所以这份虚构资料显示的是站长真实的贡献.
+  - kind: activity
+    heading: 动态
+  # now: 近况, timezone (IANA 名称) 决定显示的当地时间.
   - kind: now
     text: 在写多尺度动理学的学习闭包, 同时给研究生开一门谱方法的读书课.
     updated: 2026 年 10 月
@@ -25,17 +30,13 @@ sections:
       - { label: 语言, value: '中文, 英语, 一点德语' }
       - { label: 写作工具, value: 'LaTeX, Typst, Markdown' }
       - { label: 欢迎合作, value: 算子学习方向的合作, href: 'mailto:lin.qiao@example.org' }
-  # 过去一年的 GitHub 贡献, 构建时获取. 不写 `github:` 时用 lemma.config.mjs 里的
-  # site.links.github, 所以这份虚构资料显示的是站长真实的贡献. 软件的 stars 是手写的,
-  # 不写时从 GitHub 获取.
-  - kind: activity
-    heading: 动态
   - kind: stack
     heading: 兴趣与工具
     groups:
       - { label: 研究, tags: [算子学习, 谱方法, 刚性 PDE, 多尺度动理学, 科学机器学习] }
       - { label: 语言, tags: [Python, Julia, C++, Fortran] }
       - { label: 工具, tags: [JAX, PyTorch, FEniCS, Dedalus, LaTeX, TikZ] }
+  # 标题链接到 href, 没有 href 时链接到 repo. 这里的 stars 是手写的, 不写时从 GitHub 获取.
   - kind: projects
     heading: 软件
     projects:

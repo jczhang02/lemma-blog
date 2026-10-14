@@ -1,8 +1,9 @@
 ---
-// A CV-like profile: name, tagline, links and a short bio, then blocks in
-// the order of the frontmatter: dated entries, papers, and the blocks named by
-// `kind:` (now, facts, activity, stack, projects, posts). All content comes
-// from the about folder (plugins/about.mjs); this file only lays it out.
+// A CV-like profile: name, tagline, links and a short bio, then the GitHub
+// activity, then the other blocks in the order of the frontmatter: dated
+// entries, papers, and the blocks named by `kind:` (now, facts, stack,
+// projects, posts). All content comes from the about folder
+// (plugins/about.mjs); this file only lays it out.
 import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import AboutActivity from './AboutActivity.astro';
@@ -67,8 +68,9 @@ const rows = (list: typeof papers) =>
     };
   });
 // Every section becomes a block; items and papers become a list of entries.
-// An empty list or a posts block without posts is left out. GitHub data comes
-// fresh in a build; the dev server reuses a recent copy.
+// An empty list or a posts block without posts is left out. Activity blocks
+// come first, wherever they are written; the others keep their order. GitHub
+// data comes fresh in a build; the dev server reuses a recent copy.
 const refresh = import.meta.env.PROD;
 type Section = (typeof sections)[number];
 type Item = Extract<Section, { kind: 'items' }>['items'][number];
@@ -106,7 +108,9 @@ const blocks = (
       return [s];
     }),
   )
-).flat();
+)
+  .flat()
+  .toSorted((a, b) => Number(b.kind === 'activity') - Number(a.kind === 'activity'));
 const repoName = (href: string) => href.replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/\/$/, '');
 // In the 6rem date column, a Chinese post date is written as entries write
 // theirs (2026-10-10); 2026 年 10 月 10 日 would take two lines.
