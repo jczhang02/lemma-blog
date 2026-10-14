@@ -56,6 +56,10 @@ sections:
         repo: 'https://github.com/example-lqiao/tikz-pde'
         stars: 9
         when: 2022
+      - title: northlake-notes
+        note: 读书课的讲义, 没有年份, 也没有单独的主页.
+        repo: 'https://github.com/example-lqiao/northlake-notes'
+        stars: 0
   - heading: 工作经历
     items:
       - when: 2025 – 今
@@ -124,6 +128,12 @@ sections:
       - when: 2024
         title: 优秀研究生
       - title: 多家期刊审稿人
+  # 没有一项写了日期: 列表占满整行.
+  - heading: 服务
+    items:
+      - title: 北湖数值分析读书会组织者
+        note: 每两周一次, 读谱方法和算子学习.
+      - title: 本科生科研项目导师
 ---
 
 我研究偏微分方程的数值分析与机器学习, 特别是刚性反应扩散系统的**算子学习**: 从少量轨迹学习解算子 $\mathcal{G}: u_0 \mapsto u(\cdot, T)$. 之前在[北湖大学](https://example.org)学习谱方法.

@@ -179,7 +179,7 @@ sections:
     heading: 兴趣与工具
     groups:
       - { label: 研究, tags: [算子学习, 谱方法] }
-  - kind: projects                # 软件: 标题链接到 href, 没有 href 时链接到 repo; 不写 stars 时从 GitHub 获取
+  - kind: projects                # 软件: 标题链接到 href, 没有 href 时链接到 repo; 不写 stars 时从 GitHub 获取, 为 0 时只显示 GitHub 图标
     heading: 软件
     projects:
       - { title: sno, note: 谱神经算子., repo: 'https://github.com/…', stars: 412, when: 2025 }

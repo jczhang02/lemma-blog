@@ -63,6 +63,10 @@ sections:
         repo: 'https://github.com/example-lqiao/tikz-pde'
         stars: 9
         when: 2022
+      - title: northlake-notes
+        note: Lecture notes for the reading course, with no year and no site of their own.
+        repo: 'https://github.com/example-lqiao/northlake-notes'
+        stars: 0
   - heading: Experience
     items:
       - when: 2025 – now
@@ -174,6 +178,12 @@ sections:
         title: Outstanding Graduate Student Award
       - title: Reviewer for several journals (no date on this item)
         note: Journal of Computational Physics, SIAM Journal on Scientific Computing.
+  # No item has a date: the list takes the full width.
+  - heading: Service
+    items:
+      - title: Organiser, Northlake numerical analysis reading group
+        note: Fortnightly, on spectral methods and operator learning.
+      - title: Mentor, undergraduate research programme
 ---
 
 I work on numerical analysis and machine learning for partial differential equations, in particular **operator learning** for stiff reaction–diffusion systems, where the solution operator $\mathcal{G}: u_0 \mapsto u(\cdot, T)$ must be learned from few trajectories. Before that I studied spectral methods at [Northlake University](https://example.org).

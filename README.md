@@ -189,7 +189,7 @@ sections:
 | `kind: facts` | `facts`: a list of `label`, `value`, optional `href` |
 | `kind: activity` | `github`: a user name, by default `site.links.github`; a year of contributions as a heatmap, always right after the bio |
 | `kind: stack` | `groups`: a list of `label` and `tags` |
-| `kind: projects` | `projects`: a list of `title` (required), `note`, `href`, `repo`, `stars`, `when`, `links`; without `stars`, a GitHub `repo`'s stars are fetched |
+| `kind: projects` | `projects`: a list of `title` (required), `note`, `href`, `repo`, `stars`, `when`, `links`; without `stars`, a GitHub `repo`'s stars are fetched; 0 stars show the GitHub icon alone |
 | `kind: posts` | `limit` (default 3): the latest posts in the page's language |
 
 Every block takes an optional `heading`. Activity blocks come right after the bio, wherever they are written; the other blocks appear in the order written, and the links stay under the name. The activity block reads the public calendar at `github.com/<user>`, and projects their stars from the GitHub API, when the site is built; the dev server reuses copies up to 6 hours old, cached in `node_modules/.cache/lemma/`. Without network a build uses the last copy (a calendar more than two days old says "as of" its date); with no copy at all, a build fails rather than drop the activity block (the dev server leaves it out with an `[about]` warning), and a project shows no stars. A day's count shows on hover, on touch (a finger slides from day to day), or with the arrow keys once the grid has focus.
