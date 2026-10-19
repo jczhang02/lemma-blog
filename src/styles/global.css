@@ -1210,7 +1210,9 @@ main:focus {
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  text-wrap: balance;
+  /* Fill lines by length, but no lone last character. Balance broke at the
+     hyphen of Monge-Ampère to even out the lines. */
+  text-wrap: pretty;
 }
 
 .post-meta {

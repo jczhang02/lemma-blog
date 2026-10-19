@@ -163,7 +163,7 @@ Warm, low-chroma neutrals carry everything; the accent is the only saturated col
 **Character:** A text serif with optical sizes for reading, a neutral grotesque for the labels around it. Latin fonts come first in every stack, so English and digits never fall back to the CJK font.
 
 ### Hierarchy
-- **Display** (500, clamp(2rem, 5vw, 2.75rem), 1.2): post titles.
+- **Display** (500, clamp(2rem, 5vw, 2.75rem), 1.2): post titles, wrapped with `text-wrap: pretty` (lines filled by length, no lone last character; `balance` broke hyphenated names to even the lines).
 - **Headline** (600, 1.625rem, 1.35): numbered section headings (h2); h3 at 1.25rem.
 - **Title** (500, 1.25rem, 1.5): post titles in lists; the home intro (formula or tagline) is 1.75rem.
 - **Body** (400, 1.125rem, 1.75): article text, 46rem measure. Abstract and keywords 1rem / 0.9375rem, indented from both sides.
