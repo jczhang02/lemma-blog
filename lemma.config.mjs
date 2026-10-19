@@ -201,5 +201,9 @@ export default {
     accountId: '7087de4e3396c29d639ba6c4919c0e29',
     domain: 'chengrui.dev',
     compatibilityDate: '2026-10-01',
+    // IndexNow key (8-128 letters, digits or dashes; public by design): the
+    // site serves it at /<key>.txt, and a deploy sends the pages it added or
+    // changed to Bing and the other IndexNow search engines. null: no IndexNow.
+    indexNow: '9d8ed351f724c3c4bb2dd1f843c90cb1',
   },
 };

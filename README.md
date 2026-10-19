@@ -86,7 +86,7 @@ export default {
 | `theorems` | names of theorem-like environments, figures and tables, per language |
 | `reading` | reading speeds behind "约 8 分钟 / 8 min read" |
 | `media` | size limit for bundled videos and the R2 bucket for larger ones |
-| `deploy` | Cloudflare Worker name, account ID and domain |
+| `deploy` | Cloudflare Worker name, account ID and domain, IndexNow key |
 
 A few things are files by nature: the avatar image under `src/assets/`, the icons in `public/`, the posts in `src/content/posts/`, and the BibTeX files.
 
@@ -260,7 +260,7 @@ TikZ diagrams use the same fonts and size as the formulas around them and switch
 <details>
 <summary><strong>Deploying</strong></summary>
 
-`bun run deploy` writes the wrangler config from `lemma.config.mjs` (`deploy`: Worker name, account ID, domain) to `.wrangler/deploy.jsonc`, builds the site, and uploads `dist/` as Cloudflare Workers static assets (no Worker code, so requests are free and unlimited). It signs in with the `cf` CLI login (`cf auth login`) when `cf` is installed, and otherwise with wrangler's own (`bunx wrangler login`). Extra arguments go to wrangler, for example `bun run deploy --dry-run`.
+`bun run deploy` writes the wrangler config from `lemma.config.mjs` (`deploy`: Worker name, account ID, domain) to `.wrangler/deploy.jsonc`, builds the site, and uploads `dist/` as Cloudflare Workers static assets (no Worker code, so requests are free and unlimited). It signs in with the `cf` CLI login (`cf auth login`) when `cf` is installed, and otherwise with wrangler's own (`bunx wrangler login`). Extra arguments go to wrangler, for example `bun run deploy --dry-run`. With `deploy.indexNow` set, the site serves the key at `/<key>.txt`, and after the upload the script sends IndexNow (Bing and the other search engines that take it) the pages that are new or have a new `lastmod` in the sitemap, compared with the live sitemap before the deploy; a failed submission is only a warning. Google does not take IndexNow; it reads the sitemap. Any random string of 8 to 128 letters, digits or dashes works as a key.
 
 Any static host works too: the output in `dist/` is plain HTML, CSS and fonts. Files over 25 MiB are not accepted by Cloudflare, which is why large videos go to R2 with `bun run media:push`: it uploads them under a content hash, records them in `src/media-r2.json`, and keeps them out of git. It uploads with the `cf` CLI, so install `cf` and run `cf auth login` first.
 
