@@ -375,10 +375,13 @@ main:focus {
   line-height: 1.5;
 }
 
+/* The summary is the post's abstract: serif, as on the post page. */
 .post-desc {
   color: var(--muted);
+  font-family: var(--font-serif);
   font-size: 0.9375rem;
   line-height: 1.6;
+  text-wrap: pretty;
 }
 
 .post-list a:hover .post-title {

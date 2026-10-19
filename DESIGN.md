@@ -167,7 +167,7 @@ Warm, low-chroma neutrals carry everything; the accent is the only saturated col
 - **Headline** (600, 1.625rem, 1.35): numbered section headings (h2); h3 at 1.25rem.
 - **Title** (500, 1.25rem, 1.5): post titles in lists; the home intro (formula or tagline) is 1.75rem.
 - **Body** (400, 1.125rem, 1.75): article text, 46rem measure. Abstract and keywords 1rem / 0.9375rem, indented from both sides.
-- **Small** (0.9375rem): captions, references, footnotes, tables, preview cards; sidenotes 0.875rem.
+- **Small** (0.9375rem): captions, references, footnotes, tables, preview cards, post summaries in lists (Graphite); sidenotes 0.875rem.
 - **Label** (0.875rem sans): dates, post facts, footer.
 - **Label Small** (0.8125rem sans): copy buttons.
 
