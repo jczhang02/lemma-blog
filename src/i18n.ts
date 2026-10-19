@@ -58,6 +58,8 @@ export const ui = {
     keywords: '关键词',
     aiWritten: '本文由 AI 撰写.',
     taggedWith: (tag: string) => `标签: ${tag}`,
+    allTags: '全部标签',
+    allTagsCount: (n: number) => `全部 ${n} 个标签`,
     postCount: (n: number) => `${n} 篇`,
     readingTime: (n: number) => `约 ${n} 分钟`,
     sectionCount: (n: number) => `${n} 节`,
@@ -110,6 +112,8 @@ export const ui = {
     keywords: 'Keywords',
     aiWritten: 'This post was written by AI.',
     taggedWith: (tag: string) => `Tagged "${tag}"`,
+    allTags: 'All tags',
+    allTagsCount: (n: number) => `All ${n} tags`,
     postCount: (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`,
     readingTime: (n: number) => `${n} min read`,
     sectionCount: (n: number) => `${n} ${n === 1 ? 'section' : 'sections'}`,
@@ -161,6 +165,8 @@ export const tagSlug = (tag: string) =>
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
 export const tagUrl = (lang: Lang, tag: string) => `${prefix(lang)}/tags/${tagSlug(tag)}/`;
+/** The tags page: all tags as an index. */
+export const tagsUrl = (lang: Lang) => `${prefix(lang)}/tags/`;
 
 /** Tags of one language with their posts, most used first. */
 export async function getTags(lang: Lang) {

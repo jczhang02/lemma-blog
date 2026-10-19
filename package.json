@@ -43,6 +43,7 @@
     "hast-util-to-text": "^4.0.2",
     "lxgw-wenkai-screen-webfont": "^1.7.0",
     "pagefind": "^1.5",
+    "pinyin-pro": "^3.29.5",
     "remark-directive": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",

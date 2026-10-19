@@ -423,7 +423,7 @@ main:focus {
   letter-spacing: -0.015em;
 }
 
-/* All tags in one flowing line (home page, /tags/): name and a small count. */
+/* All tags in one flowing line (home page): name and a small count. */
 .tag-line ul {
   display: flex;
   flex-wrap: wrap;
@@ -447,6 +447,104 @@ main:focus {
   margin-left: 0.35em;
   font-size: 0.75em;
   font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* The tags page (TagIndex.astro): a book index in two columns, initials as
+   headings, each entry a name, a dotted leader and its count; an entry opens
+   in place to list its posts. */
+.index-letters {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.25rem;
+  margin: -0.75rem 0 1.5rem -1.05rem;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 44px targets; the letters still sit 1.75rem apart. */
+.index-letters a {
+  display: grid;
+  place-items: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  margin-right: -1rem;
+  text-decoration: none;
+}
+
+.tag-index {
+  columns: 2 18rem;
+  column-gap: 3rem;
+}
+
+.tag-index section {
+  break-inside: avoid-column;
+  margin-bottom: 1.5rem;
+}
+
+.tag-index h2 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 2;
+}
+
+.index-entry {
+  break-inside: avoid;
+  font-family: var(--font-serif);
+}
+
+/* 0.4rem above and below make the row a 44px target. */
+.index-entry summary {
+  display: flex;
+  align-items: baseline;
+  padding: 0.4rem 0;
+  list-style: none;
+  cursor: pointer;
+}
+
+.index-entry summary::-webkit-details-marker {
+  display: none;
+}
+
+.index-entry summary:hover .index-name,
+.index-entry[open] .index-name {
+  color: var(--accent);
+}
+
+.index-leader {
+  flex: 1;
+  min-width: 1rem;
+  margin: 0 0.5rem;
+  border-bottom: 1px dotted color-mix(in srgb, var(--muted) 55%, transparent);
+}
+
+.index-entry .tag-count {
+  color: var(--muted);
+}
+
+.index-entry ul {
+  margin: 0 0 0.75rem 1rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.index-entry li + li {
+  margin-top: 0.5rem;
+}
+
+.index-entry li a {
+  text-decoration: none;
+}
+
+.index-entry time {
+  display: block;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
 }
 
 /* A tag page: the tag as title, then its post count and a way back. */

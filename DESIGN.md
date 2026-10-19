@@ -246,6 +246,11 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 - **Order:** title; a sans meta line (date · reading time · sections, and "Read in English" on the right); the abstract, then keywords, both indented like a paper's.
 - **AI badge** (`ai: true`, a post written by AI): after the facts on the meta line, a pill like the About page's stack badges: a filled sparkle and "AI", sans 0.8125rem / 500 Ink on Vellum, 1.5rem tall, with a Hairline ring in dark mode. Screen readers hear the full sentence (本文由 AI 撰写. / This post was written by AI.). Not the accent: it is not interactive.
 
+### Tags page
+- **Index:** like the index at the back of a book: Chinese tags by pinyin (word-level, so 调和 is T) and Latin tags by letter in one sequence, under their initials (sans 0.875rem / 600 Graphite), in two columns from 39rem. Each entry is the name in serif, a dotted Graphite leader and the count; it opens in place (`<details>`, no JavaScript) to list its posts with their dates, and its name turns Terracotta while open. No categories above tags.
+- **Jump line:** the initials as links above the index, only from 8 initials on.
+- **Ways in:** the home page's one-line tag list, ordered by count, shows at most 12 tags; past that it shows the 12 most used and ends with 全部 N 个标签 → / All N tags →. Every tag page has 全部标签 / All tags beside 全部文章 / All posts.
+
 ### About page
 - **Head:** the name in Display, the tagline in serif Graphite, the contact links, then the bio as body text.
 - **Contact links:** under the name, a wrapping row of buttons in the manner of shadcn/ui's secondary button, 0.375rem apart (0.75rem between rows): 2rem tall, sans 0.875rem / 500 Ink on Vellum, 10px radius, 0 0.625rem padding, each a 1rem icon (mail, GitHub, file, link) and what the link leads to: the email address, the GitHub user name, otherwise its label. Hover turns the fill Hairline, and a press moves the button down 1px (not with reduced motion); in dark mode a Hairline ring carries the edge, since Vellum barely shows on dark paper. The hit area reaches 2.75rem into the row gap.
