@@ -159,7 +159,9 @@ export default function remarkTheorems({ labels: custom = {} } = {}) {
       const id = node.attributes?.id;
       if (id) claim(id);
       const classes = node.attributes?.class?.split(/\s+/) ?? [];
-      const title = node.children[0]?.data?.directiveLabel ? node.children.shift().children : null;
+      // An empty label (:::theorem[]{#id}) is no title.
+      const label = node.children[0]?.data?.directiveLabel ? node.children.shift().children : [];
+      const title = label.length ? label : null;
 
       if (kind === 'figure' || kind === 'table') {
         floats[kind]++;
