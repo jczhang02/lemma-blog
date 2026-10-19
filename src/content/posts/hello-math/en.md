@@ -4,6 +4,7 @@ description: "What the theme typesets: numbered equations, theorems, cross-refer
 date: 2026-10-10
 tags: [meta, Group Theory]
 draft: true
+ai: true
 macros:
   abs: ['\left| #1 \right|', 1]
   Gal: '\operatorname{Gal}'

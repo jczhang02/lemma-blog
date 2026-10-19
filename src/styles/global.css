@@ -1226,6 +1226,33 @@ main:focus {
   margin-left: auto;
 }
 
+/* A post written by AI (ai: true): a badge in the manner of the About
+   page's stack badges, in Ink so it reads before the facts around it. */
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  align-self: center;
+  height: 1.5rem;
+  padding: 0 0.5rem 0 0.4375rem;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.ai-badge svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  fill: currentColor;
+}
+
+:root[data-theme='dark'] .ai-badge {
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+
 /* Date, reading time, sections: separated by middle dots. */
 .post-facts > * + *::before {
   content: '·';

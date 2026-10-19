@@ -103,6 +103,7 @@ description: "One or two sentences, shown as the abstract. Quote it if it contai
 date: 2026-10-10
 tags: [PDE, operator learning]
 draft: true
+ai: true   # written by AI: the meta line shows an AI badge
 macros:
   Lap: '\Delta'
 ---

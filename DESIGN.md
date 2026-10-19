@@ -244,6 +244,7 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 
 ### Post header
 - **Order:** title; a sans meta line (date · reading time · sections, and "Read in English" on the right); the abstract, then keywords, both indented like a paper's.
+- **AI badge** (`ai: true`, a post written by AI): after the facts on the meta line, a pill like the About page's stack badges: a filled sparkle and "AI", sans 0.8125rem / 500 Ink on Vellum, 1.5rem tall, with a Hairline ring in dark mode. Screen readers hear the full sentence (本文由 AI 撰写. / This post was written by AI.). Not the accent: it is not interactive.
 
 ### About page
 - **Head:** the name in Display, the tagline in serif Graphite, the contact links, then the bio as body text.

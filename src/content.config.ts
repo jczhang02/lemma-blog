@@ -35,6 +35,8 @@ const posts = defineCollection({
     macros: z.record(z.string(), macro).optional(),
     // Section numbers (1, 1.1) and theorem numbers per section (2.1); see plugins/remark-theorems.mjs.
     numbering: z.boolean().default(true),
+    // Written by AI: the post header tells readers so.
+    ai: z.boolean().default(false),
   }),
 });
 

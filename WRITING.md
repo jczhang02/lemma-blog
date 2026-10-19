@@ -21,6 +21,7 @@ updated: 2026-11-01      # 可选, 显示 "更新于"
 tags: [PDE, 神经算子]
 draft: true              # 改成 false 才会发布
 numbering: true          # 可选, false 关闭章节编号
+ai: true                 # 可选, 文章由 AI 撰写时写上, 日期行会显示 AI 标记
 macros:                  # 可选, 只在本文生效
   Lap: '\Delta'
   norm: ['\left\| #1 \right\|', 1]

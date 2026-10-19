@@ -17,7 +17,7 @@ const { Content, remarkPluginFrontmatter } = await render(post);
 const translation = await getEntry('posts', `${slugOf(post)}/${otherLang(lang)}`);
 // The dev server previews drafts, so there a draft translation is linked too.
 const alternate = translation && (import.meta.env.DEV || !translation.data.draft) ? postUrl(translation) : undefined;
-const { title, description, date, updated, tags } = post.data;
+const { title, description, date, updated, tags, ai } = post.data;
 const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
 ---
 
@@ -33,6 +33,17 @@ const { readingMinutes = 1, sections = 0 } = remarkPluginFrontmatter;
           <span>{t.readingTime(readingMinutes)}</span>
           {sections > 0 && <span>{t.sectionCount(sections)}</span>}
         </span>
+        {
+          ai && (
+            <span class="ai-badge">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9.94 15.5a2 2 0 0 0-1.44-1.44l-6.13-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.13a.5.5 0 0 1 .96 0l1.58 6.13a2 2 0 0 0 1.44 1.44l6.13 1.58a.5.5 0 0 1 0 .96l-6.13 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.13a.5.5 0 0 1-.96 0z" />
+              </svg>
+              <span aria-hidden="true">AI</span>
+              <span class="sr-only">{t.aiWritten}</span>
+            </span>
+          )
+        }
         {alternate && <a href={alternate} hreflang={otherLang(lang)} lang={otherLang(lang)}>{t.readIn}</a>}
       </p>
       {

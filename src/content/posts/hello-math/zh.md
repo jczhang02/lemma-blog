@@ -4,6 +4,7 @@ description: "本主题支持的写作元素一览: 编号公式, 定理环境, 
 date: 2026-10-10
 tags: [meta, 代数]
 draft: true
+ai: true
 macros:
   abs: ['\left| #1 \right|', 1]
   Gal: '\operatorname{Gal}'
