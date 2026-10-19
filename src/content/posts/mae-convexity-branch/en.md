@@ -3,7 +3,7 @@ title: Why the Monge–Ampère equation requires convex solutions
 description: "With a Dirichlet boundary condition, the Monge–Ampère equation in two dimensions already has one convex and one concave solution. This post explains why convexity is the condition that selects the solution, and shows in a small experiment that a vanilla PINN converges to the concave one for all 10 random seeds."
 date: 2026-10-19
 tags: [PDE, Monge–Ampère, PINN]
-draft: true
+draft: false
 ai: true
 macros:
   bx: '\mathbf{x}'

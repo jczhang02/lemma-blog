@@ -3,7 +3,7 @@ title: 为什么 Monge–Ampère 方程要求凸性
 description: "Monge–Ampère 方程加上 Dirichlet 边界条件, 在二维就有一个凸解和一个凹解. 本文说明凸性为什么是选解的条件, 并用一个小实验说明: 普通 PINN 在 10 个随机种子下都收敛到凹解."
 date: 2026-10-19
 tags: [PDE, Monge–Ampère, PINN]
-draft: true
+draft: false
 ai: true
 macros:
   bx: '\mathbf{x}'
