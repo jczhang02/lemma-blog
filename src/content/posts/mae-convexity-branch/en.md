@@ -29,13 +29,17 @@ The rest of this post is organized as follows. Section \ref{sec:example} gives a
 
 :::example[Problem 1]{#ex:branches}
 On the unit disk $\Omega = B_1 \subset \R^2$, consider
+
 $$
 \det D^2 u = 1 \quad \text{in } B_1, \qquad u = \tfrac12 \quad \text{on } \partial B_1 .
 $$
+
 The functions
+
 $$
 u_+(\bx) = \tfrac12 \abs{\bx}^2, \qquad u_-(\bx) = 1 - \tfrac12 \abs{\bx}^2
 $$
+
 have Hessians $I$ and $-I$, both with determinant $1$, and both equal $\tfrac12$ on the unit circle. So both are solutions. $u_+$ is a bowl and is convex; $u_-$ is an upside-down bowl and is concave.
 :::
 
@@ -58,16 +62,20 @@ The disk is strictly convex, so among convex functions Example \ref{ex:branches}
 ### Ellipticity
 
 The literature often says that the Monge–Ampère equation "is elliptic on convex functions". The linearization makes this statement precise. For $u, v \in C^2(\Omega)$, the derivative of the determinant (Jacobi's formula)
+
 $$
 \frac{\mathrm{d}}{\mathrm{d}\varepsilon}\Big|_{\varepsilon=0} \det(A + \varepsilon B) = \tr\bigl(\cof(A)^{\top} B\bigr),
 $$
+
 where $\cof A$ denotes the cofactor matrix of $A$, gives the linearization of the equation at $u$:
+
 $$
 \begin{equation}
   L_u v := \frac{\mathrm{d}}{\mathrm{d}t}\Big|_{t=0} \det D^2(u + tv) = \tr\bigl(\cof(D^2 u)\, D^2 v\bigr).
   \label{eq:linearized}
 \end{equation}
 $$
+
 This is a linear second-order operator with coefficient matrix $\cof(D^2 u)$. It is elliptic at $\bx$ if and only if $\cof(D^2 u(\bx)) \succ 0$.
 
 :::proposition[Convexity and ellipticity of the linearization]{#prop:elliptic}
@@ -93,6 +101,7 @@ So the convexity requirement also fixes the sign of ellipticity. Note that Propo
 ## A vanilla PINN finds the concave solution \label{sec:pinn}
 
 The discussion above has a direct consequence for neural solvers. A PINN represents the solution by a network $u_\theta$ and minimizes
+
 $$
 \begin{align*}
   \mathcal{L}(\theta) &= \mathcal{L}_{\mathrm{res}}(\theta) + w_{bc}\, \mathcal{L}_{bc}(\theta), \\
@@ -100,21 +109,24 @@ $$
   \mathcal{L}_{bc}(\theta) &= \frac{1}{M} \sum_{k=1}^{M} \bigl( u_\theta(\bx_k^{b}) - g(\bx_k^{b}) \bigr)^2,
 \end{align*}
 $$
+
 where $\bx_i$ are collocation points in the interior and $\bx_k^b$ are collocation points on the boundary. On Example \ref{ex:branches}, both $u_+$ and $u_-$ have zero loss, so the loss does not distinguish the two solutions. We want to know which one the network actually reaches in training.
 
 ### Setup
 
 The network is an MLP $2 \to 32 \to 32 \to 1$ with tanh activations, computed in `float64`. We train it with Adam, learning rate $10^{-3}$, for $2000$ steps; at each step we draw $500$ new interior points and $200$ new boundary points, and set $w_{bc} = 10$. The Hessian is computed exactly by automatic differentiation with `torch.func`. After training, we test on $2000$ new random points. Then we add the trace penalty
+
 $$
 \frac{1}{N} \sum_{i=1}^{N} \min\bigl(0, \tr D^2 u_\theta(\bx_i)\bigr)^2
 $$
+
 to the loss, keep everything else the same, and train again. Penalties of this kind were used by Nyström and Vestberg \cite{nystrom2023} and by Hacking et al. \cite{hacking2025}. Each setting is run with $10$ random seeds. The results are in Table \ref{tab:branch} and Figure \ref{fig:profiles}.
 
 :::table{#tab:branch}
-| | Final loss | $\max\abs{u_\theta - u_+}$ | $\max\abs{u_\theta - u_-}$ | $\min \lambda_{\min}(D^2 u_\theta)$ | Violation |
-|:--|--:|--:|--:|--:|--:|
-| Vanilla PINN | $5.3\times10^{-5}$–$4.1\times10^{-4}$ | $0.997$–$1.000$ | $0.001$–$0.005$ | $-1.08$–$-1.02$ | $100\%$ |
-| With trace penalty | $1.4\times10^{-4}$–$2.9\times10^{-3}$ | $0.002$–$0.009$ | $0.997$–$1.000$ | $0.80$–$0.93$ | $0\%$ |
+|                    |                            Final loss | $\max\abs{u_\theta - u_+}$ | $\max\abs{u_\theta - u_-}$ | $\min \lambda_{\min}(D^2 u_\theta)$ | Violation |
+| :----------------- | ------------------------------------: | -------------------------: | -------------------------: | ----------------------------------: | --------: |
+| Vanilla PINN       | $5.3\times10^{-5}$–$4.1\times10^{-4}$ |            $0.997$–$1.000$ |            $0.001$–$0.005$ |                     $-1.08$–$-1.02$ |   $100\%$ |
+| With trace penalty | $1.4\times10^{-4}$–$2.9\times10^{-3}$ |            $0.002$–$0.009$ |            $0.997$–$1.000$ |                       $0.80$–$0.93$ |     $0\%$ |
 
 Results on Example \ref{ex:branches} for 10 random seeds; each cell gives the range over the seeds. Violation is the fraction of test points with $\lambda_{\min}(D^2 u_\theta) < 0$.
 :::

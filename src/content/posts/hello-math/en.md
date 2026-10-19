@@ -38,6 +38,7 @@ Theorems are numbered within sections. For background see \cite{serre1973}; for 
 
 :::theorem[Lagrange]{#thm:lagrange}
 Let $G$ be a finite group and $H \le G$. Then $\abs{H}$ divides $\abs{G}$, and `card` agrees:
+
 $$
 [G : H] = \frac{\abs{G}}{\abs{H}}.
 $$
@@ -45,6 +46,7 @@ $$
 
 :::proof
 The left cosets of $H$ partition $G$, and $h \mapsto gh$ is a bijection $H \to gH$. Hence
+
 $$
 \abs{G} = [G : H] \cdot \abs{H}.
 $$

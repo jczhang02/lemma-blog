@@ -29,13 +29,17 @@ $$
 
 :::example[问题 1]{#ex:branches}
 在单位圆盘 $\Omega = B_1 \subset \R^2$ 上考虑
+
 $$
 \det D^2 u = 1 \quad \text{in } B_1, \qquad u = \tfrac12 \quad \text{on } \partial B_1 .
 $$
+
 函数
+
 $$
 u_+(\bx) = \tfrac12 \abs{\bx}^2, \qquad u_-(\bx) = 1 - \tfrac12 \abs{\bx}^2
 $$
+
 的 Hessian 分别是 $I$ 和 $-I$, 行列式都是 $1$; 在单位圆周上它们都等于 $\tfrac12$. 所以两个函数都是解. $u_+$ 是一个碗, 凸; $u_-$ 是倒扣的碗, 凹.
 :::
 
@@ -58,16 +62,20 @@ $$
 ### 椭圆性
 
 文献中常说 Monge–Ampère 方程 "在凸函数上是椭圆的". 这句话可以用线性化来说清楚. 对 $u, v \in C^2(\Omega)$, 由行列式的导数公式 (Jacobi 公式)
+
 $$
 \frac{\mathrm{d}}{\mathrm{d}\varepsilon}\Big|_{\varepsilon=0} \det(A + \varepsilon B) = \tr\bigl(\cof(A)^{\top} B\bigr),
 $$
+
 其中 $\cof A$ 是 $A$ 的余子式矩阵, 我们得到方程在 $u$ 处的线性化
+
 $$
 \begin{equation}
   L_u v := \frac{\mathrm{d}}{\mathrm{d}t}\Big|_{t=0} \det D^2(u + tv) = \tr\bigl(\cof(D^2 u)\, D^2 v\bigr).
   \label{eq:linearized}
 \end{equation}
 $$
+
 这是一个二阶线性算子, 系数矩阵为 $\cof(D^2 u)$. 它在点 $\bx$ 处椭圆, 当且仅当 $\cof(D^2 u(\bx)) \succ 0$.
 
 :::proposition[凸性与线性化的椭圆性]{#prop:elliptic}
@@ -93,6 +101,7 @@ $$
 ## 普通 PINN 找到的是凹解 \label{sec:pinn}
 
 上面的讨论对神经网络求解器有一个直接的推论. PINN 用网络 $u_\theta$ 表示解, 最小化
+
 $$
 \begin{align*}
   \mathcal{L}(\theta) &= \mathcal{L}_{\mathrm{res}}(\theta) + w_{bc}\, \mathcal{L}_{bc}(\theta), \\
@@ -100,21 +109,24 @@ $$
   \mathcal{L}_{bc}(\theta) &= \frac{1}{M} \sum_{k=1}^{M} \bigl( u_\theta(\bx_k^{b}) - g(\bx_k^{b}) \bigr)^2,
 \end{align*}
 $$
+
 其中 $\bx_i$ 是区域内部的配点, $\bx_k^b$ 是边界上的配点. 在例 \ref{ex:branches} 上, $u_+$ 和 $u_-$ 的损失都是零, 所以损失不区分两个解. 我们想知道, 实际训练时网络会落到哪一个解上.
 
 ### 实验设置
 
 网络是 MLP $2 \to 32 \to 32 \to 1$, 激活函数为 tanh, 用 `float64` 计算. 优化器为 Adam, 学习率 $10^{-3}$, 训练 $2000$ 步; 每一步重新随机采 $500$ 个内部点和 $200$ 个边界点, $w_{bc} = 10$. Hessian 用 `torch.func` 自动求导精确计算. 训练后, 在 $2000$ 个新的随机点上测试. 然后在损失中加上迹罚项
+
 $$
 \frac{1}{N} \sum_{i=1}^{N} \min\bigl(0, \tr D^2 u_\theta(\bx_i)\bigr)^2,
 $$
+
 其他设置不变, 再训练一次. Nyström 和 Vestberg \cite{nystrom2023} 以及 Hacking 等 \cite{hacking2025} 用过这类罚项. 每种设置用 $10$ 个随机种子. 结果见表 \ref{tab:branch} 和图 \ref{fig:profiles}.
 
 :::table{#tab:branch}
-| | 最终损失 | $\max\abs{u_\theta - u_+}$ | $\max\abs{u_\theta - u_-}$ | $\min \lambda_{\min}(D^2 u_\theta)$ | 违反率 |
-|:--|--:|--:|--:|--:|--:|
-| 普通 PINN | $5.3\times10^{-5}$–$4.1\times10^{-4}$ | $0.997$–$1.000$ | $0.001$–$0.005$ | $-1.08$–$-1.02$ | $100\%$ |
-| 加迹罚项 | $1.4\times10^{-4}$–$2.9\times10^{-3}$ | $0.002$–$0.009$ | $0.997$–$1.000$ | $0.80$–$0.93$ | $0\%$ |
+|           |                              最终损失 | $\max\abs{u_\theta - u_+}$ | $\max\abs{u_\theta - u_-}$ | $\min \lambda_{\min}(D^2 u_\theta)$ |  违反率 |
+| :-------- | ------------------------------------: | -------------------------: | -------------------------: | ----------------------------------: | ------: |
+| 普通 PINN | $5.3\times10^{-5}$–$4.1\times10^{-4}$ |            $0.997$–$1.000$ |            $0.001$–$0.005$ |                     $-1.08$–$-1.02$ | $100\%$ |
+| 加迹罚项  | $1.4\times10^{-4}$–$2.9\times10^{-3}$ |            $0.002$–$0.009$ |            $0.997$–$1.000$ |                       $0.80$–$0.93$ |   $0\%$ |
 
 例 \ref{ex:branches} 上 10 个随机种子的结果, 每格给出 10 个种子的范围. 违反率是测试点中 $\lambda_{\min}(D^2 u_\theta) < 0$ 的比例.
 :::

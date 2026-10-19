@@ -53,6 +53,7 @@ $$
 
 :::theorem[Lagrange]{#thm:lagrange}
 设 $G$ 是有限群, $H \le G$. 那么 $\abs{H}$ 整除 $\abs{G}$, 并且
+
 $$
 [G : H] = \frac{\abs{G}}{\abs{H}}.
 $$
@@ -60,6 +61,7 @@ $$
 
 :::proof
 $H$ 的左陪集[^coset]构成 $G$ 的一个划分, 并且每个陪集 $gH$ 和 $H$ 之间有双射 $h \mapsto gh$. 所以
+
 $$
 \abs{G} = [G : H] \cdot \abs{H}.
 $$
@@ -131,12 +133,12 @@ $$
 表 \ref{tab:groups} 列出几个小群. 图 \ref{fig:hom} 是一个群同态的示意图, 图 \ref{fig:clip} 是一段视频.
 
 :::table{#tab:groups}
-| 群 $G$ | 阶 $\abs{G}$ | 是否交换 |
-|:--|--:|:-:|
-| $\Z/n\Z$ | $n$ | 是 |
-| $S_3$ | $6$ | 否 |
-| $Q_8$ | $8$ | 否 |
-| $A_5$ | $60$ | 否 |
+| 群 $G$   | 阶 $\abs{G}$ | 是否交换 |
+| :------- | -----------: | :------: |
+| $\Z/n\Z$ |          $n$ |    是    |
+| $S_3$    |          $6$ |    否    |
+| $Q_8$    |          $8$ |    否    |
+| $A_5$    |         $60$ |    否    |
 
 几个小群的阶与交换性.
 :::
@@ -170,6 +172,9 @@ $$
 映射常写作 $f:X \to Y$ 或 $\phi:G\to H$. 正文里的冒号照常显示, 例如 std::vector 和 key:value.
 
 [^gauss]: 这是 Gauss 积分, 可以用极坐标计算 $\left(\int e^{-x^2} dx\right)^2$.
+
 [^numbering]: 和 amsthm 的 `\numberwithin{theorem}{section}` 相同.
+
 [^amsthm]: 定理, 引理, 命题和推论共用一个计数器.
+
 [^coset]: 左陪集是形如 $gH = \{ gh : h \in H \}$ 的子集. 两个左陪集要么相等, 要么不相交, 并且所有左陪集的并是 $G$. 每个陪集都与 $H$ 等势, 所以陪集的个数是 $\abs{G} / \abs{H}$.
