@@ -15,9 +15,9 @@ bun run dev                  # 预览 http://localhost:4321/posts/fno-notes/
 ```yaml
 ---
 title: 标题
-description: 一两句摘要, 显示在标题下和文章列表里.
+description: 一两句摘要, 必填. 显示在标题下, 文章列表和搜索引擎结果里.
 date: 2026-10-10
-updated: 2026-11-01      # 可选, 显示 "更新于"
+updated: 2026-11-01      # 可选, 显示 "更新于", 也是 sitemap 的 lastmod
 tags: [PDE, 神经算子]
 draft: true              # 改成 false 才会发布
 numbering: true          # 可选, false 关闭章节编号

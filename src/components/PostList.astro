@@ -19,7 +19,7 @@ const { posts, lang } = Astro.props;
           <a href={postUrl(post)}>
             <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date, lang)}</time>
             <span class="post-title">{post.data.title}</span>
-            {post.data.description && <span class="post-desc">{post.data.description}</span>}
+            <span class="post-desc">{post.data.description}</span>
           </a>
         </li>
       ))}

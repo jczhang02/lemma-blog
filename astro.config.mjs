@@ -1,6 +1,6 @@
 // @ts-check
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
@@ -66,6 +66,22 @@ const media = { posts, manifest, dimensions, maxBytes: lemma.media.maxBytes, r2:
 const themes = await codeThemes(lemma.code.themes, { light: lemma.theme.colors.light.surface, dark: lemma.theme.colors.dark.surface });
 // hreflang codes of the supported locales.
 const HREFLANG = { zh: 'zh-CN', en: 'en' };
+// Sitemap lastmod, by URL path: a post's `updated`, else its `date`; a home
+// page takes the newest of its posts. Read from the frontmatter, as the
+// content collections do not exist yet when the config loads.
+const lastmod = new Map();
+for (const file of readdirSync(posts, { recursive: true, encoding: 'utf8' })) {
+  const [, slug, lang] = file.replaceAll('\\', '/').match(/^(.+)\/(\w+)\.md$/) ?? [];
+  if (!lemma.locales.list.includes(lang)) continue;
+  const front = readFileSync(new URL(file, posts), 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '';
+  const field = (/** @type {string} */ key) => front.match(new RegExp(`^${key}:\\s*['"]?([^'"\\s#]+)`, 'm'))?.[1];
+  const when = field('updated') ?? field('date');
+  if (field('draft') === 'true' || !when) continue;
+  const iso = new Date(when).toISOString();
+  const home = lang === lemma.locales.default ? '/' : `/${lang}/`;
+  lastmod.set(`${home}posts/${slug}/`, iso);
+  if (!(lastmod.get(home) >= iso)) lastmod.set(home, iso);
+}
 
 export default defineConfig({
   site: lemma.site.url,
@@ -83,6 +99,11 @@ export default defineConfig({
       i18n: {
         defaultLocale: lemma.locales.default,
         locales: Object.fromEntries(lemma.locales.list.map((/** @type {keyof typeof HREFLANG} */ l) => [l, HREFLANG[l]])),
+      },
+      // Only lastmod: Google ignores changefreq and priority.
+      serialize: (item) => {
+        const date = lastmod.get(decodeURI(new URL(item.url).pathname));
+        return date ? { ...item, lastmod: date } : item;
       },
     }),
     mediaIntegration(media),

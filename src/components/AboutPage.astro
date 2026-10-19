@@ -247,7 +247,7 @@ const printed = (href: string) =>
             <ul class="entries">
               {s.posts.map((p) => (
                 <AboutEntry when={postDate(p.data.date)} datetime={p.data.date.toISOString()} title={p.data.title} href={postUrl(p)}>
-                  {p.data.description && <p class="entry-subtitle">{p.data.description}</p>}
+                  <p class="entry-subtitle">{p.data.description}</p>
                 </AboutEntry>
               ))}
             </ul>

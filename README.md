@@ -77,7 +77,7 @@ export default {
 
 | Section | What it sets |
 | --- | --- |
-| `site` | URL (canonical links, Open Graph, sitemap, RSS), name, author (also as BibTeX `Last, First`), tagline per language, avatar, footer links, icons |
+| `site` | URL (canonical links, Open Graph, sitemap, RSS), name, author (also as BibTeX `Last, First`), tagline per language, home intro (curve mark and formula, also drawn as the link preview image `/og.png`), avatar, footer links, icons |
 | `locales` | default language and the language list (pages exist for `zh` and `en`) |
 | `theme` | light and dark colors, font stacks and the font packages to load (the CJK ones go in a stylesheet of their own), text width and size; [`DESIGN.md`](DESIGN.md) describes the system |
 | `code` | Shiki themes; token colors are raised to 4.5:1 against the code background |
@@ -99,7 +99,7 @@ A post is a folder: `src/content/posts/<slug>/zh.md` and/or `en.md`, with its im
 ```markdown
 ---
 title: Neural operators for Burgers' equation
-description: "One or two sentences, shown as the abstract. Quote it if it contains a colon."
+description: "Required. One or two sentences: the abstract and the meta description. Quote it if it contains a colon."
 date: 2026-10-10
 tags: [PDE, operator learning]
 draft: true

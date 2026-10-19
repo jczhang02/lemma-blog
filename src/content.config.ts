@@ -26,7 +26,9 @@ const posts = defineCollection({
   },
   schema: z.object({
     title: z.string(),
-    description: z.string().optional(),
+    // Required: the abstract under the title, the post list summary, and the
+    // meta description search results show.
+    description: z.string().min(1),
     date: z.coerce.date(),
     updated: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),

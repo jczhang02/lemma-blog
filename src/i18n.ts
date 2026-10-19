@@ -14,6 +14,9 @@ export const SITE = {
   introCurve: lemma.site.intro.curve as CurveName | null,
 };
 
+// The link preview image (src/pages/og.png.ts), the size Open Graph cards use.
+export const OG_IMAGE = { path: '/og.png', width: 1200, height: 630 };
+
 export type { Lang };
 export const LANGS: Lang[] = ['zh', 'en'];
 
