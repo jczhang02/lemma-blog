@@ -1,11 +1,11 @@
 <div align="center">
   <h1>Lemma</h1>
   <p><b>A quiet Astro theme for math-heavy writing: real LaTeX, numbered theorems, citations, sidenotes and link previews, in Chinese and English.</b></p>
-  <p>The theme behind <a href="https://jczhang.cc">jczhang.cc</a>, and the source of that blog.</p>
+  <p>The theme behind <a href="https://chengrui.dev">chengrui.dev</a>, and the source of that blog.</p>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b5532f?style=flat-square" alt="License"></a>
   <a href="https://astro.build"><img src="https://img.shields.io/badge/Astro-7-191917?style=flat-square&logo=astro" alt="Astro 7"></a>
   <a href="https://www.mathjax.org"><img src="https://img.shields.io/badge/MathJax-4-191917?style=flat-square" alt="MathJax 4"></a>
-  <a href="https://jczhang.cc"><img src="https://img.shields.io/badge/live-jczhang.cc-6b6a64?style=flat-square" alt="Live site"></a>
+  <a href="https://chengrui.dev"><img src="https://img.shields.io/badge/live-chengrui.dev-6b6a64?style=flat-square" alt="Live site"></a>
 </div>
 
 <p align="center">
@@ -57,7 +57,7 @@ Every setting lives in one file, [`lemma.config.mjs`](lemma.config.mjs); the res
 ```js
 export default {
   site: {
-    url: 'https://jczhang.cc',
+    url: 'https://chengrui.dev',
     title: 'Chengrui Zhang',
     description: { zh: '方程, 模型, 以及其他.', en: 'Equations, models, and other things.' },
     intro: { curve: 'monge-ampere', formula: '\\det D^2 u = f' }, // the home page; null for none / the tagline
@@ -263,7 +263,7 @@ TikZ diagrams use the same fonts and size as the formulas around them and switch
 
 Any static host works too: the output in `dist/` is plain HTML, CSS and fonts. Files over 25 MiB are not accepted by Cloudflare, which is why large videos go to R2 with `bun run media:push`: it uploads them under a content hash, records them in `src/media-r2.json`, and keeps them out of git. It uploads with the `cf` CLI, so install `cf` and run `cf auth login` first.
 
-On jczhang.cc, the R2 host has edge caching for a year (query strings ignored), a WAF rule that blocks query strings and non-GET/HEAD requests, and a rate limit of 100 requests per 10 seconds per IP, so the only metered item stays near zero.
+On the live site, the R2 host (`media.chengrui.dev`) has edge caching for a year (query strings ignored), a WAF rule that blocks query strings and non-GET/HEAD requests, and a rate limit of 100 requests per 10 seconds per IP, so the only metered item stays near zero.
 
 </details>
 

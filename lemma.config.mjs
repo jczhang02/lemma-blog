@@ -9,7 +9,7 @@
 
 export default {
   site: {
-    url: 'https://jczhang.cc',
+    url: 'https://chengrui.dev',
     title: 'Chengrui Zhang',
     author: 'Chengrui Zhang',
     // Author as BibTeX expects it ("Last, First"), for the "cite this post" block.
@@ -190,14 +190,14 @@ export default {
   media: {
     // Videos larger than this go to R2 (bun run media:push); Cloudflare's per-file limit.
     maxBytes: 25 * 1024 * 1024,
-    r2: { bucket: 'blog-media', origin: 'https://media.jczhang.cc' },
+    r2: { bucket: 'blog-media', origin: 'https://media.chengrui.dev' },
   },
 
   // bun run deploy: Cloudflare Workers static assets (no Worker code).
   deploy: {
     worker: 'jczhang-blog',
     accountId: '7087de4e3396c29d639ba6c4919c0e29',
-    domain: 'jczhang.cc',
+    domain: 'chengrui.dev',
     compatibilityDate: '2026-10-01',
   },
 };
