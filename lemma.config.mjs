@@ -146,11 +146,13 @@ export default {
     },
     // MathJax TeX packages loaded up front; anything else is still reachable
     // through \require or autoload.
+    // Not bboldx: it redefines \mathbb (\R) in its own light face; a post
+    // that wants it writes \require{bboldx}.
     packages: [
       'ams', 'newcommand', 'configmacros', 'begingroup', 'mathtools', 'physics',
       'cancel', 'cases', 'empheq', 'mhchem', 'bussproofs', 'amscd', 'extpfeil',
       'centernot', 'upgreek', 'gensymb', 'units', 'textcomp', 'colortbl',
-      'boldsymbol', 'color', 'html', 'enclose', 'bbox', 'dsfont', 'bbm', 'bboldx',
+      'boldsymbol', 'color', 'html', 'enclose', 'bbox', 'dsfont', 'bbm',
     ],
   },
 

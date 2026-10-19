@@ -17,7 +17,7 @@ const PACKAGES = [
   'ams', 'newcommand', 'configmacros', 'begingroup', 'mathtools', 'physics',
   'cancel', 'cases', 'empheq', 'mhchem', 'bussproofs', 'amscd', 'extpfeil',
   'centernot', 'upgreek', 'gensymb', 'units', 'textcomp', 'colortbl',
-  'boldsymbol', 'color', 'html', 'enclose', 'bbox', 'dsfont', 'bbm', 'bboldx',
+  'boldsymbol', 'color', 'html', 'enclose', 'bbox', 'dsfont', 'bbm',
 ];
 // Built into input/tex, so not loaded separately.
 const BUILTIN = new Set(['ams', 'newcommand', 'configmacros']);
