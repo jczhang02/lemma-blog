@@ -134,7 +134,7 @@ Results on Example \ref{ex:branches} for 10 random seeds; each cell is the mean 
 :::figure{#fig:profiles .invert-dark}
 ![Values of the 10 trained networks on the line x_2 = 0](./profiles.svg)
 
-Values of $u_\theta$ trained with 10 random seeds on the line $x_2 = 0$ (wide grey lines); the dashed and dotted lines are the convex solution $u_+$ and the concave solution $u_-$. (a) Vanilla PINN: all 10 curves lie on $u_-$. (b) With the trace penalty: all 10 curves lie on $u_+$.
+Values of $u_\theta$ trained with 10 random seeds on the line $x_2 = 0$. Each seed is one thin line; the markers are the median of the 10 curves (triangles: vanilla PINN; circles: with the trace penalty). The black solid line is the convex solution $u_+$, the orange dashed line the concave solution $u_-$. (a) Vanilla PINN: all 10 curves lie on $u_-$. (b) With the trace penalty: all 10 curves lie on $u_+$.
 :::
 
 The vanilla PINN converges to the concave solution $u_-$ for all 10 seeds, with a small loss. Judged by the loss alone, every one of these runs is a "success". With the trace penalty, all 10 seeds converge to the convex solution $u_+$. We have not analyzed why the vanilla PINN always lands on the concave branch; the experiment only shows that the branch is chosen by the architecture and the optimization, not by the loss. Therefore a neural solver for the Monge–Ampère equation needs some mechanism that enforces convexity, and every experiment should check convexity instead of reporting only the loss and the residual.
