@@ -76,6 +76,12 @@
     // Figures show their image and caption; a video does not play in a card.
     for (const video of copy.querySelectorAll('video')) video.remove();
     for (const img of copy.querySelectorAll('img')) img.loading = 'eager';
+    // A widened figure (FigureZoom.astro) shows at its normal size.
+    for (const el of copy.querySelectorAll('[data-wide], [data-wide] *')) el.removeAttribute('style');
+    for (const el of copy.querySelectorAll('[data-wide]')) {
+      el.removeAttribute('data-wide');
+      el.removeAttribute('data-more');
+    }
     return [copy];
   }
 

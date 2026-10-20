@@ -1656,6 +1656,81 @@ main:focus {
   background: var(--surface);
 }
 
+/* A figure's single image is a block, so it has no gap below for a
+   descender, with or without the zoom button around it. */
+.prose .figure-media > img:only-child {
+  display: block;
+  margin-inline: auto;
+}
+
+/* Figure zoom (FigureZoom.astro): an image that can widen sits in a button
+   with no look of its own. Widened, its box spans the window and scrolls
+   sideways when the image is wider; while it animates, the box clips at its
+   sides only and the image moves by transform. */
+.prose .zoom {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: zoom-in;
+}
+
+.prose .zoom img {
+  display: block;
+}
+
+.prose .figure-media[data-wide] {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.prose .figure-media:is([data-wide], .is-zooming) :is(.zoom, img) {
+  max-width: none;
+}
+
+.prose .figure-media[data-wide] .zoom {
+  cursor: zoom-out;
+}
+
+/* Inside the scrolling box an outer ring would be cut off. */
+.prose .figure-media[data-wide] .zoom:focus-visible {
+  outline-offset: -2px;
+}
+
+.prose .figure-media[data-more]:has(.zoom:focus-visible) {
+  mask-image: none;
+}
+
+.prose .figure-media.is-zooming {
+  overflow: clip visible;
+  mask-image: none;
+}
+
+.prose .figure-media.is-zooming img {
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* What a widened figure would cover steps aside: the TOC while the figure
+   is on screen, and the sidenotes beside it. */
+.toc.is-covered,
+.sidenote.is-covered {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 0.2s,
+    visibility 0s 0.2s;
+}
+
+.toc {
+  transition: opacity 0.2s;
+}
+
 /* Captions: smaller, centred while short (as LaTeX does), with a bold label. */
 .prose figcaption {
   max-width: 36em;
@@ -1772,7 +1847,9 @@ main:focus {
   color: var(--muted);
   font-size: 0.875rem;
   line-height: 1.6;
-  transition: color 0.15s;
+  transition:
+    color 0.15s,
+    opacity 0.2s;
 }
 
 .sidenote p {
@@ -1925,6 +2002,19 @@ main:focus {
 
   .has-sidenotes .footnotes {
     display: block;
+  }
+
+  /* A widened figure prints in the column. */
+  .prose .figure-media[data-wide] {
+    width: auto !important;
+    margin-left: 0 !important;
+    overflow: visible;
+    mask-image: none;
+  }
+
+  .prose .figure-media[data-wide] :is(.zoom, img) {
+    width: auto !important;
+    max-width: 100%;
   }
 }
 

@@ -233,6 +233,9 @@ Small, quiet radii that grow with the size of the thing: 1px TOC ticks, 2px focu
 ### Figure and table
 - **Captions:** small, centered while short, with a bold "图 1." / "Table 1." label; below figures, above tables. Line art can invert in dark mode.
 - **Tables:** booktabs rules (1.5px top and bottom, a 1px rule under the header), no vertical lines.
+- **Zoom:** a figure with one image widens in the flow of the text, past the measure to the window (24px from its sides; 8px below 600px), when that makes the image at least 15% larger; nothing floats over the page. Raster images stop at their own pixels, vector ones at three times their size and 1600px. Where the window is less than 1.3 times the column (phones), the image takes twice the column and scrolls sideways in the widened box, with the usual edge fade. The image is a toggle button (全宽显示 / Full width, with its alt text) with no look of its own: `zoom-in` / `zoom-out` cursors and the focus ring. A click, Enter or Space widens it, again or Escape puts it back.
+- **Zoom motion:** the image moves by transform from where it was to where it ends, while its box's height, and so the text below, changes on the same curve: 380ms to widen, 300ms back, `cubic-bezier(0.2, 0, 0, 1)`. Widening near the bottom of the window scrolls on the same curve until the caption shows, never past the figure's top. With reduced motion it changes at once.
+- **Zoom neighbors:** the TOC fades out while a widened figure is on screen, and so do the sidenotes beside it (0.2s); link previews of the figure show it at its normal size; print puts it back in the column.
 
 ### Code block
 - **Style:** Vellum background, 1px Hairline border, 8px radius, JetBrains Mono.

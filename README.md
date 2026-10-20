@@ -22,7 +22,7 @@
 - **Real LaTeX, rendered at build time**: MathJax 4 turns formulas into SVG, so pages ship no math JavaScript. AMS environments, `physics`, `mathtools`, `mhchem`, `cases`, blackboard and script alphabets; site-wide and per-post macros; build warnings for any TeX error or undefined macro.
 - **Paper structure**: numbered sections, theorem-like environments numbered per section, proofs with ∎, `\label` / `\ref` / `\eqref` with forward references, numbered figures and tables with captions where print puts them, booktabs tables.
 - **Citations from BibTeX**: `\cite{key}` becomes a numbered link and an AMS-style reference list; entries come from plain BibTeX files.
-- **Read in place**: footnotes become sidenotes in the margin on wide screens; citations, cross-references and notes open a preview card on hover, focus or tap.
+- **Read in place**: footnotes become sidenotes in the margin on wide screens; citations, cross-references and notes open a preview card on hover, focus or tap; a click on a figure widens it to the window, in the flow of the text.
 - **Diagrams**: `tikzcd` and `tikz` code blocks are compiled by LaTeX into inline SVG that follows the text color.
 - **Bilingual**: Chinese at `/`, English at `/en/`, translations linked both ways, careful CJK typesetting (mixed-script spacing, justified Chinese).
 - **Comfortable to read**: a tick-mark table of contents with section cards, light and dark themes with no flash, reading time, copy buttons, edge fades on wide content, 44px tap targets, WCAG AA contrast.
@@ -224,6 +224,10 @@ Citations, `\ref`, `\eqref` and notes show their target in a card: the reference
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/preview-dark.webp">
   <img src="docs/img/preview-light.webp" alt="A preview card showing a theorem" width="900">
 </picture>
+
+### Figure zoom
+
+A click (or Enter) on a figure's image widens the figure past the text column to the window, and the text below moves down to make room; a second click or Escape puts it back. Raster images stop at their own pixels and vector ones at three times their size, so nothing is blown up; on phones the image takes twice the column and scrolls sideways. It applies to figures with a single image, and only where the image would grow.
 
 ### Table of contents
 

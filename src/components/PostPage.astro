@@ -5,6 +5,7 @@ import Toc from './Toc.astro';
 import CiteThis from './CiteThis.astro';
 import Sidenotes from './Sidenotes.astro';
 import Previews from './Previews.astro';
+import FigureZoom from './FigureZoom.astro';
 import { OG_IMAGE, SITE, aboutUrl, formatDate, hasAbout, langOf, otherLang, postUrl, prefix, slugOf, tagUrl, ui } from '../i18n';
 
 interface Props {
@@ -47,7 +48,7 @@ const jsonLd = {
   {/* < is escaped, so no text in the data can end the script element. */}
   <script slot="head" type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd).replaceAll('<', '\\u003c')} />
   <Toc toc={remarkPluginFrontmatter.toc ?? []} label={t.toc} />
-  <article class="post" data-pagefind-body data-copy={t.copy} data-copied={t.copied} data-notes={t.notes} data-jump={t.jump}>
+  <article class="post" data-pagefind-body data-copy={t.copy} data-copied={t.copied} data-zoom={t.zoom} data-notes={t.notes} data-jump={t.jump}>
     <header class="post-header">
       <h1 data-pagefind-meta="title">{title}</h1>
       <p class="post-meta" data-pagefind-ignore>
@@ -94,6 +95,7 @@ const jsonLd = {
   </article>
   <Sidenotes />
   <Previews />
+  <FigureZoom />
 </Base>
 
 <script>
