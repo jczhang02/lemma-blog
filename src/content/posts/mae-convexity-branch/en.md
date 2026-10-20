@@ -125,10 +125,10 @@ to the loss, keep everything else the same, and train again. Penalties of this k
 :::table{#tab:branch}
 |                    |                            Final loss | $\max\abs{u_\theta - u_+}$ | $\max\abs{u_\theta - u_-}$ | $\min \lambda_{\min}(D^2 u_\theta)$ | Violation |
 | :----------------- | ------------------------------------: | -------------------------: | -------------------------: | ----------------------------------: | --------: |
-| Vanilla PINN       | $5.3\times10^{-5}$–$4.1\times10^{-4}$ |            $0.997$–$1.000$ |            $0.001$–$0.005$ |                     $-1.08$–$-1.02$ |   $100\%$ |
-| With trace penalty | $1.4\times10^{-4}$–$2.9\times10^{-3}$ |            $0.002$–$0.009$ |            $0.997$–$1.000$ |                       $0.80$–$0.93$ |     $0\%$ |
+| Vanilla PINN       | $[5.3\times10^{-5},\ 4.1\times10^{-4}]$ |            $[0.997,\ 1.000]$ |            $[0.001,\ 0.005]$ |                     $[-1.08,\ -1.02]$ |   $100\%$ |
+| With trace penalty | $[1.4\times10^{-4},\ 2.9\times10^{-3}]$ |            $[0.002,\ 0.009]$ |            $[0.997,\ 1.000]$ |                       $[0.80,\ 0.93]$ |     $0\%$ |
 
-Results on Example \ref{ex:branches} for 10 random seeds; each cell gives the range over the seeds. Violation is the fraction of test points with $\lambda_{\min}(D^2 u_\theta) < 0$.
+Results on Example \ref{ex:branches} for 10 random seeds; each cell is the interval $[\text{min}, \text{max}]$ over the seeds. Violation is the fraction of test points with $\lambda_{\min}(D^2 u_\theta) < 0$.
 :::
 
 :::figure{#fig:profiles .invert-dark}
